@@ -6,42 +6,47 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 
-// Tipografica usada las difetentes partes de nuestra apliación
+// Tipografica usada en las difetentes partes de nuestra apliación
 
 // Objeto (singleton) que guarda los diferentes tipos de fuentes usadas
-object MisEstilos {
+object SerpientesYEscalerasType {
     val plano = TextStyle( // Tipografica normal, pasada a MaterialDesign
         color = color_text,
-        fontSize = 16.sp
+        fontSize = 12.sp
     )
 
-    val menuSeleccionable = TextStyle( // Subrayado y como "plano"
+    val tab = TextStyle( // Tipografica normal, pasada a MaterialDesign
         color = color_text,
-        fontSize = 18.sp,
+        fontSize = 13.sp
+    )
+
+    val seleccionable = TextStyle( // Subrayado y como "plano"
+        color = color_text,
+        fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
         textDecoration = TextDecoration.Underline
     )
 
-    val menuSeleccionado = TextStyle( // Subrayado y gris
+    val seleccionado = TextStyle( // Subrayado y gris
         color = color_selectedText,
-        fontSize = 18.sp,
+        fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
         textDecoration = TextDecoration.Underline
     )
 
-    val opcionNoDisponible = TextStyle( // gris
+    val noDisponible = TextStyle( // gris
         color = color_selectedText,
-        fontSize = 16.sp
+        fontSize = 12.sp
     )
 
-    val textoMoneda = TextStyle( // Dorado/amarillo
+    val SEPStyle = TextStyle( // Dorado/amarillo
         color = color_SEPText,
-        fontSize = 16.sp,
+        fontSize = 13.sp,
         fontWeight = FontWeight.ExtraBold
     )
 }
 
 // Typography estándar (obligatorio para el MaterialTheme)
 val Typography = Typography(
-    bodyLarge = MisEstilos.plano
+    bodyLarge = SerpientesYEscalerasType.plano
 )

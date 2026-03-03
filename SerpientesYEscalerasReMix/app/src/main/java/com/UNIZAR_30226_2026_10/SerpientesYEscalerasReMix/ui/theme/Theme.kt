@@ -7,8 +7,9 @@ import androidx.compose.runtime.Composable
 // Definición de temas por defecto
 private val SerpientesYEscalerasColors = darkColorScheme(
     primary = color_primary,
+    secondary = color_secondary,
+    error = color_negative,
     background = color_bg,
-    surface = color_sf,
     onBackground = color_text,
     onSurface = color_text
 )

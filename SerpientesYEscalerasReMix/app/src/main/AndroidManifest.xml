@@ -3,6 +3,8 @@
     package="com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application>
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
