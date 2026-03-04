@@ -3,6 +3,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation
 import androidx.compose.material3.Text
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarScreen
 
 // calse objeto utilizada como un enum. Define los destinos usados en los grafos de navegación
 object Destinos {
@@ -17,7 +18,7 @@ object Destinos {
 //      Extiende a NavGraphBuilder para poder llamarse dentro de un NavHost
 fun NavGraphBuilder.menuTopBarGraph() {
     composable(Destinos.JUGAR) {
-        Text("Pantalla Jugar")
+        JugarScreen()
     }
 
     composable(Destinos.MAZOS) {

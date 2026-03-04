@@ -15,6 +15,10 @@ object SETextTypes {
         fontSize = 12.sp
     )
 
+    val grande = TextStyle( // Tipografica normal, pasada a MaterialDesign
+        color = color_text,
+        fontSize = 18.sp
+    )
 
     val tab = TextStyle( // Tipografica normal, pasada a MaterialDesign
         color = color_text,

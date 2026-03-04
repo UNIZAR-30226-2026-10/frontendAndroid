@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 
 
 @Composable
@@ -47,8 +48,8 @@ fun JugadorItem(icono: Int, nombreIcono: String, nombreJugador: String) {
             color = color_sf,
             modifier = Modifier
                 .sizeIn(maxWidth = 200.dp, maxHeight = 300.dp)
-                .width(70.dp)
-                .height(50.dp)
+                .width(140.dp)
+                .height(100.dp)
         ) {
             if (nombreJugador != "") {
                 Text(
@@ -56,7 +57,8 @@ fun JugadorItem(icono: Int, nombreIcono: String, nombreJugador: String) {
                     modifier = Modifier
                         .padding(16.dp)
                         .fillMaxWidth(),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    style = SETextTypes.grande
                 )
             } else {
                 AnadirIA()
@@ -86,7 +88,7 @@ fun AnadirIA() {
                 .height(30.dp)
         )
 
-        Text("Añadir Bot")
+        Text("Añadir Bot", style = SETextTypes.grande)
     }
 }
 
