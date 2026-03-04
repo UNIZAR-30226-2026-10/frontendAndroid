@@ -1,0 +1,20 @@
+# Android Studio
+*.iml
+.gradle
+/SerpientesYEscalerasReMix/local.properties
+/SerpientesYEscalerasReMix/.idea/caches
+/SerpientesYEscalerasReMix/.idea/libraries
+/SerpientesYEscalerasReMix/.idea/modules.xml
+/SerpientesYEscalerasReMix/.idea/workspace.xml
+/SerpientesYEscalerasReMix/.idea/navEditor.xml
+/SerpientesYEscalerasReMix/.idea/assetWizardSettings.xml
+.DS_Store
+/SerpientesYEscalerasReMix/build
+/SerpientesYEscalerasReMix/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Logs IA
+/Agentic_Logs/*
+!/Agentic_Logs/README.md
