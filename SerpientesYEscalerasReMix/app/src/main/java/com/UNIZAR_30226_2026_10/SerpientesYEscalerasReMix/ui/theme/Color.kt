@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.Color
 // Colores principales de los menus
 val color_bg = Color(0xFF111A2C)        // backgroud
 val color_fg = Color(0xFFFFFFFF)        // foreground
-val color_sf = Color(0xFF283F9F)        // superficies, igual a color_secondary
+val color_sf = Color(0xFFEEB716)        // superficies, igual a color_primary
 
 val color_text = Color(0xFFFFFFFF)
 val color_selectedText = Color(0xFFB5B5B5)

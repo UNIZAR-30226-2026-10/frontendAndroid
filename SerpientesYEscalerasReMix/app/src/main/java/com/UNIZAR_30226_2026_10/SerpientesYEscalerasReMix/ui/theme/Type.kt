@@ -9,11 +9,12 @@ import androidx.compose.ui.unit.sp
 // Tipografica usada en las difetentes partes de nuestra apliación
 
 // Objeto (singleton) que guarda los diferentes tipos de fuentes usadas
-object SerpientesYEscalerasType {
+object SETextTypes {
     val plano = TextStyle( // Tipografica normal, pasada a MaterialDesign
         color = color_text,
         fontSize = 12.sp
     )
+
 
     val tab = TextStyle( // Tipografica normal, pasada a MaterialDesign
         color = color_text,
@@ -48,5 +49,5 @@ object SerpientesYEscalerasType {
 
 // Typography estándar (obligatorio para el MaterialTheme)
 val Typography = Typography(
-    bodyLarge = SerpientesYEscalerasType.plano
+    bodyLarge = SETextTypes.plano
 )
