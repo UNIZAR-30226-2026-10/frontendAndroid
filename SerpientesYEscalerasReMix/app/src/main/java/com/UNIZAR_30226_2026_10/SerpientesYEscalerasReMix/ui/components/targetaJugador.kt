@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
@@ -36,8 +37,8 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 
 @Composable
 fun JugadorItem(icono: Int, nombreIcono: String, nombreJugador: String) {
-    var distanciaIcono = 11.dp
-    var offsetIcono = -22.dp
+    var distanciaIcono = 22.dp
+    var offsetIcono = -44.dp
 
     Box(
         contentAlignment = Alignment.Center,
@@ -48,20 +49,24 @@ fun JugadorItem(icono: Int, nombreIcono: String, nombreJugador: String) {
             color = color_sf,
             modifier = Modifier
                 .sizeIn(maxWidth = 200.dp, maxHeight = 300.dp)
-                .width(140.dp)
-                .height(100.dp)
+                .width(120.dp)
+                .height(80.dp)
         ) {
-            if (nombreJugador != "") {
-                Text(
-                    text = nombreJugador,
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    style = SETextTypes.grande
-                )
-            } else {
-                AnadirIA()
+            Box(
+                contentAlignment = Alignment.Center
+            ) {
+                if (nombreJugador != "") {
+                    Text(
+                        text = nombreJugador,
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        style = SETextTypes.grande
+                    )
+                } else {
+                    AnadirIA()
+                }
             }
         }
 
@@ -84,8 +89,8 @@ fun AnadirIA() {
             painter = painterResource(id = R.drawable.plus_simbol),
             contentDescription = "icono Añadir",
             modifier = Modifier
-                .width(30.dp)
-                .height(30.dp)
+                .width(50.dp)
+                .height(50.dp)
         )
 
         Text("Añadir Bot", style = SETextTypes.grande)
@@ -97,7 +102,7 @@ fun JugadorIcon(icono: Int, nombreIcono: String) {
     Box(contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier
-                .size(28.dp)
+                .size(62.dp)
                 .blur(1.dp)
                 .background(Color.Black.copy(alpha = 0.5f), CircleShape)
         )
@@ -106,7 +111,7 @@ fun JugadorIcon(icono: Int, nombreIcono: String) {
             painter = painterResource(id = icono),
             contentDescription = nombreIcono,
             modifier = Modifier
-                .size(25.dp)
+                .size(60.dp)
                 .shadow(
                     elevation = 10.dp,
                     shape = CircleShape,

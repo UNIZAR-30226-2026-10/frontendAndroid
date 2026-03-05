@@ -78,7 +78,7 @@ fun TabItem(icono: Int, titulo: String, seleccionado: Boolean, onClick: () -> Un
 
     Box(
         modifier = mod
-            .height(40.dp)
+            .height(50.dp)
             .border(width = 2.dp, color = color_primary)
             .background(color = colorBox)
             .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onClick() },

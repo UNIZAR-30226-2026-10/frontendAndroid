@@ -22,7 +22,7 @@ object SETextTypes {
 
     val tab = TextStyle( // Tipografica normal, pasada a MaterialDesign
         color = color_text,
-        fontSize = 13.sp
+        fontSize = 25.sp
     )
 
     val seleccionable = TextStyle( // Subrayado y como "plano"

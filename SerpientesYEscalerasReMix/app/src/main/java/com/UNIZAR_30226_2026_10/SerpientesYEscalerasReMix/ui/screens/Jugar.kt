@@ -2,19 +2,26 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens
 
 import android.graphics.Paint
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -26,6 +33,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,6 +51,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_secondary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selected
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
+import java.nio.file.WatchEvent
 
 @Preview(
     device = "spec:width=891dp,height=411dp,orientation=landscape,dpi=440"
@@ -45,11 +59,20 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 @Composable
 fun JugarScreen() {
     var opcionSeleccionada by remember { mutableStateOf("Crear") }
-    Column() {
-        eleccionCrearContinuar(opcionSeleccionada)
-        lobby()
-    }
 
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            eleccionCrearContinuar(opcionSeleccionada)
+            lobby()
+        }
+
+        Box(modifier = Modifier.padding(vertical = 30.dp)){
+            amigos()
+        }
+    }
 }
 
 @Composable
@@ -61,13 +84,11 @@ fun eleccionCrearContinuar(opcion: String) {
                          else SETextTypes.seleccionable
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 20.dp),
+        modifier = Modifier.padding(vertical = 20.dp),
         horizontalArrangement = Arrangement.Center
     ) {
         Text("Crear Partida", style = crearStyle)
-        Spacer(modifier = Modifier.width(30.dp))
+        Spacer(modifier = Modifier.width(60.dp))
         Text("Continuar Partida", style = continuarStyle)
     }
 
@@ -76,32 +97,32 @@ fun eleccionCrearContinuar(opcion: String) {
 @Composable
 fun lobby() {
     val sepVerticalJugadores = 16.dp
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(0.dp, 10.dp),
-        horizontalArrangement = Arrangement.Center
-    ) {
+    val sepVerticalBotones = 8.dp
+    Row(horizontalArrangement = Arrangement.Center) {
         Column(verticalArrangement = Arrangement.spacedBy(sepVerticalJugadores)) {
             JugadorItem(R.drawable.icono_default, "default", "Tú")
-            JugadorItem(R.drawable.icono_default, "default", "")
+            JugadorItem(R.drawable.icono_default, "default", "Yo")
         }
 
-        Spacer(modifier = Modifier.width(50.dp))
+        Spacer(modifier = Modifier.width(25.dp))
 
-        Column(verticalArrangement = Arrangement.spacedBy(sepVerticalJugadores)) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(sepVerticalBotones)
+        ) {
             BotonMazo("lateGame")
+            elegirTablero(R.drawable.tablero_debug)
             EmpezarPartida()
         }
 
-
-
-        Spacer(modifier = Modifier.width(50.dp))
+        Spacer(modifier = Modifier.width(25.dp))
 
         Column(verticalArrangement = Arrangement.spacedBy(sepVerticalJugadores)) {
             JugadorItem(R.drawable.icono_default, "default", "")
             JugadorItem(R.drawable.icono_default, "default", "")
         }
+
+        Spacer(modifier = Modifier.width(25.dp))
     }
 }
 
@@ -110,7 +131,7 @@ fun BotonMazo(nombreMazo: String) {
     Surface(
         modifier = Modifier
             .width(120.dp)
-            .height(30.dp),
+            .height(40.dp),
         color = color_secondary,
         shape = RoundedCornerShape(10.dp),
         border = BorderStroke(3.dp, color_primary), // Borde amarillo grueso
@@ -125,7 +146,7 @@ fun BotonMazo(nombreMazo: String) {
                 verticalArrangement = Arrangement.Center
             ) {
                 Text("Mazo", style = SETextTypes.grande)
-                Text(nombreMazo, style = SETextTypes.grande)
+                Text(nombreMazo, style = SETextTypes.plano)
             }
 
             // El icono de flecha a la derecha
@@ -136,7 +157,56 @@ fun BotonMazo(nombreMazo: String) {
                 modifier = Modifier
                     .size(20.dp)
                     .align(Alignment.CenterEnd) // Se alinea a la derecha del Box
+                    .offset(x = 8.dp)
             )
+        }
+    }
+}
+
+@Composable
+fun elegirTablero(tablero: Int) {
+    Surface(
+        modifier = Modifier
+            .size(120.dp),
+        color = color_secondary,
+        shape = RoundedCornerShape(10.dp),
+        border = BorderStroke(3.dp, color_primary) // Borde amarillo grueso
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Título superior
+            Text(
+                text = "Tablero",
+                modifier = Modifier.padding(vertical = 4.dp),
+                style = SETextTypes.grande
+            )
+
+            // Contenedor de la imagen e icono
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.background(color = color_bg)
+            ) {
+                // Imagen del tablero (reemplaza con tu recurso)
+                Image(
+                    painter = painterResource(id = tablero),
+                    contentDescription = "Tablero de juego",
+                    modifier = Modifier
+                        .height(80.dp)
+                        .width(80.dp)
+                        .alpha(0.8f),
+                    contentScale = ContentScale.Crop,
+                )
+
+                // Icono de edición (el lápiz blanco)
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Editar",
+                    tint = color_text,
+                    modifier = Modifier
+                        .size(60.dp)
+                )
+            }
         }
     }
 }
@@ -145,8 +215,8 @@ fun BotonMazo(nombreMazo: String) {
 fun EmpezarPartida() {
     Surface(
         modifier = Modifier
-            .width(120.dp)
-            .height(30.dp),
+            .width(150.dp)
+            .height(40.dp),
         color = color_selected,
         shape = RoundedCornerShape(10.dp),
         shadowElevation = 8.dp
@@ -161,5 +231,29 @@ fun EmpezarPartida() {
                 style = SETextTypes.grande
             )
         }
+    }
+}
+
+@Composable
+fun amigos() {
+
+    Column(
+        modifier = Modifier.padding(vertical = 70.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Amigos", style = SETextTypes.grande)
+        Image(
+            painter = painterResource(id = R.drawable.amigos),
+            contentDescription = "amigos",
+            modifier = Modifier
+                .size(80.dp)
+                .shadow(
+                    elevation = 10.dp,
+                    shape = CircleShape,
+                    clip = false
+                )
+                .clip(CircleShape)
+                .border(1.dp, color_bg, CircleShape)
+        )
     }
 }
