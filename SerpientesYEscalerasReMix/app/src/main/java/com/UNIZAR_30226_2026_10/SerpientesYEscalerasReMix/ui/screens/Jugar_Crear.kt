@@ -78,8 +78,8 @@ fun lobby() {
     val sepVerticalBotones = 8.dp
     Row(horizontalArrangement = Arrangement.Center) {
         Column(verticalArrangement = Arrangement.spacedBy(sepVerticalJugadores)) {
-            JugadorItem(R.drawable.icono_default, "default", "Tú")
-            JugadorItem(R.drawable.icono_default, "default", "Yo")
+            JugadorItem(R.drawable.icono_default, "default", "Tú", true)
+            JugadorItem(R.drawable.icono_default, "default", "Yo", false)
         }
 
         Spacer(modifier = Modifier.width(25.dp))
@@ -96,8 +96,8 @@ fun lobby() {
         Spacer(modifier = Modifier.width(25.dp))
 
         Column(verticalArrangement = Arrangement.spacedBy(sepVerticalJugadores)) {
-            JugadorItem(R.drawable.icono_default, "default", "")
-            JugadorItem(R.drawable.icono_default, "default", "")
+            JugadorItem(R.drawable.icono_default, "default", "", true)
+            JugadorItem(R.drawable.icono_default, "default", "", false)
         }
 
         Spacer(modifier = Modifier.width(25.dp))
