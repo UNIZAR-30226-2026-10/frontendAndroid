@@ -60,17 +60,23 @@ import java.nio.file.WatchEvent
 fun JugarScreen() {
     var opcionSeleccionada by remember { mutableStateOf("Crear") }
 
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            eleccionCrearContinuar(opcionSeleccionada)
-            lobby()
-        }
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        eleccionCrearContinuar(opcionSeleccionada)
 
-        Box(modifier = Modifier.padding(vertical = 30.dp)){
-            amigos()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(modifier = Modifier.width(168.dp))
+
+            lobby()
+
+            Spacer(modifier = Modifier.width(32.dp))
+
+            Box(modifier = Modifier.padding(vertical = 30.dp)){
+                amigos()
+            }
         }
     }
 }
@@ -134,7 +140,7 @@ fun BotonMazo(nombreMazo: String) {
             .height(40.dp),
         color = color_secondary,
         shape = RoundedCornerShape(10.dp),
-        border = BorderStroke(3.dp, color_primary), // Borde amarillo grueso
+        border = BorderStroke(2.dp, color_primary), // Borde amarillo grueso
         shadowElevation = 8.dp
     ) {
         Box(
@@ -170,7 +176,7 @@ fun elegirTablero(tablero: Int) {
             .size(120.dp),
         color = color_secondary,
         shape = RoundedCornerShape(10.dp),
-        border = BorderStroke(3.dp, color_primary) // Borde amarillo grueso
+        border = BorderStroke(2.dp, color_primary) // Borde amarillo grueso
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
@@ -237,23 +243,43 @@ fun EmpezarPartida() {
 @Composable
 fun amigos() {
 
-    Column(
-        modifier = Modifier.padding(vertical = 70.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Surface(
+        color = color_secondary,
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(2.dp, color_primary) // Borde amarillo grueso
     ) {
-        Text("Amigos", style = SETextTypes.grande)
-        Image(
-            painter = painterResource(id = R.drawable.amigos),
-            contentDescription = "amigos",
-            modifier = Modifier
-                .size(80.dp)
-                .shadow(
-                    elevation = 10.dp,
-                    shape = CircleShape,
-                    clip = false
-                )
-                .clip(CircleShape)
-                .border(1.dp, color_bg, CircleShape)
-        )
+        Row(verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(4.dp)) {
+            Image(
+                painter = painterResource(id = R.drawable.amigos),
+                contentDescription = "amigos",
+                modifier = Modifier
+                    .size(50.dp)
+                    .shadow(
+                        elevation = 10.dp,
+                        shape = CircleShape,
+                        clip = false
+                    )
+                    .clip(CircleShape)
+                    .border(1.dp, color_bg, CircleShape)
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Text("Amigos", style = SETextTypes.plano)
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // El icono de flecha a la derecha
+            Icon(
+                imageVector = Icons.Default.PlayArrow, // O uno similar
+                contentDescription = null,
+                tint = color_text,
+                modifier = Modifier
+                    .size(20.dp)
+                    .align(Alignment.CenterVertically) // Se alinea a la derecha del Box
+            )
+        }
+
     }
 }
