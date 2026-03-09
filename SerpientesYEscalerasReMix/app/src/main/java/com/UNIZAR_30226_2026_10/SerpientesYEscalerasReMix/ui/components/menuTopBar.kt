@@ -26,7 +26,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.*
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.*
 @Composable
 fun MenuTopBar(SEState: SENavHostController) {
-    var tabSeleccionado = SEState.rutaActual()
+    val tabSeleccionado = SEState.rutaActual()
 
     Row(
         modifier = Modifier.fillMaxWidth()

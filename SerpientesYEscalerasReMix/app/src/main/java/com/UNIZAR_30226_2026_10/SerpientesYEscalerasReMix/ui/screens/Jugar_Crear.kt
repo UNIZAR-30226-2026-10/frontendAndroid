@@ -1,6 +1,5 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens
 
-import android.graphics.Paint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,68 +34,42 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.JugadorItem
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.eleccionCrearContinuar
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_secondary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selected
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
-import java.nio.file.WatchEvent
 
-@Preview(
-    device = "spec:width=891dp,height=411dp,orientation=landscape,dpi=440"
-)
 @Composable
-fun JugarScreen() {
+fun JugarCrearScreen(SEState: SENavHostController) {
     var opcionSeleccionada by remember { mutableStateOf("Crear") }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        eleccionCrearContinuar(opcionSeleccionada)
+        eleccionCrearContinuar(opcionSeleccionada, SEState)
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Spacer(modifier = Modifier.width(168.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
             lobby()
 
-            Spacer(modifier = Modifier.width(32.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
-            Box(modifier = Modifier.padding(vertical = 30.dp)){
-                amigos()
-            }
+            amigos()
         }
     }
-}
-
-@Composable
-fun eleccionCrearContinuar(opcion: String) {
-    val crearStyle = if (opcion == "Crear") SETextTypes.seleccionado
-                     else SETextTypes.seleccionable
-
-    var continuarStyle = if (opcion != "Crear") SETextTypes.seleccionado
-                         else SETextTypes.seleccionable
-
-    Row(
-        modifier = Modifier.padding(vertical = 20.dp),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Text("Crear Partida", style = crearStyle)
-        Spacer(modifier = Modifier.width(60.dp))
-        Text("Continuar Partida", style = continuarStyle)
-    }
-
 }
 
 @Composable
