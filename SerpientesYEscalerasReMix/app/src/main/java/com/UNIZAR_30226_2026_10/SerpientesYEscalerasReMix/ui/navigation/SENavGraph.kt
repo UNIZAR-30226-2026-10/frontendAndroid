@@ -1,11 +1,9 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation
 
-import android.util.Log
 import androidx.compose.material3.Text
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarContinuarScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarCrearScreen
 
 // clase objeto utilizada como un enum. Define los destinos usados en los grafos de navegación
@@ -27,7 +25,7 @@ fun NavGraphBuilder.menuTopBarGraph(SEState : SENavHostController) {
     }
 
     composable(Destinos.JUGAR_CONTINUAR) {
-        Text("...")
+        JugarContinuarScreen(SEState)
     }
 
     composable(Destinos.MAZOS) {

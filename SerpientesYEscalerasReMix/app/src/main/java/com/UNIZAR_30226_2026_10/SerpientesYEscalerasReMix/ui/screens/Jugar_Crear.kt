@@ -25,10 +25,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -51,7 +47,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 
 @Composable
 fun JugarCrearScreen(SEState: SENavHostController) {
-    var opcionSeleccionada by remember { mutableStateOf("Crear") }
+    var opcionSeleccionada = "Crear"
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         eleccionCrearContinuar(opcionSeleccionada, SEState)

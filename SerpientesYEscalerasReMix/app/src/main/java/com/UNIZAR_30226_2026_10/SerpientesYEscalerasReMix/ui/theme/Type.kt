@@ -39,7 +39,7 @@ object SETextTypes {
         textDecoration = TextDecoration.Underline
     )
 
-    val noDisponible = TextStyle( // gris
+    val sombreado = TextStyle( // gris
         color = color_selectedText,
         fontSize = 12.sp
     )
