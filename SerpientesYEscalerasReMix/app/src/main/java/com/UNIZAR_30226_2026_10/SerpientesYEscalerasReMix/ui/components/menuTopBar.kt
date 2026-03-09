@@ -34,8 +34,8 @@ fun MenuTopBar(SEState: SENavHostController) {
         TabItem(
             R.drawable.jugar_icon,
             "Jugar",
-            tabSeleccionado == Destinos.JUGAR,
-            { SEState.goTo(Destinos.JUGAR) },
+            tabSeleccionado == Destinos.JUGAR_CREAR || tabSeleccionado == Destinos.JUGAR_CONTINUAR,
+            { SEState.goTo(Destinos.JUGAR_CREAR) },
             Modifier.weight(1f)
         )
 

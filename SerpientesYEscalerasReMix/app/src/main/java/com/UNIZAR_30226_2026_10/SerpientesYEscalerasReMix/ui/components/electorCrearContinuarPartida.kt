@@ -1,5 +1,7 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -25,23 +27,33 @@ fun eleccionCrearContinuar(opcion: String, SEState: SENavHostController) {
     val continuarStyle = if (opcion != "Crear") SETextTypes.seleccionado
     else SETextTypes.seleccionable
 
-    val modCrear = if (opcion != "Crear") Modifier.clickable() { /* Vacio */ }
-    else Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { SEState.goTo("${Destinos.JUGAR_BASE}?modo=Crear") }
-
-    val modContinuar = if (opcion == "Crear") Modifier.clickable() { /* Vacio */ }
-    else Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { SEState.goTo("${Destinos.JUGAR_BASE}?modo=Continuar") }
-
-
     Row(
         modifier = Modifier.padding(vertical = 20.dp),
         horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text("Crear Partida", style = crearStyle, modifier = modCrear)
+        Text("Crear Partida", style = crearStyle,
+            modifier = Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+                if (opcion != "Crear") {
+                    SEState.goTo(Destinos.JUGAR_CREAR)
+                }
+            })
 
         Spacer(modifier = Modifier.width(60.dp))
 
-        Text("Continuar Partida", style = continuarStyle, modifier = modContinuar)
+        Text(
+            text = "Continuar Partida",
+            style = continuarStyle,
+            modifier = Modifier.clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                if (opcion == "Crear") {
+                    Log.d("debug", "El botón ha sido pulsado")
+                    SEState.goTo(Destinos.JUGAR_CONTINUAR)
+                }
+            }
+        )
     }
 
 }

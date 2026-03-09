@@ -56,7 +56,7 @@ fun mainScreen() {
                 NavHost(
                     // Componente en el que se iran dibujando las pantallas de acuerdo a la navegación
                     navController = SEState.navController,
-                    startDestination = Destinos.JUGAR,
+                    startDestination = Destinos.JUGAR_CREAR,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(padding)
