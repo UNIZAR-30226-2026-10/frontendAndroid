@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarContinuarScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarCrearScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil
 
 // clase objeto utilizada como un enum. Define los destinos usados en los grafos de navegación
 object Destinos {
@@ -41,6 +42,6 @@ fun NavGraphBuilder.menuTopBarGraph(SEState : SENavHostController) {
     }
 
     composable(Destinos.PERFIL) {
-        Text("Perfil del Jugador")
+        Perfil(SEState)
     }
 }
