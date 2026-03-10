@@ -5,9 +5,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -15,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -25,14 +29,28 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.*
 
 @Composable
 fun Perfil(_SEState: SENavHostController) {
-    val nombreSimulado = "SerpienteGanadora5"
+    // ESTADO: El nombre que se mostrará y editará
+    var nombreUsuario by remember { mutableStateOf("SerpienteGanadora5") }
     val statsSimuladas = "35W/12L"
 
-    PerfilContent(nombre = nombreSimulado, stats = statsSimuladas)
+    // Simulación de guardado en Base de Datos
+    val guardarEnBD = { nuevoNombre: String ->
+        // Aquí irá la llamada al ViewModel: viewModel.updateName(nuevoNombre)
+        println("DEBUG: Guardando '$nuevoNombre' en la base de datos...")
+    }
+
+    PerfilContent(
+        nombre = nombreUsuario,
+        stats = statsSimuladas,
+        onNombreConfirmado = { nuevo ->
+            nombreUsuario = nuevo
+            guardarEnBD(nuevo)
+        }
+    )
 }
 
 @Composable
-fun PerfilContent(nombre: String, stats: String) {
+fun PerfilContent(nombre: String, stats: String, onNombreConfirmado: (String) -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -41,18 +59,16 @@ fun PerfilContent(nombre: String, stats: String) {
         border = BorderStroke(2.dp, color_primary),
         shape = RoundedCornerShape(28.dp)
     ) {
-        Column{
-            TarjetaUsuario(nombre, stats)
-
+        Column {
+            TarjetaUsuario(nombre, stats, onNombreConfirmado)
             Spacer(modifier = Modifier.height(15.dp))
-
             SeccionCosmeticos()
         }
     }
 }
 
 @Composable
-fun TarjetaUsuario(nombre: String, stats: String) {
+fun TarjetaUsuario(nombre: String, stats: String, onNombreConfirmado: (String) -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = color_bg,
@@ -74,8 +90,72 @@ fun TarjetaUsuario(nombre: String, stats: String) {
                 AvatarUsuario()
                 Spacer(modifier = Modifier.width(16.dp))
                 EtiquetaNombre()
-                Spacer(modifier = Modifier.width(16.dp))
-                CajaNombreUsuario(nombre)
+                CajaNombreUsuario(nombre, onNombreConfirmado)
+            }
+        }
+    }
+}
+
+@Composable
+fun CajaNombreUsuario(nombreActual: String, onConfirmar: (String) -> Unit) {
+    // Estados locales para la edición
+    var editando by remember { mutableStateOf(false) }
+    var textoTemporal by remember(nombreActual) { mutableStateOf(nombreActual) }
+
+    Surface(
+        modifier = Modifier
+            .padding(start = 20.dp)
+            .width(460.dp)
+            .height(40.dp),
+        color = if (editando) Color.White.copy(alpha = 0.05f) else color_bg,
+        border = BorderStroke(1.dp, if (editando) color_primary else color_text),
+        shape = RoundedCornerShape(4.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (editando) {
+                BasicTextField(
+                    value = textoTemporal,
+                    onValueChange = { textoTemporal = it },
+                    textStyle = SETextTypes.plano.copy(fontSize = 18.sp, color = color_text),
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
+                    cursorBrush = SolidColor(color_primary)
+                )
+                IconButton(
+                    onClick = {
+                        editando = false
+                        onConfirmar(textoTemporal)
+                    },
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Confirmar guardado",
+                        tint = Color(0xFF4CAF50),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            } else {
+                Text(
+                    text = nombreActual,
+                    style = SETextTypes.plano.copy(fontSize = 18.sp),
+                    color = color_text,
+                    modifier = Modifier.weight(1f)
+                )
+                IconButton(
+                    onClick = { editando = true },
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Editar nombre",
+                        tint = color_text,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
         }
     }
@@ -98,7 +178,7 @@ fun AvatarUsuario() {
         }
         Icon(
             imageVector = Icons.Default.Edit,
-            contentDescription = null,
+            contentDescription = "Cambiar avatar",
             tint = color_text,
             modifier = Modifier
                 .size(24.dp)
@@ -110,44 +190,11 @@ fun AvatarUsuario() {
 
 @Composable
 fun EtiquetaNombre() {
-    Column {
-        Text(
-            text = "Nombre de usuario:",
-            style = SETextTypes.seleccionable.copy(fontSize = 18.sp),
-            color = color_text
-        )
-    }
-}
-
-@Composable
-fun CajaNombreUsuario(nombre: String) {
-    Surface(
-        modifier = Modifier
-            .padding(start = 20.dp)
-            .width(460.dp)
-            .height(40.dp),
-        color = color_bg,
-        border = BorderStroke(1.dp, color_text),
-        shape = RoundedCornerShape(2.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = nombre,
-                style = SETextTypes.plano.copy(fontSize = 18.sp),
-                color = color_text,
-                modifier = Modifier.weight(1f)
-            )
-            Icon(
-                imageVector = Icons.Default.Edit,
-                contentDescription = "Editar nombre",
-                tint = color_text,
-                modifier = Modifier.size(18.dp)
-            )
-        }
-    }
+    Text(
+        text = "Nombre de usuario:",
+        style = SETextTypes.seleccionable.copy(fontSize = 18.sp),
+        color = color_text
+    )
 }
 
 @Composable
@@ -191,7 +238,7 @@ fun CosmeticoItem(label: String, imagenRes: Int) {
             }
             Icon(
                 imageVector = Icons.Default.Edit,
-                contentDescription = null,
+                contentDescription = "Cambiar cosmético",
                 tint = color_primary,
                 modifier = Modifier
                     .size(48.dp)
