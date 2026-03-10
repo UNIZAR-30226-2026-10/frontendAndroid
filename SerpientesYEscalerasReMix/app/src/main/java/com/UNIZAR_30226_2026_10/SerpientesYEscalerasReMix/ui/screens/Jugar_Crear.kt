@@ -59,17 +59,17 @@ fun JugarCrearScreen(SEState: SENavHostController) {
         ) {
             Spacer(modifier = Modifier.width(16.dp))
 
-            lobby()
+            lobbyElementos()
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            amigos()
+            amigosBoton()
         }
     }
 }
 
 @Composable
-fun lobby() {
+fun lobbyElementos() {
     val sepVerticalJugadores = 16.dp
     val sepVerticalBotones = 8.dp
     Row(horizontalArrangement = Arrangement.Center) {
@@ -209,7 +209,7 @@ fun EmpezarPartida() {
 }
 
 @Composable
-fun amigos() {
+fun amigosBoton() {
 
     Surface(
         color = color_secondary,
