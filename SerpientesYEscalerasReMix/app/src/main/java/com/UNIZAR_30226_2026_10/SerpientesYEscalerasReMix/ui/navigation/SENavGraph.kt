@@ -1,8 +1,11 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.material3.Text
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.AmigosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarContinuarScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarCrearScreen
 
@@ -10,10 +13,11 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarCrearS
 object Destinos {
     const val JUGAR_CREAR = "crearPartida"
     const val JUGAR_CONTINUAR = "continuarPartida"
-
+    const val JUGAR_AMIGOS = "amigos"
     const val MAZOS = "mazos"
     const val LOGROS = "logros"
     const val TIENDA = "tienda"
+
     const val PERFIL = "perfil"
 }
 
@@ -26,6 +30,16 @@ fun NavGraphBuilder.menuTopBarGraph(SEState : SENavHostController) {
 
     composable(Destinos.JUGAR_CONTINUAR) {
         JugarContinuarScreen(SEState)
+    }
+
+    composable(Destinos.JUGAR_AMIGOS,
+        enterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(700)
+            ) }
+    ) {
+        AmigosScreen(SEState)
     }
 
     composable(Destinos.MAZOS) {

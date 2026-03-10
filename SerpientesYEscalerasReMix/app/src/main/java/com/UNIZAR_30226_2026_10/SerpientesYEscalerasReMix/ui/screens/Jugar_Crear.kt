@@ -4,6 +4,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -37,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.JugadorItem
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.eleccionCrearContinuar
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
@@ -63,7 +67,7 @@ fun JugarCrearScreen(SEState: SENavHostController) {
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            amigosBoton()
+            amigosBoton(SEState)
         }
     }
 }
@@ -209,15 +213,18 @@ fun EmpezarPartida() {
 }
 
 @Composable
-fun amigosBoton() {
+fun amigosBoton(SEState: SENavHostController) {
 
     Surface(
         color = color_secondary,
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(2.dp, color_primary) // Borde amarillo grueso
+        border = BorderStroke(2.dp, color_primary)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(4.dp)) {
+            modifier = Modifier
+                .padding(4.dp)
+                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { SEState.goTo(Destinos.JUGAR_AMIGOS) })
+        {
             Image(
                 painter = painterResource(id = R.drawable.amigos),
                 contentDescription = "amigos",

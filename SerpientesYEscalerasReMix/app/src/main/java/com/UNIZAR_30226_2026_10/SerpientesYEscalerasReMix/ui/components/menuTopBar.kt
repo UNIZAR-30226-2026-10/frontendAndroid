@@ -22,8 +22,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.*
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.*
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_secondary
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selected
+
 @Composable
 fun MenuTopBar(SEState: SENavHostController) {
     val tabSeleccionado = SEState.rutaActual()
@@ -34,7 +39,7 @@ fun MenuTopBar(SEState: SENavHostController) {
         TabItem(
             R.drawable.jugar_icon,
             "Jugar",
-            tabSeleccionado == Destinos.JUGAR_CREAR || tabSeleccionado == Destinos.JUGAR_CONTINUAR,
+            tabSeleccionado == Destinos.JUGAR_CREAR || tabSeleccionado == Destinos.JUGAR_CONTINUAR || tabSeleccionado == Destinos.JUGAR_AMIGOS,
             { SEState.goTo(Destinos.JUGAR_CREAR) },
             Modifier.weight(1f)
         )
@@ -95,7 +100,7 @@ fun TabItem(icono: Int, titulo: String, seleccionado: Boolean, onClick: () -> Un
                 modifier = Modifier.size(25.dp)
             )
 
-            Spacer(modifier = Modifier.width(3.dp)) // Espacio de separación
+            Spacer(modifier = Modifier.width(3.dp))
 
             // Titulo del item
             Text(
