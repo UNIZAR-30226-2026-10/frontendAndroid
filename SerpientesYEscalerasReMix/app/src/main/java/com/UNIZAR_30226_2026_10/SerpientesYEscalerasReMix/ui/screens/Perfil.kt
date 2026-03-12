@@ -2,6 +2,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,11 +17,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
@@ -35,7 +40,7 @@ fun Perfil(_SEState: SENavHostController) {
 
     // Simulación de guardado en Base de Datos
     val guardarEnBD = { nuevoNombre: String ->
-        // Aquí irá la llamada al ViewModel: viewModel.updateName(nuevoNombre)
+        // Aquí irá la llamada al ViewModel
         println("DEBUG: Guardando '$nuevoNombre' en la base de datos...")
     }
 
@@ -54,8 +59,8 @@ fun PerfilContent(nombre: String, stats: String, onNombreConfirmado: (String) ->
     Surface(
         modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp),
-        color = color_bg,
+            .padding(16.dp),
+        color = color_secondary,
         border = BorderStroke(2.dp, color_primary),
         shape = RoundedCornerShape(28.dp)
     ) {
@@ -71,7 +76,7 @@ fun PerfilContent(nombre: String, stats: String, onNombreConfirmado: (String) ->
 fun TarjetaUsuario(nombre: String, stats: String, onNombreConfirmado: (String) -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = color_bg,
+        color = color_secondary,
         border = BorderStroke(2.dp, color_primary),
         shape = RoundedCornerShape(24.dp)
     ) {
@@ -107,7 +112,7 @@ fun CajaNombreUsuario(nombreActual: String, onConfirmar: (String) -> Unit) {
             .padding(start = 20.dp)
             .width(460.dp)
             .height(40.dp),
-        color = if (editando) Color.White.copy(alpha = 0.05f) else color_bg,
+        color = color_bg,
         border = BorderStroke(1.dp, if (editando) color_primary else color_text),
         shape = RoundedCornerShape(4.dp)
     ) {
@@ -167,7 +172,7 @@ fun AvatarUsuario() {
         Surface(
             modifier = Modifier.size(85.dp),
             shape = CircleShape,
-            color = Color.White,
+            color = color_text,
             border = BorderStroke(2.dp, Color.Black)
         ) {
             Image(
@@ -212,7 +217,7 @@ fun SeccionCosmeticos() {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             CosmeticoItem("Escaleras", R.drawable.tablero_debug)
-            CosmeticoItem("Serpientes", R.drawable.icono_default)
+            CosmeticoItem("Serpientes", R.drawable.tablero_debug)
             CosmeticoItem("Fichas", R.drawable.tablero_debug)
         }
     }
@@ -225,25 +230,29 @@ fun CosmeticoItem(label: String, imagenRes: Int) {
         Spacer(modifier = Modifier.height(4.dp))
         Box(contentAlignment = Alignment.Center) {
             Surface(
-                modifier = Modifier.size(200.dp, 115.dp),
-                color = Color.White,
-                shape = RoundedCornerShape(4.dp)
+                modifier = Modifier.size(200.dp, 115.dp)
+                                    .border(2.dp, color_text, RoundedCornerShape(4.dp)),
+                color = color_bg,
+                shape = RoundedCornerShape(4.dp),
+
             ) {
                 Image(
                     painter = painterResource(id = imagenRes),
                     contentDescription = label,
-                    modifier = Modifier.padding(12.dp),
-                    contentScale = ContentScale.Fit
+                    modifier = Modifier.padding(8.dp),
+                    contentScale = ContentScale.Crop,
+                    colorFilter = ColorFilter.tint(Color.Black.copy(alpha = 0.4f), BlendMode.Darken)
+                )
+
+                // Icono de edición (el lápiz blanco)
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Editar",
+                    tint = color_text,
+                    modifier = Modifier
+                        .size(60.dp)
                 )
             }
-            Icon(
-                imageVector = Icons.Default.Edit,
-                contentDescription = "Cambiar cosmético",
-                tint = color_primary,
-                modifier = Modifier
-                    .size(48.dp)
-                    .rotate(-15f)
-            )
         }
     }
 }
