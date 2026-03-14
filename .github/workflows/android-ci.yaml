@@ -10,6 +10,10 @@ jobs:
   test-and-build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: ./SerpientesYEscalerasReMix
+
     steps:
       - name: 1. Descargar código
         uses: actions/checkout@v4
@@ -24,18 +28,18 @@ jobs:
 
       - name: 3. Dar permisos al ejecutor (gradlew)
         # Esto es lo que permite que el Robot ejecute el script
-        run: chmod +x ./SerpientesYEscalerasReMix/gradlew
+        run: chmod +x gradlew
 
       - name: 4. Análisis estático (Lint)
         # Esto revisa errores de diseño, bugs potenciales y mejores prácticas
-        run: ./SerpientesYEscalerasReMix/gradlew lintDebug
+        run: ./gradlew lintDebug
 
       - name: 5. Ejecutar Tests Unitarios
         # Esto corre los tests de lógica que tengáis en la carpeta test/
         # Si no hay este paso ..
-        run: ./SerpientesYEscalerasReMix/gradlew testDebugUnitTest
+        run: ./gradlew testDebugUnitTest
 
       - name: 6. Build de verificación (Assemble)
         # Este paso intenta generar el APK de debug. 
         # Si hay un error de compilación en Kotlin o Compose, aquí fallará.
-        run: ./SerpientesYEscalerasReMix/gradlew assembleDebug
+        run: ./gradlew assembleDebug
