@@ -24,18 +24,18 @@ jobs:
 
       - name: 3. Dar permisos al ejecutor (gradlew)
         # Esto es lo que permite que el Robot ejecute el script
-        run: chmod +x gradlew
+        run: chmod +x ./SerpientesYEscalerasReMix/gradlew
 
       - name: 4. Análisis estático (Lint)
         # Esto revisa errores de diseño, bugs potenciales y mejores prácticas
-        run: ./gradlew lintDebug
+        run: ./SerpientesYEscalerasReMix/gradlew lintDebug
 
       - name: 5. Ejecutar Tests Unitarios
         # Esto corre los tests de lógica que tengáis en la carpeta test/
         # Si no hay este paso ..
-        run: ./gradlew testDebugUnitTest
+        run: ./SerpientesYEscalerasReMix/gradlew testDebugUnitTest
 
       - name: 6. Build de verificación (Assemble)
         # Este paso intenta generar el APK de debug. 
         # Si hay un error de compilación en Kotlin o Compose, aquí fallará.
-        run: ./gradlew assembleDebug
+        run: ./SerpientesYEscalerasReMix/gradlew assembleDebug
