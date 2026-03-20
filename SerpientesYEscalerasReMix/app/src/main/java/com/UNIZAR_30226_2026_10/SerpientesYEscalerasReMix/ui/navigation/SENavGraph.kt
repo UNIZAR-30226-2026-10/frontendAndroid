@@ -12,6 +12,8 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil
 
 // clase objeto utilizada como un enum. Define los destinos usados en los grafos de navegación
 object Destinos {
+    const val LOGIN = "login"
+    const val REGISTER = "register"
     const val JUGAR_CREAR = "crearPartida"
     const val JUGAR_CONTINUAR = "continuarPartida"
     const val JUGAR_AMIGOS = "amigos"
@@ -24,7 +26,7 @@ object Destinos {
 
 // Función que encapsula la navegación del menu superior de la aplicación.
 //      Extiende a NavGraphBuilder para poder llamarse dentro de un NavHost
-fun NavGraphBuilder.menuTopBarGraph(SEState : SENavHostController) {
+fun NavGraphBuilder.navGraph(SEState : SENavHostController) {
     composable(Destinos.JUGAR_CREAR) {
         JugarCrearScreen(SEState)
     }
