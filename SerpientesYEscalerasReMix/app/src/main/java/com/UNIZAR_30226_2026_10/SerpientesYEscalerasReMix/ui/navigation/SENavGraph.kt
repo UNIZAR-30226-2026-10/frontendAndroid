@@ -5,9 +5,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.material3.Text
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.AmigosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarContinuarScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarCrearScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.LoginScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil
 
 // clase objeto utilizada como un enum. Define los destinos usados en los grafos de navegación
@@ -26,7 +28,11 @@ object Destinos {
 
 // Función que encapsula la navegación del menu superior de la aplicación.
 //      Extiende a NavGraphBuilder para poder llamarse dentro de un NavHost
-fun NavGraphBuilder.navGraph(SEState : SENavHostController) {
+fun NavGraphBuilder.navGraph(SEState: SENavHostController, cF: CaseFacade) {
+    composable(Destinos.LOGIN) {
+        LoginScreen(SEState, cF)
+    }
+
     composable(Destinos.JUGAR_CREAR) {
         JugarCrearScreen(SEState)
     }
@@ -35,12 +41,14 @@ fun NavGraphBuilder.navGraph(SEState : SENavHostController) {
         JugarContinuarScreen(SEState)
     }
 
-    composable(Destinos.JUGAR_AMIGOS,
+    composable(
+        Destinos.JUGAR_AMIGOS,
         enterTransition = {
             slideIntoContainer(
                 towards = AnimatedContentTransitionScope.SlideDirection.Right,
                 animationSpec = tween(700)
-            ) }
+            )
+        }
     ) {
         AmigosScreen(SEState)
     }

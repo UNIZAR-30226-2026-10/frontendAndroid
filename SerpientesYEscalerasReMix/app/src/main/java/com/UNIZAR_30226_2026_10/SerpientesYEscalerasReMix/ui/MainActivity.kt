@@ -23,7 +23,6 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SerpientesYEs
 import kotlinx.coroutines.runBlocking
 
 // MainActivity, muestra topBar y contenido de la pantalla en base a la navegación
-
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +47,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 
 @Composable
 fun mainScreen(cF: CaseFacade) {
@@ -75,37 +75,7 @@ fun mainScreen(cF: CaseFacade) {
                         .padding(padding)
                 ) {
                     // Inclusión de los diferentes grafos de navegación
-                    navGraph(SEState)
-                }
-            }
-        )
-    }
-}
-
-@Preview(
-    device = "spec:width=891dp,height=411dp,orientation=landscape,dpi=440"
-)
-@Composable
-fun mainScreenDebug() {
-    // Estado de la pantalla a mostrar
-    val SEState = rememberSEAppState()
-
-    // Pantalla incial en función del login
-
-    SerpientesYEscalerasReMixTheme {
-        Scaffold(
-            topBar = { MenuTopBar(SEState) },
-            content = { padding ->
-                NavHost(
-                    // Componente en el que se iran dibujando las pantallas de acuerdo a la navegación
-                    navController = SEState.navController,
-                    startDestination = Destinos.JUGAR_CREAR,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                ) {
-                    // Inclusión de los diferentes grafos de navegación
-                    navGraph(SEState)
+                    navGraph(SEState, cF)
                 }
             }
         )
