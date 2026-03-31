@@ -2,6 +2,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -11,6 +12,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarContin
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarCrearScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.LoginScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.RegisterScreen
 
 // clase objeto utilizada como un enum. Define los destinos usados en los grafos de navegación
 object Destinos {
@@ -28,9 +30,13 @@ object Destinos {
 
 // Función que encapsula la navegación del menu superior de la aplicación.
 //      Extiende a NavGraphBuilder para poder llamarse dentro de un NavHost
-fun NavGraphBuilder.navGraph(SEState: SENavHostController, cF: CaseFacade) {
+fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHostState, cF: CaseFacade) {
     composable(Destinos.LOGIN) {
-        LoginScreen(SEState, cF)
+        LoginScreen(SEState, snackHost, cF)
+    }
+
+    composable(Destinos.REGISTER) {
+        RegisterScreen(SEState, snackHost, cF)
     }
 
     composable(Destinos.JUGAR_CREAR) {

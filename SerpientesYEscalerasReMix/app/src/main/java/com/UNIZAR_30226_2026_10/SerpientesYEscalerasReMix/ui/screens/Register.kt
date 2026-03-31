@@ -40,16 +40,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(SEState: SENavHostController, snackHost: SnackbarHostState, cF: CaseFacade) {
-    // Para poder ejecutar corutines
+fun RegisterScreen(SEState: SENavHostController, snackHost: SnackbarHostState, cF: CaseFacade) {
     val scope = rememberCoroutineScope()
 
-    // Ver la pantalla en vertical
+    // Mantenemos el modo vertical para el formulario
     LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
 
-    // Variables en las que ir guardando el texto introducido
     var emailForm by remember { mutableStateOf("") }
     var passwordForm by remember { mutableStateOf("") }
+    var confirmPasswordForm by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -63,29 +62,41 @@ fun LoginScreen(SEState: SENavHostController, snackHost: SnackbarHostState, cF: 
 
             Spacer(Modifier.height(10.dp))
 
-            Text("Iniciar Sesión", style = subtitulo)
+            Text("Registrarse", style = subtitulo)
 
             Spacer(Modifier.height(40.dp))
 
-            // Campo de Usuario (e-mail)
+            // Campo Usuario
             OutlinedTextField(
                 value = emailForm,
                 onValueChange = { emailForm = it },
-                label = { Text("Usuario") },
+                label = { Text("Usuario / Email") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
 
             Spacer(Modifier.height(16.dp))
 
-            // Campo de Contraseña
+            // Campo Contraseña
             OutlinedTextField(
                 value = passwordForm,
                 onValueChange = { passwordForm = it },
                 label = { Text("Contraseña") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                // Ocultar los caracteres de la contraseña
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            // Campo Confirmar Contraseña
+            OutlinedTextField(
+                value = confirmPasswordForm,
+                onValueChange = { confirmPasswordForm = it },
+                label = { Text("Confirmar Contraseña") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
@@ -93,34 +104,39 @@ fun LoginScreen(SEState: SENavHostController, snackHost: SnackbarHostState, cF: 
             Spacer(Modifier.height(24.dp))
 
             Button(
-                onClick = { loginButtonAction(emailForm, passwordForm, scope, snackHost, SEState, cF) },
+                onClick = {
+                    if (passwordForm == confirmPasswordForm) {
+                        registerButtonAction(emailForm, passwordForm, confirmPasswordForm, scope, snackHost, SEState, cF)
+                    } else {
+                        // Aquí podrías mostrar un Toast de "Las contraseñas no coinciden"
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(),
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Text("INICIAR SESIÓN")
+                Text("REGISTRARSE")
             }
 
-            TextButton(onClick = { registerButtonAction(SEState) }) {
-                Text(text = "¿No tienes cuenta? Regístrate aquí", style = seleccionable)
+            TextButton(onClick = { SEState.goTo(Destinos.LOGIN) }) {
+                Text(text = "¿Ya tienes cuenta? Inicia sesión", style = seleccionable)
             }
         }
     }
 }
 
-fun loginButtonAction(
-    emailForm: String, passwordForm: String, scope: CoroutineScope,
-    snackHost: SnackbarHostState, SEState: SENavHostController, cF: CaseFacade
+fun registerButtonAction(
+    emailForm: String, passwordForm: String, confirmPasswordForm: String,
+    scope: CoroutineScope, snackHost: SnackbarHostState, SEState: SENavHostController, cF: CaseFacade
 ) {
     scope.launch {
-        val invalidForms = emailForm == "" || passwordForm == ""
-        val loginSuccess = !invalidForms && cF.loginRegisterCase.iniciarSesion(emailForm, passwordForm)
-        if (loginSuccess) {
-            // Preparar la orientación en horizontal
+        val invalidForms = emailForm == "" || passwordForm == "" || passwordForm != confirmPasswordForm
+        val registerSuccess = !invalidForms && cF.loginRegisterCase.registrarse(emailForm, passwordForm)
+        if (registerSuccess) {
+            // Al igual que en el login, preparamos el cambio a horizontal para el juego
             prepareScreenOrientation(SEState, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
-
             SEState.goTo(Destinos.JUGAR_CREAR)
         } else {
             snackHost.showSnackbar(
@@ -128,13 +144,5 @@ fun loginButtonAction(
                 duration = SnackbarDuration.Short
             )
         }
-        print("hola")
     }
-}
-
-fun registerButtonAction(SEState: SENavHostController) {
-    // Preparar la orientación en vertical
-    prepareScreenOrientation(SEState, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-
-    SEState.goTo(Destinos.REGISTER)
 }

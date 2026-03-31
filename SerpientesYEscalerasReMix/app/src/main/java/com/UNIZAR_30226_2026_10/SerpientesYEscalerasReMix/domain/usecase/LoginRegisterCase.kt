@@ -12,7 +12,7 @@ class LoginRegisterCase(private val local: LocalStorage) { // añadir remote log
         }
     }
 
-    suspend fun iniciarSesion(email: String): Boolean {
+    suspend fun iniciarSesion(email: String, passwd: String): Boolean {
 
         // Llamada a la API
 

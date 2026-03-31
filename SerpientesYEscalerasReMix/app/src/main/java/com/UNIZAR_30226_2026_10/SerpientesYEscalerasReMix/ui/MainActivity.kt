@@ -7,9 +7,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -62,8 +65,12 @@ fun mainScreen(cF: CaseFacade) {
     val pantallaIni = if (email == "") Destinos.LOGIN
     else Destinos.JUGAR_CREAR
 
+    // Para mostrar PopUps en las pantallas
+    val snackbarHostState = remember { SnackbarHostState() }
+
     SerpientesYEscalerasReMixTheme {
         Scaffold(
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState, modifier = Modifier.padding(20.dp)) },
             topBar = { MenuTopBar(SEState) },
             content = { padding ->
                 NavHost(
@@ -75,7 +82,7 @@ fun mainScreen(cF: CaseFacade) {
                         .padding(padding)
                 ) {
                     // Inclusión de los diferentes grafos de navegación
-                    navGraph(SEState, cF)
+                    navGraph(SEState, snackbarHostState, cF)
                 }
             }
         )
