@@ -32,48 +32,53 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selecte
 @Composable
 fun MenuTopBar(SEState: SENavHostController) {
     val tabSeleccionado = SEState.rutaActual()
+    val pantallasSinTopBar = listOf(Destinos.LOGIN, Destinos.REGISTER)
 
-    Row(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        TabItem(
-            R.drawable.jugar_icon,
-            "Jugar",
-            tabSeleccionado == Destinos.JUGAR_CREAR || tabSeleccionado == Destinos.JUGAR_CONTINUAR || tabSeleccionado == Destinos.JUGAR_AMIGOS,
-            { SEState.goTo(Destinos.JUGAR_CREAR) },
-            Modifier.weight(1f)
-        )
+    if (tabSeleccionado !in pantallasSinTopBar) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            TabItem(
+                R.drawable.jugar_icon,
+                "Jugar",
+                tabSeleccionado == Destinos.JUGAR_CREAR || tabSeleccionado == Destinos.JUGAR_CONTINUAR || tabSeleccionado == Destinos.JUGAR_AMIGOS,
+                { SEState.goTo(Destinos.JUGAR_CREAR) },
+                Modifier.weight(1f)
+            )
 
-        TabItem(
-            R.drawable.jugar_icon,
-            "Mazos",
-            tabSeleccionado == Destinos.MAZOS,
-            { SEState.goTo(Destinos.MAZOS) },
-            Modifier.weight(1f)
-        )
+            TabItem(
+                R.drawable.jugar_icon,
+                "Mazos",
+                tabSeleccionado == Destinos.MAZOS,
+                { SEState.goTo(Destinos.MAZOS) },
+                Modifier.weight(1f)
+            )
 
-        TabItem(R.drawable.jugar_icon,
-            "Logros",
-            tabSeleccionado == Destinos.LOGROS,
-            { SEState.goTo(Destinos.LOGROS) },
-            Modifier.weight(1f)
-        )
+            TabItem(
+                R.drawable.jugar_icon,
+                "Logros",
+                tabSeleccionado == Destinos.LOGROS,
+                { SEState.goTo(Destinos.LOGROS) },
+                Modifier.weight(1f)
+            )
 
-        TabItem(R.drawable.jugar_icon,
-            "Tienda",
-            tabSeleccionado == Destinos.TIENDA,
-            { SEState.goTo(Destinos.TIENDA) },
-            Modifier.weight(1f)
-        )
+            TabItem(
+                R.drawable.jugar_icon,
+                "Tienda",
+                tabSeleccionado == Destinos.TIENDA,
+                { SEState.goTo(Destinos.TIENDA) },
+                Modifier.weight(1f)
+            )
 
-        TabItem(R.drawable.jugar_icon,
-            "Perfil",
-            tabSeleccionado == Destinos.PERFIL,
-            { SEState.goTo(Destinos.PERFIL) },
-            Modifier.weight(1f)
-        )
+            TabItem(
+                R.drawable.jugar_icon,
+                "Perfil",
+                tabSeleccionado == Destinos.PERFIL,
+                { SEState.goTo(Destinos.PERFIL) },
+                Modifier.weight(1f)
+            )
+        }
     }
-
 }
 
 @Composable

@@ -129,7 +129,7 @@ fun JugadorIcon(icono: Int, nombreIcono: String, esLider: Boolean) {
                         scaleX = -1f, // Espejo horizontal
                         rotationZ = 40f
                     )
-                    .offset(y=-40.dp)
+                    .offset(y = -40.dp)
             )
         }
     }
