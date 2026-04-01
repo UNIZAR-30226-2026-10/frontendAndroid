@@ -14,26 +14,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
-import androidx.compose.foundation.Image
 import androidx.compose.ui.Alignment
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
-
-
-/*import androidx.compose.ui.layout.ContentScale
-import coil3.compose.AsyncImage
-import androidx.compose.ui.res.painterResource
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R*/
-
 
 @Composable
 fun TarjetaProductoTienda(
@@ -45,7 +32,7 @@ fun TarjetaProductoTienda(
         modifier = modifier
             .width(160.dp)
             .clickable { onClick() }
-            .border(1.dp, color_sf),
+            .border(1.dp, color_sf, shape = RoundedCornerShape(8.dp)),
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {

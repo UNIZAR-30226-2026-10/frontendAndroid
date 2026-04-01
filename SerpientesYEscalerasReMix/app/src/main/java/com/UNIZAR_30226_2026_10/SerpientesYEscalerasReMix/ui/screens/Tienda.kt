@@ -1,5 +1,6 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -24,14 +25,13 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.tooling.preview.Preview
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.listaDePruebas
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.fakes.listaDePruebas
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonCategoriaCustom
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.TarjetaProductoTienda
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.rememberSEAppState
@@ -44,7 +44,6 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fondoTienda
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_offline
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DetalleProductoTienda
 
 
@@ -83,7 +82,7 @@ fun TiendaScreen(SEState: SENavHostController, sep: Int = 1000) {
             onDismiss = { productoSeleccionado = null },
             onComprar = { prod ->
                 // TODO Lógica de compra
-                println("Comprando producto: ${prod.nombre}")
+                Log.d("TiendaScreen", "Comprar producto: ${prod.nombre}")
                 productoSeleccionado = null
             }
         )

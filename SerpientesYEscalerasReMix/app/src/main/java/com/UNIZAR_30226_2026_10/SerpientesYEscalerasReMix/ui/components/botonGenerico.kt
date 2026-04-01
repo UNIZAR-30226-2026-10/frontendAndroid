@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
+import java.util.Locale
 
 @Composable
 fun BotonGenerico(
@@ -36,7 +37,7 @@ fun BotonGenerico(
         border = BorderStroke(2.dp, color_sf),
     ) {
         Text(
-            text = texto.uppercase(),
+            text = texto.uppercase(Locale.ROOT),
             style = SETextTypes.plano, //TODO
             color = Color.White
         )
