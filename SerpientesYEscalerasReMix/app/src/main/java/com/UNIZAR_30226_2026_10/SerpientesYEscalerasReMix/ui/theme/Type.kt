@@ -33,12 +33,6 @@ object SETextTypes {
         fontSize = 25.sp
     )
 
-    val titulo = TextStyle( // Tipografia para titulos (grande y en negrita)
-        color = color_text,
-        fontSize = 36.sp,
-        fontWeight = FontWeight.Bold
-    )
-
     val subtitulo = TextStyle( // Tipografia para subtitulos (grande)
         color = color_text,
         fontSize = 25.sp
