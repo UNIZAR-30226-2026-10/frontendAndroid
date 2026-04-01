@@ -135,8 +135,9 @@ fun registerButtonAction(
         val invalidForms = emailForm == "" || passwordForm == "" || passwordForm != confirmPasswordForm
         val registerSuccess = !invalidForms && cF.loginRegisterCase.registrarse(emailForm, passwordForm)
         if (registerSuccess) {
-            // Al igual que en el login, preparamos el cambio a horizontal para el juego
+            // Preparar el cambio a horizontal para el juego
             prepareScreenOrientation(SEState, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+
             SEState.goTo(Destinos.JUGAR_CREAR)
         } else {
             snackHost.showSnackbar(
