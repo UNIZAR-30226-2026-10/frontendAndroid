@@ -56,7 +56,7 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
             )
         }
     ) {
-        AmigosScreen(SEState)
+        AmigosScreen(SEState, cF)
     }
 
     composable(Destinos.MAZOS) {

@@ -2,7 +2,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase
 
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
 
-class LoginRegisterCase(private val local: LocalStorage) { // añadir remote login
+class LoginRegisterCase(private val local: LocalStorage) { // TODO añadir remote login
 
     suspend fun comprobarLogin(): String {
         if (local.getLogin()) {
@@ -14,9 +14,9 @@ class LoginRegisterCase(private val local: LocalStorage) { // añadir remote log
 
     suspend fun iniciarSesion(email: String, passwd: String): Boolean {
 
-        // Llamada a la API
+        // TODO Llamada a la API
 
-        if (true) { // Cambiar: if no error en llamada a la API
+        if (true) { // TODO Cambiar: if no error en llamada a la API
             local.setLogin(true)
             local.setEmail(email)
 
@@ -32,9 +32,9 @@ class LoginRegisterCase(private val local: LocalStorage) { // añadir remote log
 
     suspend fun registrarse(email: String, passwd: String): Boolean {
 
-        // Llamada a la API
+        // TODO Llamada a la API
 
-        if (true) { // Cambiar: if no error en llamada a la API
+        if (true) { // TODO Cambiar: if no error en llamada a la API
             local.setLogin(true)
             local.setEmail(email)
 
