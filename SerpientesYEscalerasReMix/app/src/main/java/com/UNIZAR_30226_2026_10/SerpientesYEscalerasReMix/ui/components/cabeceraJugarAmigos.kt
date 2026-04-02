@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,30 +35,19 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Amigo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_secondary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 
 
 @Composable
 fun CabeceraAmigos(
     SEState: SENavHostController,
-    cF: CaseFacade,
-    onBusquedaFinalizada: (List<Amigo>) -> Unit
+    onSearch: (String) -> Unit
 ) {
-    // Para poder ejecutar corutines
-    val scope = rememberCoroutineScope()
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -165,25 +153,9 @@ fun CabeceraAmigos(
                 },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), // Acción a esperar del teclado del usuario
                 keyboardActions = KeyboardActions( // Llamada a esperar cuando llega la acción anterior
-                    onSearch = {
-                        scope.launch {
-                            val listaAmigosDef = searchAmigoAction(cF, scope, searchText)
-                            val listaAmgiosBusqueda = listaAmigosDef.await()
-                            onBusquedaFinalizada(listaAmgiosBusqueda)
-                        }
-                    }
+                    onSearch = { onSearch(searchText) } // Llamada al viewmodel
                 ),
             )
         }
-    }
-}
-
-fun searchAmigoAction(cF: CaseFacade, scope: CoroutineScope, searchText: String): Deferred<List<Amigo>> {
-    if (searchText != "") {
-        return scope.async {
-            cF.amigosCase.buscarAmigos(searchText)
-        }
-    } else {
-        return CompletableDeferred(emptyList())
     }
 }
