@@ -8,11 +8,13 @@ class CaseFacade(context: Context) {
     // Creación del almacen local
     private val local = LocalStorage(context)
 
-    // Creación de la clase remote relacionada con la API TODO
+    // TODO Creación de la clase remote relacionada con la API y añadirla en los constructores
     // private val remoteApi =
 
     // Crear Todos los casos de uso, asignando local y remoteApi segun corresponda
     public val loginRegisterCase = LoginRegisterCase(local)
 
     public val amigosCase = AmigosCase()
+
+    public val jugarContinuarCase = JugarContinuarCase()
 }
