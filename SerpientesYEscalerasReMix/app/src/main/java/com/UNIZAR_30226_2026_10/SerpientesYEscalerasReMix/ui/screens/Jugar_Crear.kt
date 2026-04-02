@@ -3,9 +3,6 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +15,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -27,20 +23,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.AbandonarLobbyButton
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.AmigosButton
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ContinuarButton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.JugadorItem
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.eleccionCrearContinuar
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
@@ -53,9 +47,6 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 fun JugarCrearScreen(SEState: SENavHostController) {
     var opcionSeleccionada = "Crear"
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        eleccionCrearContinuar(opcionSeleccionada, SEState)
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -65,11 +56,16 @@ fun JugarCrearScreen(SEState: SENavHostController) {
 
             lobbyElementos()
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(40.dp))
 
-            amigosBoton(SEState)
+            Column() {
+                ContinuarButton(SEState)
+                Spacer(modifier = Modifier.height(50.dp))
+                AmigosButton(SEState)
+                Spacer(modifier = Modifier.height(50.dp))
+                AbandonarLobbyButton(SEState, {})
+            }
         }
-    }
 }
 
 @Composable
@@ -209,52 +205,5 @@ fun EmpezarPartida() {
                 style = SETextTypes.grande
             )
         }
-    }
-}
-
-@Composable
-fun amigosBoton(SEState: SENavHostController) {
-
-    Surface(
-        color = color_secondary,
-        shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(2.dp, color_primary)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(4.dp)
-                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { SEState.goTo(Destinos.JUGAR_AMIGOS) })
-        {
-            Image(
-                painter = painterResource(id = R.drawable.amigos),
-                contentDescription = "amigos",
-                modifier = Modifier
-                    .size(50.dp)
-                    .shadow(
-                        elevation = 10.dp,
-                        shape = CircleShape,
-                        clip = false
-                    )
-                    .clip(CircleShape)
-                    .border(1.dp, color_bg, CircleShape)
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Text("Amigos", style = SETextTypes.plano)
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // El icono de flecha a la derecha
-            Icon(
-                imageVector = Icons.Default.PlayArrow, // O uno similar
-                contentDescription = null,
-                tint = color_text,
-                modifier = Modifier
-                    .size(20.dp)
-                    .align(Alignment.CenterVertically) // Se alinea a la derecha del Box
-            )
-        }
-
     }
 }

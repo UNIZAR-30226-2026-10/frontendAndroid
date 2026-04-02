@@ -11,8 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-// TODO añadir loop para hacer polling de la lista (llegan invitaciones, se añaden amigos, etc)
-// IMPORTANTE SOLO HACER EL POLLING CUANDO NO SE ESTEN BUSCANDO USUARIOS
 class AmigosViewModel(private val cF: CaseFacade) : ViewModel() {
 
     // Para que solo exista un único viewmodel durante toda la ejecución de la app

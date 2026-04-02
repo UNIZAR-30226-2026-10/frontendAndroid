@@ -1,6 +1,5 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components
 
-import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -55,5 +54,4 @@ fun eleccionCrearContinuar(opcion: String, SEState: SENavHostController) {
             }
         )
     }
-
 }
