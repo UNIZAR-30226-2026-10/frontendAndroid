@@ -1,5 +1,7 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase
 
+import kotlinx.coroutines.flow.StateFlow
+
 data class Usuario( // TODO mover a donde sea pertienente
     val nombre: String,
     val estadoTexto: String, // "online", "te ha invitado", etc.
@@ -8,7 +10,7 @@ data class Usuario( // TODO mover a donde sea pertienente
     val haInvitado: Boolean = false
 )
 
-class AmigosCase { // TODO añadir remote amigos
+class AmigosCase(private val userEmail: StateFlow<String>) { // TODO añadir remote amigos
 
     suspend fun obtenerAmigos(): List<Usuario> {
         // TODO llamada a la API, ahora siempre dev unos amigo por def sin importar el nombre

@@ -1,6 +1,5 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Amigos
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -44,7 +43,6 @@ class AmigosViewModel(private val cF: CaseFacade) : ViewModel() {
         pollingJob = viewModelScope.launch {
             while (isActive) {
                 if (!estaBuscando) {
-                    Log.d("POLLING", "hola")
                     try {
                         val nuevosAmigos = cF.amigosCase.obtenerAmigos()
                         listaAmigosOriginal.value = nuevosAmigos
@@ -96,10 +94,9 @@ class AmigosViewModel(private val cF: CaseFacade) : ViewModel() {
         }
     }
 
-    fun anadirAmigo(nombre: String, onSuccess: () -> Unit) {
+    fun anadirAmigo(nombre: String) {
         viewModelScope.launch {
             cF.amigosCase.añadirAmigo(nombre)
-            onSuccess()
         }
     }
 }

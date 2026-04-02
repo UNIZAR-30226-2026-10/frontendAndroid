@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
@@ -100,7 +101,7 @@ fun TarjetaAmigo(
             informacionAmigo(amigo, expandido, onClick)
 
             if (expandido) {
-                desplegableAmigo(viewModel, SEState, amigo)
+                desplegableAmigo(viewModel, SEState, amigo, fondo)
             }
         }
 
@@ -174,17 +175,20 @@ fun informacionAmigo(usuario: Usuario, expandido: Boolean, onClick: () -> Unit) 
 }
 
 @Composable
-fun desplegableAmigo(viewModel: AmigosViewModel, SEState: SENavHostController, usuario: Usuario) {
+fun desplegableAmigo(viewModel: AmigosViewModel, SEState: SENavHostController, usuario: Usuario, fondo: Color) {
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color_secondary.copy(alpha = 0.5f)) // Un tono ligeramente distinto
+            .background(fondo)
             .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
     ) {
 
-        val colorUnirse = if (usuario.haInvitado) color_text
+        val colorUnselectedAux = if (fondo == color_unselected) color_bg
         else color_unselected
+
+        val colorUnirse = if (usuario.haInvitado) color_text
+        else colorUnselectedAux
 
         val acciones =
             if (usuario.esAmigo) listOf(
@@ -228,10 +232,12 @@ fun desplegableOptionAccion(
     if (texto == "Invitar a la partida") { // TODO cambiar y enviar el e-mail del usuario en las peticiones
         viewModel.invitarAmigo(usuario.nombre)
     } else if (texto == "Unirse a la partida") {
-        viewModel.unirseAPartida(usuario.nombre, onSuccess = { SEState.goTo(Destinos.JUGAR_CREAR) })
+        if (usuario.haInvitado) {
+            viewModel.unirseAPartida(usuario.nombre, onSuccess = { SEState.goTo(Destinos.JUGAR_CREAR) })
+        }
     } else if (texto == "Borrar amigo") {
         viewModel.borrarAmigo(usuario.nombre)
     } else if (texto == "Añadir amigo") {
-        viewModel.anadirAmigo(usuario.nombre, onSuccess = { SEState.goTo(Destinos.JUGAR_CREAR) })
+        viewModel.anadirAmigo(usuario.nombre)
     }
 }

@@ -14,7 +14,7 @@ class CaseFacade(context: Context) {
     // Crear Todos los casos de uso, asignando local y remoteApi segun corresponda
     public val loginRegisterCase = LoginRegisterCase(local)
 
-    public val amigosCase = AmigosCase()
+    public val amigosCase = AmigosCase(loginRegisterCase.emailFlow)
 
-    public val jugarContinuarCase = JugarContinuarCase()
+    public val jugarContinuarCase = JugarContinuarCase(loginRegisterCase.emailFlow)
 }

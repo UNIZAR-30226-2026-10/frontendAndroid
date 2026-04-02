@@ -8,10 +8,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarContinuarScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarCrearScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Amigos.AmigosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Amigos.AmigosViewModel
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Continuar.JugarContinuarScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Continuar.JugarContinuarViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.LoginScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.RegisterScreen
@@ -26,8 +27,8 @@ object Destinos {
     const val MAZOS = "mazos"
     const val LOGROS = "logros"
     const val TIENDA = "tienda"
-
     const val PERFIL = "perfil"
+    const val PARTIDA = "partida"
 }
 
 // Función que encapsula la navegación del menu superior de la aplicación.
@@ -46,7 +47,10 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
     }
 
     composable(Destinos.JUGAR_CONTINUAR) {
-        JugarContinuarScreen(SEState)
+        val jugarContinuarViewModel: JugarContinuarViewModel = viewModel(
+            factory = JugarContinuarViewModel.Factory(cF)
+        )
+        JugarContinuarScreen(SEState, jugarContinuarViewModel)
     }
 
     composable(
@@ -78,5 +82,9 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
 
     composable(Destinos.PERFIL) {
         Perfil(SEState)
+    }
+
+    composable(Destinos.PARTIDA) {
+        Text("Partida")
     }
 }
