@@ -11,6 +11,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.AmigosScree
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarContinuarScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarCrearScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.LoginScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.MazosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.TiendaScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.RegisterScreen
@@ -60,21 +61,15 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
         AmigosScreen(SEState)
     }
 
-    composable(Destinos.MAZOS) {
-        Text("Pantalla de Mazos")
+    composable(Destinos.MAZOS){
+        MazosScreen(SEState)
     }
 
     composable(Destinos.LOGROS) {
         Text("Pantalla de Logros")
     }
 
-    composable(Destinos.TIENDA,
-        enterTransition = {
-            slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec = tween(700)
-            ) }
-    ) {
+    composable(Destinos.TIENDA) {
         TiendaScreen(SEState)
     }
 

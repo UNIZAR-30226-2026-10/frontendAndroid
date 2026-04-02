@@ -1,4 +1,4 @@
-package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model
+package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model
 
 data class Producto(
     val nombre: String,

@@ -18,7 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.Producto
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Producto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import kotlinx.coroutines.launch
