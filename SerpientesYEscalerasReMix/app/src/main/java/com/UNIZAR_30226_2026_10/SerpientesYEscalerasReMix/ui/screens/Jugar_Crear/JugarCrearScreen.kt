@@ -1,4 +1,4 @@
-package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens
+package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Crear
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -72,7 +72,7 @@ fun LobbyElementos(SEState: SENavHostController) {
             Row() {
                 AbandonarLobbyButton(SEState, {})
                 Spacer(modifier = Modifier.width(10.dp))
-                EmpezarPartidaButton(false, true, false, {}, { a -> })
+                EmpezarPartidaButton(false, false, false, {}, { a -> })
             }
         }
 

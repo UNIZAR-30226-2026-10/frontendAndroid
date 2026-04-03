@@ -74,8 +74,8 @@ fun EmpezarPartidaButton(
             Text(
                 text = when {
                     esLider -> "Empezar Partida"
-                    estaListo -> "Cancelar ✖"
-                    else -> "Listo ✔"
+                    estaListo -> "No Preparado"
+                    else -> "Preparado"
                 },
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,

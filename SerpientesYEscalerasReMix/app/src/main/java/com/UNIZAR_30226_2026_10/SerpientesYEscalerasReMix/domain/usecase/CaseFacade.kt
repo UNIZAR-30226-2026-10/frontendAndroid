@@ -17,4 +17,6 @@ class CaseFacade(context: Context) {
     public val amigosCase = AmigosCase(loginRegisterCase.emailFlow)
 
     public val jugarContinuarCase = JugarContinuarCase(loginRegisterCase.emailFlow)
+
+    public val jugarCrearCase = JugarCrearCase(loginRegisterCase.emailFlow)
 }
