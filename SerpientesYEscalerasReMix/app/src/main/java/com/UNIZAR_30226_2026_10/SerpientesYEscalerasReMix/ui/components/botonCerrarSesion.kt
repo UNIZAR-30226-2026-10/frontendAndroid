@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.prepareScreenOrientation
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.prepararOrientacion
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_negative
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
@@ -27,12 +27,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun LogoutButton(scope: CoroutineScope, SEState: SENavHostController, cF: CaseFacade) {
+fun LogoutBoton(scope: CoroutineScope, SEState: SENavHostController, cF: CaseFacade) {
 
     Surface(
         color = color_negative,
         shape = RoundedCornerShape(16.dp),
-        onClick = { logoutButtonAction(scope, SEState, cF) }
+        onClick = { logoutBotonAccion(scope, SEState, cF) }
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(4.dp))
         {
@@ -56,12 +56,12 @@ fun LogoutButton(scope: CoroutineScope, SEState: SENavHostController, cF: CaseFa
     }
 }
 
-fun logoutButtonAction(scope: CoroutineScope, SEState: SENavHostController, cF: CaseFacade) {
+fun logoutBotonAccion(scope: CoroutineScope, SEState: SENavHostController, cF: CaseFacade) {
     scope.launch {
         cF.loginRegisterCase.cerrarSesion()
 
         // Preparar el cambio a vertical para el login
-        prepareScreenOrientation(SEState, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        prepararOrientacion(SEState, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
 
         SEState.goTo(Destinos.LOGIN)
     }

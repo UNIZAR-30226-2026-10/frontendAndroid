@@ -28,7 +28,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 
 
 @Composable
-fun CrearButton(SEState: SENavHostController, orientacion: String) {
+fun CrearBoton(SEState: SENavHostController, orientacion: String) {
 
     Surface(
         color = color_secondary,

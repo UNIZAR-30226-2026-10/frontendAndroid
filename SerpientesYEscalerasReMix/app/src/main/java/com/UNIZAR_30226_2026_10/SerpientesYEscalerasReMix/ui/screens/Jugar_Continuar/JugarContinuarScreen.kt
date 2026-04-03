@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.CrearButton
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.CrearBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ListaPartidas
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
 
@@ -26,7 +26,7 @@ fun JugarContinuarScreen(SEState: SENavHostController, viewModel: JugarContinuar
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            CrearButton(SEState, "der")
+            CrearBoton(SEState, "der")
             Spacer(modifier = Modifier.width(16.dp))
         }
 

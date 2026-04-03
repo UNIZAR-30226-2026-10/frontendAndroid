@@ -26,7 +26,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 
 
 @Composable
-fun ContinuarButton(SEState: SENavHostController) {
+fun ContinuarBoton(SEState: SENavHostController) {
 
     Surface(
         color = color_secondary,

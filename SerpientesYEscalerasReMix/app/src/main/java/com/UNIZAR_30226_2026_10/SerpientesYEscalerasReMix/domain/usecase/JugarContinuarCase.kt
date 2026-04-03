@@ -10,7 +10,7 @@ data class Partida(
     val id: Int
 )
 
-class JugarContinuarCase(private val userEmail: StateFlow<String>) { // TODO añadir remote amigos
+class JugarContinuarCase(private val userEmail: StateFlow<String>, private val username: StateFlow<String>) { // TODO añadir remote amigos
 
     suspend fun obtenerPartidas(): List<Partida> { // TODO poner en dev la clase correspondiente
         // TODO llamada a la API, ahora siempre dev unos amigo por def sin importar el nombre

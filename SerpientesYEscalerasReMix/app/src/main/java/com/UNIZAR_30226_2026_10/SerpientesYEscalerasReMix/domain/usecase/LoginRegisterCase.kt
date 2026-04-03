@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.asStateFlow
 class LoginRegisterCase(private val local: LocalStorage) { // TODO añadir remote login
 
     private val email = MutableStateFlow("")
+    private val username = MutableStateFlow("")
     val emailFlow: StateFlow<String> = email.asStateFlow() // Observable desde otros usecase
+    val usernameFlow: StateFlow<String> = username.asStateFlow() // Observable desde otros usecase
 
     suspend fun comprobarLogin(): String {
         if (local.getLogin()) {
@@ -27,6 +29,7 @@ class LoginRegisterCase(private val local: LocalStorage) { // TODO añadir remot
             local.setLogin(true)
             local.setEmail(_email)
             email.value = _email
+            username.value = "Yo" // TODO Cambiar con lo que devuelva la API
 
             return true
         } else {
@@ -37,9 +40,10 @@ class LoginRegisterCase(private val local: LocalStorage) { // TODO añadir remot
     suspend fun cerrarSesion() {
         local.clearEmail()
         email.value = ""
+        username.value = ""
     }
 
-    suspend fun registrarse(_email: String, passwd: String): Boolean {
+    suspend fun registrarse(_username: String, _email: String, passwd: String): Boolean {
 
         // TODO Llamada a la API
 
@@ -47,6 +51,7 @@ class LoginRegisterCase(private val local: LocalStorage) { // TODO añadir remot
             local.setLogin(true)
             local.setEmail(_email)
             email.value = _email
+            username.value = _username
 
             return true
         } else {

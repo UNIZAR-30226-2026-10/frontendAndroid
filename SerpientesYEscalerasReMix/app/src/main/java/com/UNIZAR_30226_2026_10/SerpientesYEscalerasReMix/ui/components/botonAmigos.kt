@@ -36,7 +36,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_seconda
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 
 @Composable
-fun AmigosButton(SEState: SENavHostController) {
+fun AmigosBoton(SEState: SENavHostController) {
 
     Surface(
         color = color_secondary,

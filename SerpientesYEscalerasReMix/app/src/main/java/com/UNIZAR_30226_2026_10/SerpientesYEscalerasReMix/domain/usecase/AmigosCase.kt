@@ -10,7 +10,7 @@ data class Usuario( // TODO mover a donde sea pertienente
     val haInvitado: Boolean = false
 )
 
-class AmigosCase(private val userEmail: StateFlow<String>) { // TODO añadir remote amigos
+class AmigosCase(private val userEmail: StateFlow<String>, private val username: StateFlow<String>) { // TODO añadir remote amigos
 
     suspend fun obtenerAmigos(): List<Usuario> {
         // TODO llamada a la API, ahora siempre dev unos amigo por def sin importar el nombre

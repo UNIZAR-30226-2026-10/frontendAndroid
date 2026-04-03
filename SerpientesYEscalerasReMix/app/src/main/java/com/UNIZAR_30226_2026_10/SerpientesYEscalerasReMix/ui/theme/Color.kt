@@ -7,6 +7,8 @@ val color_bg = Color(0xFF111A2C)        // backgroud
 val color_fg = Color(0xFFFFFFFF)        // foreground
 val color_sf = Color(0xFFEEB716)        // superficies, igual a color_primary
 
+val color_transparent = Color.Transparent
+
 val color_text = Color(0xFFFFFFFF)
 val color_selectedText = Color(0xFFB5B5B5)
 val color_SEPText = Color(0xFFEEB716)

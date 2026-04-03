@@ -13,7 +13,6 @@ import kotlinx.coroutines.launch
 
 class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
 
-    // Factory para la inyección de dependencias siguiendo tu patrón
     companion object {
         fun Factory(cF: CaseFacade): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
@@ -23,24 +22,19 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
             }
     }
 
-    // Exponemos el StateFlow del caso de uso directamente para que la UI lo observe
     val lobbyActual: StateFlow<Lobby?> = cF.jugarCrearCase.currentLobby
+    val email: StateFlow<String> = cF.userEmail
 
     private var pollingJob: Job? = null
 
-    // Lógica de Polling similar a AmigosViewModel
+    // Polling del lobby
     fun iniciarPollingLobby(lobbyId: String) {
         if (pollingJob?.isActive == true) return
 
         pollingJob = viewModelScope.launch {
             while (isActive) {
-                try {
-                    // Actualiza el atributo currentLobby en el caso de uso
-                    cF.jugarCrearCase.obtenerEstadoLobby(lobbyId)
-                } catch (e: Exception) {
-                    // Manejo de errores de red silencioso para el polling
-                }
-                delay(3000) // Consultar cada 3 segundos
+                cF.jugarCrearCase.obtenerEstadoLobby(lobbyId)
+                delay(2000) // Consultar cada 2 segundos
             }
         }
     }
@@ -57,39 +51,27 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
         }
     }
 
-    fun unirseALobby(lobbyId: String, username: String, onSuccess: () -> Unit) {
+    fun cambiarEstadoListo(estaListo: Boolean) {
         viewModelScope.launch {
-            val exito = cF.jugarCrearCase.unirseALobby(lobbyId, username)
-            if (exito) {
-                onSuccess()
-            }
+            cF.jugarCrearCase.cambiarEstadoListo(lobbyActual.value?.id, estaListo)
         }
     }
 
-    fun cambiarEstadoListo(lobbyId: String, estaListo: Boolean) {
+    fun seleccionarMazo(nombreMazo: String) {
         viewModelScope.launch {
-            cF.jugarCrearCase.cambiarEstadoListo(lobbyId, estaListo)
+            cF.jugarCrearCase.seleccionarMazo(lobbyActual.value?.id, nombreMazo)
         }
     }
 
-    fun seleccionarMazo(lobbyId: String, nombreMazo: String) {
+    fun anadirBot() {
         viewModelScope.launch {
-            cF.jugarCrearCase.seleccionarMazo(lobbyId, nombreMazo)
+            cF.jugarCrearCase.anadirBot(lobbyActual.value?.id)
         }
     }
 
-    fun añadirBot(lobbyId: String) {
+    fun abandonarOExpulsar(emailAEliminar: String?) {
         viewModelScope.launch {
-            cF.jugarCrearCase.añadirBot(lobbyId)
-        }
-    }
-
-    fun abandonarOExpulsar(lobbyId: String, emailAEliminar: String, onSuccess: () -> Unit = {}) {
-        viewModelScope.launch {
-            val exito = cF.jugarCrearCase.abandonarExpulsar(lobbyId, emailAEliminar)
-            if (exito) {
-                onSuccess()
-            }
+            cF.jugarCrearCase.abandonarExpulsar(lobbyActual.value?.id, emailAEliminar)
         }
     }
 }

@@ -54,7 +54,7 @@ fun CabeceraAmigos(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         // Vovler a Crear Partida
-        CrearButton(SEState, "izq")
+        CrearBoton(SEState, "izq")
 
         Spacer(Modifier.width(80.dp))
 

@@ -26,7 +26,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_seconda
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 
 @Composable
-fun MazoElegirButton(nombreMazo: String) {
+fun MazoElegirBoton(nombreMazo: String) {
     Surface(
         modifier = Modifier
             .width(120.dp)

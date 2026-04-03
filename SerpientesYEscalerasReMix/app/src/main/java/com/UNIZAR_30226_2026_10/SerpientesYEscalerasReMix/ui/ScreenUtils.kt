@@ -4,10 +4,11 @@ import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
 
 @Composable
-fun LockScreenOrientation(orientation: Int) {
+fun fijarOrientacion(orientation: Int) {
     val context = LocalContext.current
 
     DisposableEffect(orientation) {
@@ -25,7 +26,19 @@ fun LockScreenOrientation(orientation: Int) {
 
 // Accede a la actividad para indicarle que se gire (si tiene que hacerlo) antes de que se destruya
 // la vista cargada en la actividad
-fun prepareScreenOrientation(SEState: SENavHostController, Orientation: Int) {
+fun prepararOrientacion(SEState: SENavHostController, Orientation: Int) {
     val activity = SEState.navController.context as? Activity
     activity?.requestedOrientation = Orientation
+}
+
+// Busca Icono de jugador en R
+fun buscarIconoR(icono: String): Int {
+    // TODO ajustar debidamente a los iconos de R (una vez sean creados, etc)
+    val iconoR = when (icono) {
+        "default" -> R.drawable.icono_default
+        "bot"     -> R.drawable.icono_bots
+        else -> R.drawable.icono_default
+    }
+
+    return iconoR
 }

@@ -29,7 +29,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_seconda
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 
 @Composable
-fun ElegirTableroButton(tablero: Int) {
+fun ElegirTableroBoton(tablero: Int) {
     Surface(
         modifier = Modifier
             .size(120.dp),

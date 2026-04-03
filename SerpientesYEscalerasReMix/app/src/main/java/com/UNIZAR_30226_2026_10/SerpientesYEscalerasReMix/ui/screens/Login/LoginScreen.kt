@@ -29,10 +29,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.LockScreenOrientation
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.fijarOrientacion
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.prepareScreenOrientation
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.prepararOrientacion
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes.seleccionable
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes.subtitulo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes.titulo
@@ -45,7 +45,7 @@ fun LoginScreen(SEState: SENavHostController, snackHost: SnackbarHostState, cF: 
     val scope = rememberCoroutineScope()
 
     // Ver la pantalla en vertical
-    LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+    fijarOrientacion(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
 
     // Variables en las que ir guardando el texto introducido
     var emailForm by remember { mutableStateOf("") }
@@ -119,7 +119,7 @@ fun loginButtonAction(
         val loginSuccess = !invalidForms && cF.loginRegisterCase.iniciarSesion(emailForm, passwordForm)
         if (loginSuccess) {
             // Preparar la orientación en horizontal
-            prepareScreenOrientation(SEState, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+            prepararOrientacion(SEState, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
 
             SEState.goTo(Destinos.JUGAR_CREAR)
         } else {
@@ -134,7 +134,7 @@ fun loginButtonAction(
 
 fun registerButtonAction(SEState: SENavHostController) {
     // Preparar la orientación en vertical
-    prepareScreenOrientation(SEState, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+    prepararOrientacion(SEState, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
 
     SEState.goTo(Destinos.REGISTER)
 }

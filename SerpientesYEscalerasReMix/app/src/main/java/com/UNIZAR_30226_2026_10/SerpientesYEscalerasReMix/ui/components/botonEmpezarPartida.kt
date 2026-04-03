@@ -24,7 +24,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selecte
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_unselected
 
 @Composable
-fun EmpezarPartidaButton(
+fun EmpezarPartidaBoton(
     esLider: Boolean,
     estaListo: Boolean,
     todosListos: Boolean, // Nueva condición para el líder

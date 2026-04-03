@@ -31,15 +31,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.JugadorLobby
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarIconoR
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_positive
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_transparent
 
 
 @Composable
-fun JugadorItem(icono: Int, nombreIcono: String, nombreJugador: String, esLider: Boolean, estaListo: Boolean) {
+fun JugadorItem(
+    vistaLider: Boolean,
+    esLider: Boolean,
+    jugador: JugadorLobby?,
+    onAnadirBot: () -> Unit,
+    onExpulsar: () -> Unit
+) {
     var distanciaIcono = 22.dp
     var offsetIcono = -44.dp
 
@@ -58,69 +67,63 @@ fun JugadorItem(icono: Int, nombreIcono: String, nombreJugador: String, esLider:
             Box(
                 contentAlignment = Alignment.Center
             ) {
-                if (nombreJugador != "") {
+                if (jugador != null) {
                     Text(
-                        text = nombreJugador,
+                        text = jugador.username,
                         modifier = Modifier
                             .padding(16.dp)
                             .fillMaxWidth(),
                         textAlign = TextAlign.Center,
                         style = SETextTypes.grande
                     )
-                } else {
-                    AnadirIA()
+                } else if (vistaLider) {
+                    AnadirBot(onAnadirBot)
                 }
             }
         }
 
-        if (nombreJugador != "") {
+        if (jugador != null) {
+            val icono = if (jugador.isBot) buscarIconoR("bot")
+            else buscarIconoR(jugador.profileIcon)
+
             Box(
                 modifier = Modifier.offset(y = offsetIcono)
             ) {
-                JugadorIcon(icono, nombreIcono, esLider)
+                JugadorIcon(icono, esLider)
             }
         }
 
-        if (nombreJugador != "" && estaListo) {
-            Box(
-                modifier = Modifier
-                    .size(28.dp)
-                    // Posicionamos en la esquina superior derecha del Surface
-                    .offset(x = 50.dp, y = (-35).dp)
-                    .background(color_positive, CircleShape)
-                    .border(2.dp, color_fg, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Check, // Usamos el icono Check estándar
-                    contentDescription = "Jugador Listo",
-                    tint = color_fg,
-                    modifier = Modifier.size(20.dp) // Tamaño del icono dentro del círculo
-                )
-            }
+        if (jugador != null && jugador.isReady) {
+            IndicadorListo()
+        }
+
+        if (jugador != null && vistaLider) {
+            ExpulsarBoton(onExpulsar)
         }
     }
 }
 
 @Composable
-fun AnadirIA() {
+fun AnadirBot(onAnadirBot: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.plus_simbol),
-            contentDescription = "icono Añadir",
-            modifier = Modifier
-                .width(50.dp)
-                .height(50.dp)
-        )
+        Surface(onClick = onAnadirBot, color = color_transparent) {
+            Image(
+                painter = painterResource(id = R.drawable.plus_simbol),
+                contentDescription = "icono Añadir",
+                modifier = Modifier
+                    .width(50.dp)
+                    .height(50.dp)
+            )
 
-        Text("Añadir Bot", style = SETextTypes.grande)
+            Text("Añadir Bot", style = SETextTypes.grande)
+        }
     }
 }
 
 @Composable
-fun JugadorIcon(icono: Int, nombreIcono: String, esLider: Boolean) {
+fun JugadorIcon(icono: Int, esLider: Boolean) {
     Box(contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier
@@ -131,7 +134,7 @@ fun JugadorIcon(icono: Int, nombreIcono: String, esLider: Boolean) {
 
         Image(
             painter = painterResource(id = icono),
-            contentDescription = nombreIcono,
+            contentDescription = "icono jugador",
             modifier = Modifier
                 .size(60.dp)
                 .shadow(
@@ -154,6 +157,44 @@ fun JugadorIcon(icono: Int, nombreIcono: String, esLider: Boolean) {
                         rotationZ = 40f
                     )
                     .offset(y = -40.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun IndicadorListo() {
+    Box(
+        modifier = Modifier
+            .size(28.dp)
+            // Posicionamos en la esquina superior derecha del Surface
+            .offset(x = 50.dp, y = (-35).dp)
+            .background(color_positive, CircleShape)
+            .border(2.dp, color_fg, CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.Check, // Usamos el icono Check estándar
+            contentDescription = "Jugador Listo",
+            tint = color_fg,
+            modifier = Modifier.size(20.dp) // Tamaño del icono dentro del círculo
+        )
+    }
+}
+
+@Composable
+fun ExpulsarBoton(onExpulsar: () -> Unit) {
+    Surface(onClick = onExpulsar, color = color_transparent) {
+        Box(
+            modifier = Modifier
+                // Posicionamos en la esquina inferior derecha del Surface
+                .offset(x = 50.dp, y = 35.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.icono_expulsar),
+                contentDescription = "icono expulsar",
+                modifier = Modifier.size(20.dp)
             )
         }
     }
