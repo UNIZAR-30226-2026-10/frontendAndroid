@@ -47,7 +47,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Amigo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_offline
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_online
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_positive
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_secondary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selected
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
@@ -138,7 +138,7 @@ fun informacionAmigo(usuario: Usuario, expandido: Boolean, onClick: () -> Unit) 
             // Círculo de estado (Verde/Rojo)
             Surface(
                 shape = CircleShape,
-                color = if (usuario.estaOnline) color_online else color_offline,
+                color = if (usuario.estaOnline) color_positive else color_offline,
                 modifier = Modifier.size(20.dp)
             ) {}
         }

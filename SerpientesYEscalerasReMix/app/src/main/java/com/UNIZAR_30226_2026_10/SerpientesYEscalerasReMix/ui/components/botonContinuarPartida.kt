@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -34,28 +34,28 @@ fun ContinuarButton(SEState: SENavHostController) {
         border = BorderStroke(2.dp, color_primary),
         onClick = { SEState.goTo(Destinos.JUGAR_CONTINUAR) },
         modifier = Modifier
-            .width(150.dp)
-            .height(50.dp)
+            .width(180.dp)
+            .height(40.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(4.dp))
         {
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Text("Continuar Partida", style = SETextTypes.plano)
-
-            Spacer(modifier = Modifier.width(8.dp))
-
             Icon(
-                imageVector = Icons.Default.KeyboardArrowRight, // O uno similar
+                imageVector = Icons.Default.KeyboardArrowLeft, // O uno similar
                 contentDescription = null,
                 tint = color_text,
                 modifier = Modifier
                     .size(20.dp)
                     .align(Alignment.CenterVertically)
             )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Text("Retomar una Partida", style = SETextTypes.plano)
+
         }
 
     }
 }
-

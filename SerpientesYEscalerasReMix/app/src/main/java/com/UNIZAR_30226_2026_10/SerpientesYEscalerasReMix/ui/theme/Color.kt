@@ -17,7 +17,7 @@ val color_selected = Color(0xFF2078B4)
 val color_unselected = Color(0xFF1C234A)
 val color_negative = Color(0xFFEA3A3A)  // Cancelar o borrar
 
-val color_online = Color(0Xff00EA2F)
+val color_positive = Color(0Xff00EA2F)
 val color_offline = Color(0xFFEA000B)
 
 val color_cardComun = Color(0xFF2186BB)

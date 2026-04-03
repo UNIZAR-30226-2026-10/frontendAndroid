@@ -13,9 +13,9 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Amigo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Amigos.AmigosViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Continuar.JugarContinuarScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Continuar.JugarContinuarViewModel
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.LoginScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Login.LoginScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.RegisterScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Register.RegisterScreen
 
 // clase objeto utilizada como un enum. Define los destinos usados en los grafos de navegación
 object Destinos {
@@ -46,7 +46,14 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
         JugarCrearScreen(SEState)
     }
 
-    composable(Destinos.JUGAR_CONTINUAR) {
+    composable(Destinos.JUGAR_CONTINUAR,
+        enterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(700)
+            )
+        }
+    ) {
         val jugarContinuarViewModel: JugarContinuarViewModel = viewModel(
             factory = JugarContinuarViewModel.Factory(cF)
         )
@@ -57,7 +64,7 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
         Destinos.JUGAR_AMIGOS,
         enterTransition = {
             slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
                 animationSpec = tween(700)
             )
         }

@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,11 +33,13 @@ import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fg
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_positive
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
 
 
 @Composable
-fun JugadorItem(icono: Int, nombreIcono: String, nombreJugador: String, esLider: Boolean) {
+fun JugadorItem(icono: Int, nombreIcono: String, nombreJugador: String, esLider: Boolean, estaListo: Boolean) {
     var distanciaIcono = 22.dp
     var offsetIcono = -44.dp
 
@@ -73,6 +78,25 @@ fun JugadorItem(icono: Int, nombreIcono: String, nombreJugador: String, esLider:
                 modifier = Modifier.offset(y = offsetIcono)
             ) {
                 JugadorIcon(icono, nombreIcono, esLider)
+            }
+        }
+
+        if (nombreJugador != "" && estaListo) {
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    // Posicionamos en la esquina superior derecha del Surface
+                    .offset(x = 50.dp, y = (-35).dp)
+                    .background(color_positive, CircleShape)
+                    .border(2.dp, color_fg, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Check, // Usamos el icono Check estándar
+                    contentDescription = "Jugador Listo",
+                    tint = color_fg,
+                    modifier = Modifier.size(20.dp) // Tamaño del icono dentro del círculo
+                )
             }
         }
     }

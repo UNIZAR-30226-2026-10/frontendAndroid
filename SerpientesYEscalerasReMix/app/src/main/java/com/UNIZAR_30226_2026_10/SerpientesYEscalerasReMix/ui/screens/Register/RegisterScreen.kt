@@ -1,4 +1,4 @@
-package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens
+package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Register
 
 import android.content.pm.ActivityInfo
 import androidx.compose.foundation.layout.Box

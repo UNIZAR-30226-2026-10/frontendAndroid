@@ -44,7 +44,7 @@ fun AmigosButton(SEState: SENavHostController) {
         border = BorderStroke(2.dp, color_primary),
         modifier = Modifier
             .width(150.dp)
-            .height(50.dp)
+            .height(40.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -58,7 +58,7 @@ fun AmigosButton(SEState: SENavHostController) {
                 painter = painterResource(id = R.drawable.amigos),
                 contentDescription = "amigos",
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(35.dp)
                     .shadow(
                         elevation = 10.dp,
                         shape = CircleShape,
