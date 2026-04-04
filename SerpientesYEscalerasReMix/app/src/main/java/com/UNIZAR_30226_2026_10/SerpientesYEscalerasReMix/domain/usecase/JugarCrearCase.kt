@@ -1,5 +1,6 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase
 
+import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -162,5 +163,6 @@ class JugarCrearCase(
         // TODO Llamada a la API
         // DELETE /api/lobbies/:lobby-id/players/:email
         // con lobbyId.value, emailAEliminar (cabecera) y tu mail email.value en cuerpo (reqBy)
+        Log.d("A", emailAEliminar)
     }
 }

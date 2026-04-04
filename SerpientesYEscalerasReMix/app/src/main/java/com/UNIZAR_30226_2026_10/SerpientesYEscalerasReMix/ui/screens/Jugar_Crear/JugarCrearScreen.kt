@@ -85,28 +85,20 @@ fun LobbyElementos(SEState: SENavHostController, viewModel: JugarCrearViewModel)
         Column(verticalArrangement = Arrangement.spacedBy(sepVerticalJugadores)) {
             JugadorItem(
                 vistaLider = vistaLider,
-                esLider = lobby?.hostEmail == lobby?.players?.getOrNull(0)?.email,
-                esElUsuario = lobby?.players?.getOrNull(0)?.email == viewModel.email.value,
-                jugador = lobby?.players?.getOrNull(0),
+                esLider = viewModel.esLider(0),
+                esElUsuario = viewModel.esElUsuario(0),
+                jugador = viewModel.getJugador(0),
                 onAnadirBot = { viewModel.anadirBot() },
-                onExpulsar = {
-                    lobby?.players?.getOrNull(0)?.email?.let { email ->
-                        viewModel.expulsar(email)
-                    }
-                }
+                onExpulsar = { viewModel.expulsar(0) }
             )
 
             JugadorItem(
                 vistaLider = vistaLider,
-                esLider = lobby?.hostEmail == lobby?.players?.getOrNull(2)?.email,
-                esElUsuario = lobby?.players?.getOrNull(2)?.email == viewModel.email.value,
-                jugador = lobby?.players?.getOrNull(2),
+                esLider = viewModel.esLider(2),
+                esElUsuario = viewModel.esElUsuario(2),
+                jugador = viewModel.getJugador(2),
                 onAnadirBot = { viewModel.anadirBot() },
-                onExpulsar = {
-                    lobby?.players?.getOrNull(2)?.email?.let { email ->
-                        viewModel.expulsar(email)
-                    }
-                }
+                onExpulsar = { viewModel.expulsar(2) }
             )
         }
 
@@ -141,28 +133,20 @@ fun LobbyElementos(SEState: SENavHostController, viewModel: JugarCrearViewModel)
         Column(verticalArrangement = Arrangement.spacedBy(sepVerticalJugadores)) {
             JugadorItem(
                 vistaLider = vistaLider,
-                esLider = lobby?.hostEmail == lobby?.players?.getOrNull(1)?.email,
-                esElUsuario = lobby?.players?.getOrNull(1)?.email == viewModel.email.value,
-                jugador = lobby?.players?.getOrNull(1),
+                esLider = viewModel.esLider(1),
+                esElUsuario = viewModel.esElUsuario(1),
+                jugador = viewModel.getJugador(1),
                 onAnadirBot = { viewModel.anadirBot() },
-                onExpulsar = {
-                    lobby?.players?.getOrNull(1)?.email?.let { email ->
-                        viewModel.expulsar(email)
-                    }
-                }
+                onExpulsar = { viewModel.expulsar(1) }
             )
 
             JugadorItem(
                 vistaLider = vistaLider,
-                esLider = lobby?.hostEmail == lobby?.players?.getOrNull(3)?.email,
-                esElUsuario = lobby?.players?.getOrNull(3)?.email == viewModel.email.value,
-                jugador = lobby?.players?.getOrNull(3),
+                esLider = viewModel.esLider(3),
+                esElUsuario = viewModel.esElUsuario(3),
+                jugador = viewModel.getJugador(3),
                 onAnadirBot = { viewModel.anadirBot() },
-                onExpulsar = {
-                    lobby?.players?.getOrNull(3)?.email?.let { email ->
-                        viewModel.expulsar(email)
-                    }
-                }
+                onExpulsar = { viewModel.expulsar(3) }
             )
         }
 

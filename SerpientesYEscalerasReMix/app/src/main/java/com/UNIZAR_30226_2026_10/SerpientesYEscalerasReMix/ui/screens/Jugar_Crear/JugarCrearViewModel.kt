@@ -1,10 +1,10 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Crear
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.JugadorLobby
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.Lobby
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -36,8 +36,6 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
 
         pollingJob = viewModelScope.launch {
             while (isActive) {
-                Log.d("A", username.value)
-                Log.d("A", email.value)
                 cF.jugarCrearCase.obtenerEstadoLobby()
                 delay(2000) // Consultar cada 2 segundos
             }
@@ -48,9 +46,21 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
         pollingJob?.cancel()
     }
 
-    // Métodos para obtener información del usuario respecto al lobby
+    // Métodos para obtener información de los usuarios respecto al lobby
     fun soyLider(): Boolean {
         return email.value == lobbyActual.value?.hostEmail
+    }
+
+    fun esLider(idx: Int): Boolean {
+        return lobbyActual.value?.hostEmail == lobbyActual.value?.players?.getOrNull(idx)?.email
+    }
+
+    fun esElUsuario(idx: Int): Boolean {
+        return lobbyActual.value?.players?.getOrNull(idx)?.email == email.value
+    }
+
+    fun getJugador(idx: Int): JugadorLobby? {
+        return lobbyActual.value?.players?.getOrNull(idx)
     }
 
     // Métodos de interacción con el Lobby
@@ -85,8 +95,9 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
         }
     }
 
-    fun expulsar(emailAEliminar: String) {
+    fun expulsar(idx: Int) {
         viewModelScope.launch {
+            val emailAEliminar = lobbyActual.value?.players?.getOrNull(idx)?.email ?: ""
             cF.jugarCrearCase.abandonarExpulsar(emailAEliminar)
         }
     }
