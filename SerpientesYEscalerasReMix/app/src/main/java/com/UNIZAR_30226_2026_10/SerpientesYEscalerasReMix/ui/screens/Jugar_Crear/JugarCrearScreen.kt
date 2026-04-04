@@ -77,26 +77,32 @@ fun JugarCrearScreen(SEState: SENavHostController, viewModel: JugarCrearViewMode
 @Composable
 fun LobbyElementos(SEState: SENavHostController, viewModel: JugarCrearViewModel) {
     val lobby by viewModel.lobbyActual.collectAsState()
-    val vistaLider = viewModel.soyLider()
+    val miEmail by viewModel.email.collectAsState()
+    val hostEmail = lobby?.hostEmail
+
+    val listaJugadores = lobby?.players ?: emptyList()
+    val vistaLider = miEmail == hostEmail
 
     val sepVerticalJugadores = 16.dp
     val sepVerticalBotones = 8.dp
     Row(horizontalArrangement = Arrangement.Center) {
         Column(verticalArrangement = Arrangement.spacedBy(sepVerticalJugadores)) {
+            val jugador0 = listaJugadores.getOrNull(0)
             JugadorItem(
                 vistaLider = vistaLider,
-                esLider = viewModel.esLider(0),
-                esElUsuario = viewModel.esElUsuario(0),
-                jugador = viewModel.getJugador(0),
+                esLider = jugador0?.email == hostEmail,
+                esElUsuario = jugador0?.email == miEmail,
+                jugador = jugador0,
                 onAnadirBot = { viewModel.anadirBot() },
                 onExpulsar = { viewModel.expulsar(0) }
             )
 
+            val jugador2 = listaJugadores.getOrNull(2)
             JugadorItem(
                 vistaLider = vistaLider,
-                esLider = viewModel.esLider(2),
-                esElUsuario = viewModel.esElUsuario(2),
-                jugador = viewModel.getJugador(2),
+                esLider = jugador2?.email == hostEmail,
+                esElUsuario = jugador2?.email == miEmail,
+                jugador = jugador2,
                 onAnadirBot = { viewModel.anadirBot() },
                 onExpulsar = { viewModel.expulsar(2) }
             )
@@ -131,20 +137,22 @@ fun LobbyElementos(SEState: SENavHostController, viewModel: JugarCrearViewModel)
         Spacer(modifier = Modifier.width(25.dp))
 
         Column(verticalArrangement = Arrangement.spacedBy(sepVerticalJugadores)) {
+            val jugador1 = listaJugadores.getOrNull(1)
             JugadorItem(
                 vistaLider = vistaLider,
-                esLider = viewModel.esLider(1),
-                esElUsuario = viewModel.esElUsuario(1),
-                jugador = viewModel.getJugador(1),
+                esLider = jugador1?.email == hostEmail,
+                esElUsuario = jugador1?.email == miEmail,
+                jugador = jugador1,
                 onAnadirBot = { viewModel.anadirBot() },
                 onExpulsar = { viewModel.expulsar(1) }
             )
 
+            val jugador3 = listaJugadores.getOrNull(3)
             JugadorItem(
                 vistaLider = vistaLider,
-                esLider = viewModel.esLider(3),
-                esElUsuario = viewModel.esElUsuario(3),
-                jugador = viewModel.getJugador(3),
+                esLider = jugador3?.email == hostEmail,
+                esElUsuario = jugador3?.email == miEmail,
+                jugador = jugador3,
                 onAnadirBot = { viewModel.anadirBot() },
                 onExpulsar = { viewModel.expulsar(3) }
             )
