@@ -77,7 +77,7 @@ fun JugarCrearScreen(SEState: SENavHostController, viewModel: JugarCrearViewMode
 @Composable
 fun LobbyElementos(SEState: SENavHostController, viewModel: JugarCrearViewModel) {
     val lobby by viewModel.lobbyActual.collectAsState()
-    val vistaLider = viewModel.email.value == lobby?.hostEmail
+    val vistaLider = viewModel.soyLider()
 
     val sepVerticalJugadores = 16.dp
     val sepVerticalBotones = 8.dp

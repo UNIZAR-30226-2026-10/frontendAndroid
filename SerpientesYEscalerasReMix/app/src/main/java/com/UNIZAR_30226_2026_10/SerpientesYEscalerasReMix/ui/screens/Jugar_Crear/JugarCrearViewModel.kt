@@ -48,8 +48,12 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
         pollingJob?.cancel()
     }
 
-    // Métodos de interacción con el Lobby
+    // Métodos para obtener información del usuario respecto al lobby
+    fun soyLider(): Boolean {
+        return email.value == lobbyActual.value?.hostEmail
+    }
 
+    // Métodos de interacción con el Lobby
     fun crearLobby() {
         viewModelScope.launch {
             cF.jugarCrearCase.crearLobby()
