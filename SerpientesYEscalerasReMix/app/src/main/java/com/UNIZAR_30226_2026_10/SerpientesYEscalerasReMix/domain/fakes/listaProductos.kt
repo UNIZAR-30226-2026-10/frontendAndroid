@@ -1,6 +1,6 @@
-package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.fakes
+package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes
 
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.Producto
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Producto
 
 val listaDePruebas = listOf(
     Producto("Escaleras nobles", "La escalera de un ilustre señor", 200, "https://picsum.photos/seed/1/400/400", "Escaleras"),

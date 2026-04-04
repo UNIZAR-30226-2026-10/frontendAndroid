@@ -9,7 +9,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.Producto
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Producto
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height

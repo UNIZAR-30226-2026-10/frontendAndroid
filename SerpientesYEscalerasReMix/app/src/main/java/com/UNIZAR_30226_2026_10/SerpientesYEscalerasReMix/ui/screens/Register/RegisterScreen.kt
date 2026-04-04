@@ -1,4 +1,4 @@
-package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens
+package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Register
 
 import android.content.pm.ActivityInfo
 import androidx.compose.foundation.layout.Box
@@ -29,10 +29,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.LockScreenOrientation
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.fijarOrientacion
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.prepareScreenOrientation
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.prepararOrientacion
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes.seleccionable
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes.subtitulo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes.titulo
@@ -44,8 +44,9 @@ fun RegisterScreen(SEState: SENavHostController, snackHost: SnackbarHostState, c
     val scope = rememberCoroutineScope()
 
     // Mantenemos el modo vertical para el formulario
-    LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+    fijarOrientacion(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
 
+    var usernameForm by remember { mutableStateOf("") }
     var emailForm by remember { mutableStateOf("") }
     var passwordForm by remember { mutableStateOf("") }
     var confirmPasswordForm by remember { mutableStateOf("") }
@@ -66,11 +67,22 @@ fun RegisterScreen(SEState: SENavHostController, snackHost: SnackbarHostState, c
 
             Spacer(Modifier.height(40.dp))
 
-            // Campo Usuario
+            // Campo Usuario (username)
+            OutlinedTextField(
+                value = usernameForm,
+                onValueChange = { usernameForm = it },
+                label = { Text("Nombre de Usuario") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            // Campo Usuario (email)
             OutlinedTextField(
                 value = emailForm,
                 onValueChange = { emailForm = it },
-                label = { Text("Usuario / Email") },
+                label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -105,11 +117,7 @@ fun RegisterScreen(SEState: SENavHostController, snackHost: SnackbarHostState, c
 
             Button(
                 onClick = {
-                    if (passwordForm == confirmPasswordForm) {
-                        registerButtonAction(emailForm, passwordForm, confirmPasswordForm, scope, snackHost, SEState, cF)
-                    } else {
-                        // Aquí podrías mostrar un Toast de "Las contraseñas no coinciden"
-                    }
+                    registerButtonAction(usernameForm, emailForm, passwordForm, confirmPasswordForm, scope, snackHost, SEState, cF)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -128,15 +136,15 @@ fun RegisterScreen(SEState: SENavHostController, snackHost: SnackbarHostState, c
 }
 
 fun registerButtonAction(
-    emailForm: String, passwordForm: String, confirmPasswordForm: String,
+    usernameForm: String, emailForm: String, passwordForm: String, confirmPasswordForm: String,
     scope: CoroutineScope, snackHost: SnackbarHostState, SEState: SENavHostController, cF: CaseFacade
 ) {
     scope.launch {
         val invalidForms = emailForm == "" || passwordForm == "" || passwordForm != confirmPasswordForm
-        val registerSuccess = !invalidForms && cF.loginRegisterCase.registrarse(emailForm, passwordForm)
+        val registerSuccess = !invalidForms && cF.loginRegisterCase.registrarse(usernameForm, emailForm, passwordForm)
         if (registerSuccess) {
             // Preparar el cambio a horizontal para el juego
-            prepareScreenOrientation(SEState, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+            prepararOrientacion(SEState, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
 
             SEState.goTo(Destinos.JUGAR_CREAR)
         } else {
