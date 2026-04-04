@@ -17,6 +17,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Crear
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Login.LoginScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Register.RegisterScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.TiendaScreen
 
 // clase objeto utilizada como un enum. Define los destinos usados en los grafos de navegación
 object Destinos {
@@ -28,6 +29,7 @@ object Destinos {
     const val MAZOS = "mazos"
     const val LOGROS = "logros"
     const val TIENDA = "tienda"
+
     const val PERFIL = "perfil"
     const val PARTIDA = "partida"
 }
@@ -87,8 +89,14 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
         Text("Pantalla de Logros")
     }
 
-    composable(Destinos.TIENDA) {
-        Text("Tienda de items")
+    composable(Destinos.TIENDA,
+        enterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(700)
+            ) }
+    ) {
+        TiendaScreen(SEState)
     }
 
     composable(Destinos.PERFIL) {

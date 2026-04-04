@@ -22,6 +22,8 @@ val color_negative = Color(0xFFEA3A3A)  // Cancelar o borrar
 val color_positive = Color(0Xff00EA2F)
 val color_offline = Color(0xFFEA000B)
 
+val color_fondoTienda = Color(0xFF151E48)
+
 val color_cardComun = Color(0xFF2186BB)
 val color_cardRara = Color(0xFF00BB27)
 val color_cardEpica = Color(0xFFCB00AF)

@@ -20,15 +20,17 @@ object SETextTypes {
         fontSize = 18.sp
     )
 
+    val titulo = TextStyle( // Tipografica normal, pasada a MaterialDesign
+        color = color_text,
+        fontSize = 30.sp,
+        fontWeight = FontWeight.ExtraBold,
+        // Centrar texto
+        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+    )
+
     val tab = TextStyle( // Tipografica normal, pasada a MaterialDesign
         color = color_text,
         fontSize = 25.sp
-    )
-
-    val titulo = TextStyle( // Tipografia para titulos (grande y en negrita)
-        color = color_text,
-        fontSize = 36.sp,
-        fontWeight = FontWeight.Bold
     )
 
     val subtitulo = TextStyle( // Tipografia para subtitulos (grande)

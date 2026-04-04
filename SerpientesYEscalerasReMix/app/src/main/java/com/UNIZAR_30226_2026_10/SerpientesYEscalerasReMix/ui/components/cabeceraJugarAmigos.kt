@@ -61,7 +61,7 @@ fun CabeceraAmigos(
         // Titulo
         Text(
             text = "Amigos",
-            style = SETextTypes.grande,
+            style = SETextTypes.titulo,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )

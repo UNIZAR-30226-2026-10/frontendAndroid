@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +27,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.EmpezarP
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.JugadorItem
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MazoElegirBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 
 @Composable
 fun JugarCrearScreen(SEState: SENavHostController, viewModel: JugarCrearViewModel) {
@@ -58,6 +60,7 @@ fun JugarCrearScreen(SEState: SENavHostController, viewModel: JugarCrearViewMode
             verticalAlignment = Alignment.CenterVertically
         ) {
             ContinuarBoton(SEState)
+            Text(text = "Lobby", style = SETextTypes.titulo)
             AmigosBoton(SEState)
         }
 
