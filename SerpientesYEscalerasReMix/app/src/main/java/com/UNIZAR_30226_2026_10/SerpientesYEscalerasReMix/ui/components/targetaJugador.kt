@@ -3,6 +3,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,6 +46,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_transpa
 fun JugadorItem(
     vistaLider: Boolean,
     esLider: Boolean,
+    esElUsuario: Boolean,
     jugador: JugadorLobby?,
     onAnadirBot: () -> Unit,
     onExpulsar: () -> Unit
@@ -74,7 +76,7 @@ fun JugadorItem(
                             .padding(16.dp)
                             .fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        style = SETextTypes.grande
+                        style = SETextTypes.plano
                     )
                 } else if (vistaLider) {
                     AnadirBot(onAnadirBot)
@@ -97,7 +99,7 @@ fun JugadorItem(
             IndicadorListo()
         }
 
-        if (jugador != null && vistaLider) {
+        if (jugador != null && vistaLider && !esElUsuario) {
             ExpulsarBoton(onExpulsar)
         }
     }
@@ -105,10 +107,12 @@ fun JugadorItem(
 
 @Composable
 fun AnadirBot(onAnadirBot: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Surface(onClick = onAnadirBot, color = color_transparent) {
+    Surface(onClick = onAnadirBot, color = color_transparent) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Añadir Bot", style = SETextTypes.grande)
+
             Image(
                 painter = painterResource(id = R.drawable.plus_simbol),
                 contentDescription = "icono Añadir",
@@ -117,7 +121,6 @@ fun AnadirBot(onAnadirBot: () -> Unit) {
                     .height(50.dp)
             )
 
-            Text("Añadir Bot", style = SETextTypes.grande)
         }
     }
 }
@@ -184,18 +187,18 @@ fun IndicadorListo() {
 
 @Composable
 fun ExpulsarBoton(onExpulsar: () -> Unit) {
-    Surface(onClick = onExpulsar, color = color_transparent) {
-        Box(
-            modifier = Modifier
-                // Posicionamos en la esquina inferior derecha del Surface
-                .offset(x = 50.dp, y = 35.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.icono_expulsar),
-                contentDescription = "icono expulsar",
-                modifier = Modifier.size(20.dp)
-            )
-        }
+    Box(
+        modifier = Modifier
+            .size(28.dp)
+            // Posicionamos en la esquina inferior derecha del Surface
+            .offset(x = 40.dp, y = 20.dp)
+            .clickable { onExpulsar() },
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.icono_expulsar),
+            contentDescription = "icono expulsar",
+            modifier = Modifier.size(40.dp)
+        )
     }
 }

@@ -1,5 +1,6 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase
 
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 data class Usuario( // TODO mover a donde sea pertienente
@@ -10,7 +11,11 @@ data class Usuario( // TODO mover a donde sea pertienente
     val haInvitado: Boolean = false
 )
 
-class AmigosCase(private val userEmail: StateFlow<String>, private val username: StateFlow<String>) { // TODO añadir remote amigos
+class AmigosCase(
+    private val email: StateFlow<String>,
+    private val username: StateFlow<String>,
+    private val lobbyId: MutableStateFlow<String>
+) { // TODO añadir remote amigos
 
     suspend fun obtenerAmigos(): List<Usuario> {
         // TODO llamada a la API, ahora siempre dev unos amigo por def sin importar el nombre
@@ -47,9 +52,10 @@ class AmigosCase(private val userEmail: StateFlow<String>, private val username:
         // TODO llamar a la API
     }
 
-    suspend fun unirseAmigoLobby(amigoNombre: String) : Boolean {
+    suspend fun getAmigoLobby(amigoNombre: String) {
         // TODO llamar a la API
-        return true
+        // GET /api/friends/:friend-email/lobbyId
+        lobbyId.value = "2"
     }
 
 }

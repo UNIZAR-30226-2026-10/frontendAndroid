@@ -2,6 +2,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Amig
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -12,7 +13,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ListaAmi
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
 
 @Composable
-fun AmigosScreen(SEState: SENavHostController, viewModel: AmigosViewModel) {
+fun AmigosScreen(SEState: SENavHostController, snackHost: SnackbarHostState, viewModel: AmigosViewModel) {
 
     // Activar polling al entrar en la pantalla
     LaunchedEffect(Unit) {
@@ -32,6 +33,6 @@ fun AmigosScreen(SEState: SENavHostController, viewModel: AmigosViewModel) {
         // Cabecera, buscar amigos y volver a la pantalla anterior
         CabeceraAmigos(SEState, onSearch = { searchText -> viewModel.buscarAmigos(searchText) })
 
-        ListaAmigos(viewModel, SEState, viewModel.listaAmigosMostrada)
+        ListaAmigos(viewModel, SEState, snackHost, viewModel.listaAmigosMostrada)
     }
 }

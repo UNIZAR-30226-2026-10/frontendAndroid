@@ -2,19 +2,18 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase
 
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
-class LoginRegisterCase(private val local: LocalStorage) { // TODO añadir remote login
-
-    private val email = MutableStateFlow("")
-    private val username = MutableStateFlow("")
-    val emailFlow: StateFlow<String> = email.asStateFlow() // Observable desde otros usecase
-    val usernameFlow: StateFlow<String> = username.asStateFlow() // Observable desde otros usecase
+class LoginRegisterCase(
+    private val local: LocalStorage,
+    private val email: MutableStateFlow<String>,
+    private val username: MutableStateFlow<String>
+) { // TODO añadir remote login
 
     suspend fun comprobarLogin(): String {
         if (local.getLogin()) {
             email.value = local.getEmail()
+            val passwd = local.getPasswd()
+            iniciarSesion(email.value, passwd)
             return email.value
         } else {
             return ""
@@ -38,18 +37,19 @@ class LoginRegisterCase(private val local: LocalStorage) { // TODO añadir remot
     }
 
     suspend fun cerrarSesion() {
-        local.clearEmail()
+        local.clearLogin()
         email.value = ""
         username.value = ""
     }
 
-    suspend fun registrarse(_username: String, _email: String, passwd: String): Boolean {
+    suspend fun registrarse(_username: String, _email: String, _passwd: String): Boolean {
 
         // TODO Llamada a la API
 
         if (true) { // TODO Cambiar: if no error en llamada a la API
             local.setLogin(true)
             local.setEmail(_email)
+            local.setPasswd(_passwd)
             email.value = _email
             username.value = _username
 

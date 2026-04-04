@@ -1,5 +1,6 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Crear
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -23,17 +24,21 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
     }
 
     val lobbyActual: StateFlow<Lobby?> = cF.jugarCrearCase.currentLobby
-    val email: StateFlow<String> = cF.userEmail
+    val email: StateFlow<String> = cF.email
+    val username: StateFlow<String> = cF.username
+    val lobbyId: StateFlow<String> = cF.lobbyId
 
     private var pollingJob: Job? = null
 
     // Polling del lobby
-    fun iniciarPollingLobby(lobbyId: String) {
+    fun iniciarPollingLobby() {
         if (pollingJob?.isActive == true) return
 
         pollingJob = viewModelScope.launch {
             while (isActive) {
-                cF.jugarCrearCase.obtenerEstadoLobby(lobbyId)
+                Log.d("A", username.value)
+                Log.d("A", email.value)
+                cF.jugarCrearCase.obtenerEstadoLobby()
                 delay(2000) // Consultar cada 2 segundos
             }
         }
@@ -45,33 +50,40 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
 
     // Métodos de interacción con el Lobby
 
-    fun crearLobby(username: String) {
+    fun crearLobby() {
         viewModelScope.launch {
-            cF.jugarCrearCase.crearLobby(username)
+            cF.jugarCrearCase.crearLobby()
         }
     }
 
-    fun cambiarEstadoListo(estaListo: Boolean) {
+    fun cambiarPreparado(preparado: Boolean) { // TODO
         viewModelScope.launch {
-            cF.jugarCrearCase.cambiarEstadoListo(lobbyActual.value?.id, estaListo)
+            cF.jugarCrearCase.cambiarEstadoPreparado(preparado)
         }
     }
 
-    fun seleccionarMazo(nombreMazo: String) {
+    fun seleccionarMazo(nombreMazo: String) { // TODO
         viewModelScope.launch {
-            cF.jugarCrearCase.seleccionarMazo(lobbyActual.value?.id, nombreMazo)
+            cF.jugarCrearCase.seleccionarMazo(nombreMazo)
         }
     }
 
-    fun anadirBot() {
+    fun anadirBot() { // TODO quizas añadir un snackbar si alguien se une antes de que se pueda añadir el bot
         viewModelScope.launch {
-            cF.jugarCrearCase.anadirBot(lobbyActual.value?.id)
+            cF.jugarCrearCase.anadirBot()
         }
     }
 
-    fun abandonarOExpulsar(emailAEliminar: String?) {
+    fun abandonar() {
         viewModelScope.launch {
-            cF.jugarCrearCase.abandonarExpulsar(lobbyActual.value?.id, emailAEliminar)
+            cF.jugarCrearCase.abandonarExpulsar(email.value)
+            cF.jugarCrearCase.crearLobby()
+        }
+    }
+
+    fun expulsar(emailAEliminar: String) {
+        viewModelScope.launch {
+            cF.jugarCrearCase.abandonarExpulsar(emailAEliminar)
         }
     }
 }

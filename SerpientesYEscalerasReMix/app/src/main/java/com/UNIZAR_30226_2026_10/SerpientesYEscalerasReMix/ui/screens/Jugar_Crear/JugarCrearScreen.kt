@@ -6,9 +6,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -26,6 +29,21 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHos
 
 @Composable
 fun JugarCrearScreen(SEState: SENavHostController, viewModel: JugarCrearViewModel) {
+
+    // Activar polling al entrar en la pantalla
+    LaunchedEffect(Unit) {
+        if (viewModel.lobbyId.value == "") { // no se esta uniendo a ningún lobby desde la pantalla de Jugar_Amigos
+            viewModel.crearLobby()
+        }
+        viewModel.iniciarPollingLobby()
+    }
+
+    // Desactivar polling cuando la pantalla no sea visible
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.detenerPollingLobby()
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -65,23 +83,25 @@ fun LobbyElementos(SEState: SENavHostController, viewModel: JugarCrearViewModel)
             JugadorItem(
                 vistaLider = vistaLider,
                 esLider = lobby?.hostEmail == lobby?.players?.getOrNull(0)?.email,
+                esElUsuario = lobby?.players?.getOrNull(0)?.email == viewModel.email.value,
                 jugador = lobby?.players?.getOrNull(0),
                 onAnadirBot = { viewModel.anadirBot() },
                 onExpulsar = {
-                        lobby?.players?.getOrNull(0)?.email?.let { email ->
-                        viewModel.abandonarOExpulsar(email)
+                    lobby?.players?.getOrNull(0)?.email?.let { email ->
+                        viewModel.expulsar(email)
                     }
                 }
             )
 
             JugadorItem(
                 vistaLider = vistaLider,
-                esLider = lobby?.hostEmail == lobby?.players?.getOrNull(1)?.email,
-                jugador = lobby?.players?.getOrNull(1),
+                esLider = lobby?.hostEmail == lobby?.players?.getOrNull(2)?.email,
+                esElUsuario = lobby?.players?.getOrNull(2)?.email == viewModel.email.value,
+                jugador = lobby?.players?.getOrNull(2),
                 onAnadirBot = { viewModel.anadirBot() },
                 onExpulsar = {
-                    lobby?.players?.getOrNull(1)?.email?.let { email ->
-                        viewModel.abandonarOExpulsar(email)
+                    lobby?.players?.getOrNull(2)?.email?.let { email ->
+                        viewModel.expulsar(email)
                     }
                 }
             )
@@ -96,11 +116,20 @@ fun LobbyElementos(SEState: SENavHostController, viewModel: JugarCrearViewModel)
             MazoElegirBoton("lateGame")
             if (vistaLider) {
                 ElegirTableroBoton(R.drawable.tablero_debug)
+            } else {
+                Spacer(modifier = Modifier.height(120.dp))
             }
             Row() {
-                AbandonarLobbyBoton(SEState, {})
+                AbandonarLobbyBoton(SEState, onClick = { viewModel.abandonar() })
                 Spacer(modifier = Modifier.width(10.dp))
-                EmpezarPartidaBoton(false, false, false, {}, { a -> })
+                // TODO cambiar la condicion de estaListo y todos listos (quizas mas conveniente pasar el viewmodel y hacerlo alli)
+                EmpezarPartidaBoton(
+                    vistaLider,
+                    vistaLider,
+                    vistaLider,
+                    {},
+                    { a -> viewModel.cambiarPreparado(a) }
+                )
             }
         }
 
@@ -109,12 +138,13 @@ fun LobbyElementos(SEState: SENavHostController, viewModel: JugarCrearViewModel)
         Column(verticalArrangement = Arrangement.spacedBy(sepVerticalJugadores)) {
             JugadorItem(
                 vistaLider = vistaLider,
-                esLider = lobby?.hostEmail == lobby?.players?.getOrNull(2)?.email,
-                jugador = lobby?.players?.getOrNull(2),
+                esLider = lobby?.hostEmail == lobby?.players?.getOrNull(1)?.email,
+                esElUsuario = lobby?.players?.getOrNull(1)?.email == viewModel.email.value,
+                jugador = lobby?.players?.getOrNull(1),
                 onAnadirBot = { viewModel.anadirBot() },
                 onExpulsar = {
-                    lobby?.players?.getOrNull(2)?.email?.let { email ->
-                        viewModel.abandonarOExpulsar(email)
+                    lobby?.players?.getOrNull(1)?.email?.let { email ->
+                        viewModel.expulsar(email)
                     }
                 }
             )
@@ -122,11 +152,12 @@ fun LobbyElementos(SEState: SENavHostController, viewModel: JugarCrearViewModel)
             JugadorItem(
                 vistaLider = vistaLider,
                 esLider = lobby?.hostEmail == lobby?.players?.getOrNull(3)?.email,
+                esElUsuario = lobby?.players?.getOrNull(3)?.email == viewModel.email.value,
                 jugador = lobby?.players?.getOrNull(3),
                 onAnadirBot = { viewModel.anadirBot() },
                 onExpulsar = {
                     lobby?.players?.getOrNull(3)?.email?.let { email ->
-                        viewModel.abandonarOExpulsar(email)
+                        viewModel.expulsar(email)
                     }
                 }
             )

@@ -77,11 +77,14 @@ class AmigosViewModel(private val cF: CaseFacade) : ViewModel() {
         }
     }
 
-    fun unirseAPartida(nombre: String, onSuccess: () -> Unit) {
+    fun unirseAPartida(amigoNombre: String, onSuccess: () -> Unit, onError: () -> Unit) {
         viewModelScope.launch {
-            val exito = cF.amigosCase.unirseAmigoLobby(nombre)
+            cF.amigosCase.getAmigoLobby(amigoNombre)
+            val exito = cF.jugarCrearCase.unirseALobby()
             if (exito) {
                 onSuccess()
+            } else {
+                onError()
             }
         }
     }

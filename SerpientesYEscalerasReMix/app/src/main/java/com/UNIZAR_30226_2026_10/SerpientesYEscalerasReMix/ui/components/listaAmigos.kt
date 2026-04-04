@@ -24,12 +24,15 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,10 +55,17 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_seconda
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selected
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_unselected
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 
 @Composable
-fun ListaAmigos(viewModel: AmigosViewModel, SEState: SENavHostController, usuarios: List<Usuario>) {
+fun ListaAmigos(
+    viewModel: AmigosViewModel,
+    SEState: SENavHostController,
+    snackHost: SnackbarHostState,
+    usuarios: List<Usuario>
+) {
     // Guarda de forma observable el amigo del cual se estan viendo los detalles
     var usuarioExpandido by remember { mutableStateOf<String?>(null) }
 
@@ -67,6 +77,7 @@ fun ListaAmigos(viewModel: AmigosViewModel, SEState: SENavHostController, usuari
             TarjetaAmigo(
                 viewModel,
                 SEState,
+                snackHost,
                 usuario,
                 usuarioExpandido == usuario.nombre,
                 onClick = {
@@ -81,6 +92,7 @@ fun ListaAmigos(viewModel: AmigosViewModel, SEState: SENavHostController, usuari
 fun TarjetaAmigo(
     viewModel: AmigosViewModel,
     SEState: SENavHostController,
+    snackHost: SnackbarHostState,
     amigo: Usuario,
     expandido: Boolean,
     onClick: () -> Unit
@@ -101,7 +113,7 @@ fun TarjetaAmigo(
             informacionAmigo(amigo, expandido, onClick)
 
             if (expandido) {
-                desplegableAmigo(viewModel, SEState, amigo, fondo)
+                desplegableAmigo(viewModel, SEState, snackHost, amigo, fondo)
             }
         }
 
@@ -175,7 +187,15 @@ fun informacionAmigo(usuario: Usuario, expandido: Boolean, onClick: () -> Unit) 
 }
 
 @Composable
-fun desplegableAmigo(viewModel: AmigosViewModel, SEState: SENavHostController, usuario: Usuario, fondo: Color) {
+fun desplegableAmigo(
+    viewModel: AmigosViewModel,
+    SEState: SENavHostController,
+    snackHost: SnackbarHostState,
+    usuario: Usuario,
+    fondo: Color
+) {
+
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -205,7 +225,7 @@ fun desplegableAmigo(viewModel: AmigosViewModel, SEState: SENavHostController, u
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable(onClick = {
-                        desplegableOptionAccion(viewModel, SEState, texto, usuario)
+                        desplegableOptionAccion(viewModel, SEState, snackHost, scope, texto, usuario)
                     })
                     .padding(vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -226,6 +246,8 @@ fun desplegableAmigo(viewModel: AmigosViewModel, SEState: SENavHostController, u
 fun desplegableOptionAccion(
     viewModel: AmigosViewModel,
     SEState: SENavHostController,
+    snackHost: SnackbarHostState,
+    scope: CoroutineScope,
     texto: String,
     usuario: Usuario
 ) {
@@ -233,7 +255,18 @@ fun desplegableOptionAccion(
         viewModel.invitarAmigo(usuario.nombre)
     } else if (texto == "Unirse a la partida") {
         if (usuario.haInvitado) {
-            viewModel.unirseAPartida(usuario.nombre, onSuccess = { SEState.goTo(Destinos.JUGAR_CREAR) })
+            viewModel.unirseAPartida(
+                usuario.nombre,
+                onSuccess = { SEState.goTo(Destinos.JUGAR_CREAR) },
+                onError = {
+                    scope.launch {
+                        snackHost.showSnackbar(
+                            message = "No te has podido unir al lobby de ${usuario.nombre}",
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                }
+            )
         }
     } else if (texto == "Borrar amigo") {
         viewModel.borrarAmigo(usuario.nombre)

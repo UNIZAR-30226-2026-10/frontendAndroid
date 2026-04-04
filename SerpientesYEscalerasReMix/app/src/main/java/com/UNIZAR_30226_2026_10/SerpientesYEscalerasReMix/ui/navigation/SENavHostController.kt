@@ -12,7 +12,7 @@ import androidx.navigation.compose.rememberNavController
 //      Dibuja pantallas en objetos del tipo NavHost
 //      Guarda pila con el historial de pantallas
 class SENavHostController( val navController: NavHostController ) {
-    fun goTo(ruta: String) { // Evita pantallas repitadas en la pila
+    fun goTo(ruta: String) { // Evita pantallas repetidas en la pila
         val idInicio = navController.graph.findStartDestination().id
 
         navController.navigate(ruta) {

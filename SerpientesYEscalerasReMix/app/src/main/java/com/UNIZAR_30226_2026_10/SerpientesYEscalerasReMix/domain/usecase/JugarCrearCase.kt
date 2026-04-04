@@ -19,12 +19,16 @@ data class JugadorLobby(
     val deckName: String? = null
 )
 
-class JugarCrearCase(private val userEmail: StateFlow<String>, private val username: StateFlow<String>) { // TODO añadir remote
+class JugarCrearCase(
+    private val email: StateFlow<String>,
+    private val username: StateFlow<String>,
+    private val lobbyId: MutableStateFlow<String>
+) { // TODO añadir remote
 
-    val playersEjemplo: List<JugadorLobby?> = listOf(
+    val playersEjemplo2: List<JugadorLobby?> = listOf(
         JugadorLobby(
             email = "paco@gmail.com",
-            username = "Paco_Lider",
+            username = "ZigZagKing",
             isReady = true,
             isBot = false,
             deckName = "Mazo Clásico"
@@ -43,50 +47,70 @@ class JugarCrearCase(private val userEmail: StateFlow<String>, private val usern
             isBot = true,
             deckName = "Mazo Básico"
         ),
-        null // Cuarto hueco vacío
-    )
-
-
-    val LobbyEjemplo1 = Lobby(
-        id = "lobby_777_abc",
-        hostEmail = "paco@gmail.com", // Coincide con el email de Paco_Lider
-        players = playersEjemplo
+        null
     )
 
     val LobbyEjemplo2 = Lobby(
-        id = "lobby_778_abc",
-        hostEmail = "ana@gmail.com", // Coincide con el email de Paco_Lider
-        players = playersEjemplo
+        id = "1",
+        hostEmail = "paco@gmail.com", // Coincide con el email de Paco_Lider
+        players = playersEjemplo2
     )
+
+    val playersEjemplo1: List<JugadorLobby?>
+        get() = listOf(
+            JugadorLobby(
+                email = "ibai@gmail.com",
+                username = "Ibai_llanos",
+                isReady = true,
+                isBot = false,
+                deckName = "Mazo Clásico"
+            ),
+            JugadorLobby(
+                email = email.value,
+                username = username.value,
+                isReady = false,
+                isBot = false,
+                deckName = "Mazo Dragones"
+            ),
+            null,
+            null
+        )
+
+    val LobbyEjemplo1
+        get() = Lobby(
+            id = "2",
+            hostEmail = email.value,
+            players = playersEjemplo1
+        )
 
     private val _currentLobby = MutableStateFlow<Lobby?>(null)
     val currentLobby: StateFlow<Lobby?> = _currentLobby.asStateFlow()
 
-    suspend fun crearLobby(username: String){
+    suspend fun crearLobby() {
         // TODO Llamada a la API
         // POST /api/lobbies
-        // _currentLobby.value = remote.createLobby(userEmail.value, username)
+        // _currentLobby.value = remote.createLobby(email.value, username.value)
 
-        _currentLobby.value = LobbyEjemplo1
+        lobbyId.value = "1"
     }
-    
-    suspend fun obtenerEstadoLobby(lobbyId: String?){
+
+    suspend fun obtenerEstadoLobby() {
         // TODO Llamada a la API
         // GET /api/lobbies/:lobby-id
-        // _currentLobby.value = remote.getLobbyInfo(lobbyId)
+        // _currentLobby.value = remote.getLobbyInfo(lobbyId.value)
 
-        _currentLobby.value = LobbyEjemplo2
+        _currentLobby.value = if (lobbyId.value == "1") LobbyEjemplo1 else LobbyEjemplo2
     }
 
 
-    suspend fun anadirBot(lobbyId: String?) {
-        // TODO Llamada a la API
+    suspend fun anadirBot() {
+        // TODO Llamada a la API y quizas mostrar snackbar de error si justo alguien se une
         // POST /api/lobbies/:lobby-id/bots
         //  val exito = remote.addBot(lobbyId, requestedBy = userEmail.value)
 
         val exito = true
 
-        if (exito) {
+        if (exito) { // TODO borrar (solo sirve para ver si se llama bien a la funcion, deberia de añadirse y en unos segundos desaparecer el bot)
             val lobbyActual = _currentLobby.value ?: return // salir en caso de que no haya un lobby (no deberia de pasar)
 
             val indexPrimerHueco = lobbyActual.players.indexOfFirst { it == null }
@@ -110,57 +134,33 @@ class JugarCrearCase(private val userEmail: StateFlow<String>, private val usern
     }
 
 
-    suspend fun unirseALobby(lobbyId: String?, username: String): Boolean {
+    suspend fun unirseALobby(): Boolean {
         // TODO Llamada a la API
         // POST /api/lobbies/:lobby-id/players
-        // return remote.joinLobby(lobbyId, userEmail.value, username)
+        // return remote.joinLobby(lobbyId.value, userEmail.value, username.value)
 
         return true
     }
 
 
-    suspend fun seleccionarMazo(lobbyId: String?, deckName: String): Boolean {
+    suspend fun seleccionarMazo(deckName: String): Boolean {
         // TODO Llamada a la API
         // PUT /api/lobbies/:lobby-id/players/:email/deck
-        // return remote.setPlayerDeck(lobbyId, userEmail.value, deckName)
+        // return remote.setPlayerDeck(lobbyId.value, userEmail.value, deckName)
 
         return true
     }
 
-    suspend fun cambiarEstadoListo(lobbyId: String?, isReady: Boolean): Boolean {
+    suspend fun cambiarEstadoPreparado(preparado: Boolean){
         // TODO Llamada a la API
         // PUT /api/lobbies/:lobby-id/players/:email/ready
-        // return remote.setPlayerReady(lobbyId, userEmail.value, isReady)
-
-        return true
+        // remote.setPlayerReady(lobbyId.value, email.value, isReady)
     }
 
 
-    suspend fun abandonarExpulsar(lobbyId: String?, emailAEliminar: String?) {
+    suspend fun abandonarExpulsar(emailAEliminar: String) {
         // TODO Llamada a la API
         // DELETE /api/lobbies/:lobby-id/players/:email
-        /*val exito = remote.removePlayer(
-            lobbyId = lobbyId,
-            playerEmail = emailAEliminar,
-            requestedBy = userEmail.value
-        )*/
-
-        val exito = true // TODO eliminar
-
-        if (exito) {
-            val lobbyActual = _currentLobby.value
-
-            if (lobbyActual != null) {
-                // Si el que se va es el líder, el lobby se destruye
-                if (emailAEliminar == lobbyActual.hostEmail) {
-                    _currentLobby.value = null
-                    crearLobby(username.value)
-                // Si es un jugador normal, filtramos la lista
-                } else {
-                    val nuevaListaJugadores = lobbyActual.players.filter { it?.email != emailAEliminar }
-                    _currentLobby.value = lobbyActual.copy(players = nuevaListaJugadores)
-                }
-            }
-        }
+        // con lobbyId.value, emailAEliminar (cabecera) y tu mail email.value en cuerpo (reqBy)
     }
 }

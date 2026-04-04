@@ -76,7 +76,7 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
         val amigosViewModel: AmigosViewModel = viewModel(
             factory = AmigosViewModel.Factory(cF)
         )
-        AmigosScreen(SEState, amigosViewModel)
+        AmigosScreen(SEState, snackHost, amigosViewModel)
     }
 
     composable(Destinos.MAZOS) {
