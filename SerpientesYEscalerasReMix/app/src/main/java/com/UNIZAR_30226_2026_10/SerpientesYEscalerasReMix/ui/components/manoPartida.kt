@@ -42,9 +42,9 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_unselec
 @Composable
 fun MazoVisual(onSelectCarta: (Carta) -> Unit) {
     val mano = listOf(
-        Carta(1, "Moises", R.drawable.carta_moises, "Te saltas el bloqueo"),
-        Carta(2, "Moises", R.drawable.carta_moises, "Te saltas el bloqueo"),
-        Carta(3, "Moises", R.drawable.carta_moises, "Te saltas el bloqueo"),
+        Carta(1, "Moises", imagen =  R.drawable.carta_moises, efecto = "Te saltas el bloqueo"),
+        Carta(2, "Moises", imagen = R.drawable.carta_moises, efecto = "Te saltas el bloqueo"),
+        Carta(3, "Moises", imagen = R.drawable.carta_moises, efecto = "Te saltas el bloqueo"),
         null
     )
 
