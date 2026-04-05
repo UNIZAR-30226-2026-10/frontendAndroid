@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.MazosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Amigos.AmigosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Amigos.AmigosViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Continuar.JugarContinuarScreen
@@ -83,21 +84,15 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
         AmigosScreen(SEState, snackHost, amigosViewModel)
     }
 
-    composable(Destinos.MAZOS) {
-        Text("Pantalla de Mazos")
+    composable(Destinos.MAZOS){
+        MazosScreen(SEState)
     }
 
     composable(Destinos.LOGROS) {
         LogrosScreen(SEState)
     }
 
-    composable(Destinos.TIENDA,
-        enterTransition = {
-            slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec = tween(700)
-            ) }
-    ) {
+    composable(Destinos.TIENDA) {
         TiendaScreen(SEState)
     }
 

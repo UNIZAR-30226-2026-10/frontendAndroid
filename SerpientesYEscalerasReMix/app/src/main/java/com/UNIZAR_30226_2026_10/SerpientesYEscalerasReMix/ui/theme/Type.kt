@@ -33,6 +33,12 @@ object SETextTypes {
         textAlign = androidx.compose.ui.text.style.TextAlign.Center
     )
 
+    val nombreMazo = TextStyle(
+        color = color_text,
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Bold,
+        textDecoration = TextDecoration.Underline
+    )
     val tab = TextStyle( // Tipografica normal, pasada a MaterialDesign
         color = color_text,
         fontSize = 25.sp

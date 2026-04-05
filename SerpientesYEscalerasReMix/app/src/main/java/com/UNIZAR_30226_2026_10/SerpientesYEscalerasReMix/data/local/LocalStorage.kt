@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
 
-// Se declara en el contecto global de Android un nuevo campo "dataLocal" que contendrá todos
+// Se declara en el contexto global de Android un nuevo campo "dataLocal" que contendrá todos
 // aquellos valores que queramos guardar entre ejecuciones diferentes de la app.
 // Concretamente se guardan en el fichero interno "user_prefs" (Singleton)
 private val Context.dataLocal by preferencesDataStore(name = "user_prefs")
