@@ -4,7 +4,10 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
@@ -20,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -31,7 +35,6 @@ import androidx.compose.ui.window.Dialog
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_SEPText
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_negative
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_positive
@@ -64,8 +67,8 @@ fun CartaContent(
 
     Card(
         modifier = Modifier
-            .fillMaxWidth()
             .padding(16.dp)
+            .fillMaxHeight()
             .border(5.dp, color_primary, RoundedCornerShape(24.dp)),
         colors = CardDefaults.cardColors(containerColor = color_bg),
         shape = RoundedCornerShape(24.dp)
@@ -78,11 +81,7 @@ fun CartaContent(
             // Título
             Text(
                 text = carta.nombre.uppercase(),
-                style = SETextTypes.grande.copy(
-                    fontWeight = FontWeight.Black,
-                    letterSpacing = 2.sp,
-                    color = color_SEPText
-                ),
+                style = SETextTypes.grande,
                 modifier = Modifier.drawBehind {
                     val strokeWidth = 2.dp.toPx()
                     val y = size.height + 4.dp.toPx()
@@ -91,11 +90,19 @@ fun CartaContent(
             )
 
             // Imagen de la carta
-            Image(
-                painter = painterResource(id = carta.imagen),
-                contentDescription = "imagen carta",
-                modifier = Modifier.fillMaxWidth()
-            )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = carta.imagen),
+                    contentDescription = "imagen carta",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit // IMPORTANTE: No se corta, se ajusta
+                )
+            }
 
             // Efecto
             Surface(
@@ -115,7 +122,6 @@ fun CartaContent(
             if (puedeJugar) {
                 Button(
                     onClick = { onJugar(carta) },
-                    modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = color_positive),
                     shape = RoundedCornerShape(16.dp)
                 ) {

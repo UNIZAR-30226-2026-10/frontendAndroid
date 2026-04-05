@@ -32,7 +32,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selecte
 @Composable
 fun MenuTopBar(SEState: SENavHostController) {
     val tabSeleccionado = SEState.rutaActual()
-    val pantallasSinTopBar = listOf(Destinos.LOGIN, Destinos.REGISTER)
+    val pantallasSinTopBar = listOf(Destinos.LOGIN, Destinos.REGISTER, Destinos.PARTIDA)
 
     if (tabSeleccionado !in pantallasSinTopBar) {
         Row(

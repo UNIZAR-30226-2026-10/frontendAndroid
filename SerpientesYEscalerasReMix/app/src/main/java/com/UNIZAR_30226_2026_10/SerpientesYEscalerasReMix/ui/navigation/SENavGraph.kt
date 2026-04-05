@@ -16,6 +16,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Crear
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Crear.JugarCrearViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Login.LoginScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.LogrosScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Partida
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Register.RegisterScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.TiendaScreen
@@ -105,6 +106,6 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
     }
 
     composable(Destinos.PARTIDA) {
-        Text("Partida")
+        Partida(SEState)
     }
 }
