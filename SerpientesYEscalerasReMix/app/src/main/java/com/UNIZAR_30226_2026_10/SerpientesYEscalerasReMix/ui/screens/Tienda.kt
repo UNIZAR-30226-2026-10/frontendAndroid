@@ -31,7 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.tooling.preview.Preview
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.fakes.listaDePruebas
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.listaDePruebas
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonCategoriaCustom
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.TarjetaProductoTienda
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.rememberSEAppState

@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
@@ -12,9 +13,17 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarContin
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.JugarCrearScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.LoginScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.MazosScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Amigos.AmigosScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Amigos.AmigosViewModel
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Continuar.JugarContinuarScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Continuar.JugarContinuarViewModel
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Crear.JugarCrearScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Crear.JugarCrearViewModel
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Login.LoginScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.LogrosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Register.RegisterScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.TiendaScreen
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.RegisterScreen
 
 // clase objeto utilizada como un enum. Define los destinos usados en los grafos de navegación
 object Destinos {
@@ -28,6 +37,7 @@ object Destinos {
     const val TIENDA = "tienda"
 
     const val PERFIL = "perfil"
+    const val PARTIDA = "partida"
 }
 
 // Función que encapsula la navegación del menu superior de la aplicación.
@@ -42,15 +52,13 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
     }
 
     composable(Destinos.JUGAR_CREAR) {
-        JugarCrearScreen(SEState)
+        val jugarCrearViewModel: JugarCrearViewModel = viewModel(
+            factory = JugarCrearViewModel.Factory(cF)
+        )
+        JugarCrearScreen(SEState, jugarCrearViewModel)
     }
 
-    composable(Destinos.JUGAR_CONTINUAR) {
-        JugarContinuarScreen(SEState)
-    }
-
-    composable(
-        Destinos.JUGAR_AMIGOS,
+    composable(Destinos.JUGAR_CONTINUAR,
         enterTransition = {
             slideIntoContainer(
                 towards = AnimatedContentTransitionScope.SlideDirection.Right,
@@ -58,7 +66,25 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
             )
         }
     ) {
-        AmigosScreen(SEState)
+        val jugarContinuarViewModel: JugarContinuarViewModel = viewModel(
+            factory = JugarContinuarViewModel.Factory(cF)
+        )
+        JugarContinuarScreen(SEState, jugarContinuarViewModel)
+    }
+
+    composable(
+        Destinos.JUGAR_AMIGOS,
+        enterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(700)
+            )
+        }
+    ) {
+        val amigosViewModel: AmigosViewModel = viewModel(
+            factory = AmigosViewModel.Factory(cF)
+        )
+        AmigosScreen(SEState, snackHost, amigosViewModel)
     }
 
     composable(Destinos.MAZOS){
@@ -66,7 +92,7 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
     }
 
     composable(Destinos.LOGROS) {
-        Text("Pantalla de Logros")
+        LogrosScreen(SEState)
     }
 
     composable(Destinos.TIENDA) {
@@ -75,5 +101,9 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
 
     composable(Destinos.PERFIL) {
         Perfil(SEState)
+    }
+
+    composable(Destinos.PARTIDA) {
+        Text("Partida")
     }
 }
