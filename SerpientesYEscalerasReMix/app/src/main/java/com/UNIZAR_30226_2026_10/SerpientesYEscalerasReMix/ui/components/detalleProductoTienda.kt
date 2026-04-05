@@ -30,12 +30,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Producto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_positive
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_online
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Producto
 
 @Composable
 fun DetalleProductoTienda(
@@ -124,7 +124,7 @@ fun DetalleProductoTienda(
                         modifier = Modifier
                             .padding(top = 16.dp)
                             .align(Alignment.CenterHorizontally),
-                        colorPrincipal = color_positive,
+                        colorPrincipal = color_online,
                     )
                 }
             }
