@@ -93,8 +93,93 @@ val mazo3: Mazo = Mazo(
     )
 )
 
+val mazo4: Mazo = Mazo(
+    nombre = "Offensive Power",
+    cartas = listOf(
+        carta4,
+        carta4,
+        carta5,
+        carta5,
+        carta1,
+        carta1,
+        carta2,
+        carta2,
+        carta3,
+        carta3
+    )
+)
+
+val mazo5: Mazo = Mazo(
+    nombre = "Defensive Wall",
+    cartas = listOf(
+        carta5,
+        carta5,
+        carta1,
+        carta1,
+        carta2,
+        carta2,
+        carta3,
+        carta3,
+        carta4,
+        carta4
+    )
+)
+
+val mazo6: Mazo = Mazo(
+    nombre = "Epic Collection",
+    cartas = listOf(
+        carta3,
+        carta3,
+        carta4,
+        carta4,
+        carta5,
+        carta5,
+        carta1,
+        carta1,
+        carta2,
+        carta2
+    )
+)
+
+val mazo7: Mazo = Mazo(
+    nombre = "Legendary Set",
+    cartas = listOf(
+        carta4,
+        carta4,
+        carta5,
+        carta5,
+        carta1,
+        carta1,
+        carta2,
+        carta2,
+        carta3,
+        carta3
+    )
+)
+
+val mazo8: Mazo = Mazo(
+    nombre = "Random Mix",
+    cartas = listOf(
+        carta1,
+        carta2,
+        carta3,
+        carta4,
+        carta5,
+        carta1,
+        carta2,
+        carta3,
+        carta4,
+        carta5
+    )
+)
+
 val listaDeMazosDePrueba = listOf(
     mazo1,
     mazo2,
-    mazo3
+    mazo3,
+    mazo4,
+    mazo5,
+    mazo6,
+    mazo7,
+    mazo8
 )
