@@ -20,6 +20,11 @@ object SETextTypes {
         fontSize = 18.sp
     )
 
+    val itemTitulo = TextStyle(
+        color = color_primary,
+        fontSize = 15.sp
+    )
+
     val titulo = TextStyle( // Tipografica normal, pasada a MaterialDesign
         color = color_text,
         fontSize = 30.sp,
