@@ -39,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.TiendaRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_SEPText
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
@@ -48,7 +49,14 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DetalleP
 
 
 @Composable
-fun TiendaScreen(SEState: SENavHostController, sep: Int = 1000) {
+fun TiendaScreen(SEState: SENavHostController) {
+
+    val repository = TiendaRepositoryImpl()
+    val getProductosCase = GetProductosCase(repository)
+    val getSaldoCase = GetSaldoCase(repository)
+    val comprarProductoCase = ComprarProductoCase(repository)
+
+
 
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()

@@ -5,7 +5,9 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Producto
 
 
 interface TiendaRepository {
-    suspend fun comprarProducto(nombreProducto: String): Boolean
+    suspend fun comprarProducto(producto: Producto): Boolean
     suspend fun getProductos(): List<Producto>
+    suspend fun getSaldo(): Int
     suspend fun getHistorialCompras(): List<Compra>
+
 }
