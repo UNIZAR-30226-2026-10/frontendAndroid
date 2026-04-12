@@ -27,6 +27,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -49,24 +50,53 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DetalleP
 
 
 @Composable
-fun TiendaScreen(SEState: SENavHostController) {
+fun TiendaScreen(SEState: SENavHostController, viewModel: TiendaViewModel) {
 
-    val repository = TiendaRepositoryImpl()
-    val getProductosCase = GetProductosCase(repository)
-    val getSaldoCase = GetSaldoCase(repository)
-    val comprarProductoCase = ComprarProductoCase(repository)
+    val state by viewModel.uiState.collectAsState()
+
+    when (val s = state) {
+        is TiendaUiState.Loading -> {
+            // TODO Mostrar pantalla de carga
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Cargando tienda...")
+            }
+        }
+        is TiendaUiState.Success -> {
+            // TODO Mostrar la tienda con los productos reales
+            TiendaContent(
+                sep = s.saldo,
+                productos = s.productos,
+                onComprarProducto = { producto ->
+                    viewModel.comprarProducto(producto)
+                }
+            )
+        }
+        is TiendaUiState.Error -> {
+            // TODO Mostrar mensaje de error
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Error al cargar la tienda: ${s.message}")
+            }
+        }
+    }
 
 
+}
+
+@Composable
+fun TiendaContent(
+    sep: Int,
+    productos: List<Producto>,
+    onComprarProducto: (Producto) -> Unit
+) {
 
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    val productos: List<Producto> = listaDePruebas // TODO Reemplazar con datos reales del ViewModel
-
     // Crea mapa "Cat 1" -> 0, "Cat 2" -> 8, ... (indice de inicio de cada categoria o numero de productos)
-    val categorias = productos.map { it.categoria }.distinct()
-
+    val categorias = remember(productos) { productos.map { it.categoria }.distinct() }
     var categoriaSeleccionada by remember { mutableStateOf(categorias.firstOrNull() ?: "") }
+    // FIXME no necesario segun el diseño planteado pero se puede mirar
+    //var productoSeleccionado by remember { mutableStateOf<Producto?>(null) }
 
     // Sincronizar scroll y botones de categoria
     LaunchedEffect(listState.firstVisibleItemIndex) {
@@ -89,8 +119,7 @@ fun TiendaScreen(SEState: SENavHostController) {
             producto = producto,
             onDismiss = { productoSeleccionado = null },
             onComprar = { prod ->
-                // TODO Lógica de compra
-                Log.d("TiendaScreen", "Comprar producto: ${prod.nombre}")
+                onComprarProducto(producto)
                 productoSeleccionado = null
             }
         )
@@ -187,16 +216,5 @@ fun TiendaScreen(SEState: SENavHostController) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-    }
-}
-
-@Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
-@Composable
-fun TiendaScreenPreview() {
-    val SEState = rememberSEAppState()
-    // Usamos el tema de tu proyecto
-    MaterialTheme {
-        // PASAMOS LOS DATOS MOCK AQUÍ
-        TiendaScreen(SEState)
     }
 }

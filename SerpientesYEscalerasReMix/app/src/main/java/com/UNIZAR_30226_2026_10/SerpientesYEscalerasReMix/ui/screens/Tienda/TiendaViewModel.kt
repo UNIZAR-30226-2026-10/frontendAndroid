@@ -11,8 +11,10 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.UserRepository
 
 class TiendaViewModel (
+    private val userRepository: UserRepository,
     private val getProductosCase: GetProductosCase,
     private val comprarProductoCase: ComprarProductoCase,
     private val getSaldoCase: GetSaldoCase
@@ -26,19 +28,37 @@ class TiendaViewModel (
 
     companion object {
         fun factory(
+            userRepository: UserRepository,
             getProductosCase: GetProductosCase,
             comprarProductoCase: ComprarProductoCase,
             getSaldoCase: GetSaldoCase
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return TiendaViewModel(getProductosCase, comprarProductoCase, getSaldoCase) as T
+                return TiendaViewModel(
+                    userRepository,
+                    getProductosCase,
+                    comprarProductoCase,
+                    getSaldoCase) as T
             }
         }
     }
 
     init {
         fetchProductos()
+
+        viewModelScope.launch {
+            userRepository.saldo.collect { saldoActualizado ->
+                actualizarEstadoConSaldo(saldoActualizado)
+            }
+        }
+    }
+
+    private fun actualizarEstadoConSaldo(nuevoSaldo: Int) {
+        val estadoActual = _uiState.value
+        if (estadoActual is TiendaUiState.Success) {
+            _uiState.value = estadoActual.copy(saldo = nuevoSaldo)
+        }
     }
 
     fun fetchProductos() {
@@ -60,6 +80,7 @@ class TiendaViewModel (
                 val exito = comprarProductoCase(producto)
                 if (exito) {
                     // Refrescar la lista de productos y el saldo después de una compra exitosa
+                    // FIXME quizas se podria hacer q se marcara como comprado el producto en vez de volver a cargar todo
                     fetchProductos()
                 }
             } catch (e: Exception) {
@@ -69,9 +90,4 @@ class TiendaViewModel (
 
         }
     }
-
-    init {
-        fetchProductos()
-    }
-
 }
