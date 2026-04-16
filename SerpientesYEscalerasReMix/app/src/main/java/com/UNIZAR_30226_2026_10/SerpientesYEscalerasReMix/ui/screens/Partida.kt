@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeTableroSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Jugador
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DadoBoton
@@ -79,6 +80,7 @@ fun Partida(navController: SENavHostController) {
     val esMiTurno = true
     val yaJugadoCarta = false
 
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = color_bg
@@ -86,12 +88,7 @@ fun Partida(navController: SENavHostController) {
         Box(modifier = Modifier.fillMaxSize()) {
 
             // Tablero (Componente principal)
-            Tablero(
-                equipoActual = equipoActual,
-                valorDadoExterno = null,
-                onAvanzarTurno = { /* Lógica para pasar turno */ },
-                onTirarDadoManual = { valor -> println("Dado tirado: $valor") }
-            )
+            Tablero(tableroState = fakeTableroSnapshot)
 
             // Interfaz Superior: Botón Salir y Lista de Jugadores
             Row(

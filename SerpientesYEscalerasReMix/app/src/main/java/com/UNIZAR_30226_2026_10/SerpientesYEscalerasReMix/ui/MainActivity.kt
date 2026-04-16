@@ -2,6 +2,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -60,6 +61,8 @@ fun mainScreen(cF: CaseFacade) {
     val email = runBlocking {
         cF.loginRegisterCase.comprobarLogin()
     }
+
+    Log.d("A", email)
 
     // Pantalla incial en función del login
     val pantallaIni = if (email == "") Destinos.LOGIN
