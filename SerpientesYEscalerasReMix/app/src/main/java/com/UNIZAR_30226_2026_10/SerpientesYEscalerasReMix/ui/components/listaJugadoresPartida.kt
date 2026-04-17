@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -31,21 +30,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Jugador
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeJugadoresSnapshot
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.JugadoresSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fg
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fichas_amarillas
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fichas_azules
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fichas_rojas
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fichas_verdes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selected
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_transparent
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_unselected
 
 @Composable
-fun ListaJugadores(jugadores: List<Jugador>) {
+fun ListaJugadores(jugadoresState: JugadoresSnapshot) {
     Column(
         modifier = Modifier
             .width(200.dp)
@@ -55,14 +51,16 @@ fun ListaJugadores(jugadores: List<Jugador>) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "TURNO",
+            text = "TURNO ${jugadoresState.turnoActual}",
             style = SETextTypes.mediano,
             modifier = Modifier.padding(bottom = 6.dp)
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            jugadores.forEach { jugador ->
-                val esTurno = jugador.esTurno ?: false
+            var numJugador: Int = 0
+            jugadoresState.jugadores.forEach { jugador ->
+                numJugador++
+                val esTurno = numJugador == jugadoresState.ronda
 
                 Row(
                     modifier = Modifier
@@ -83,7 +81,7 @@ fun ListaJugadores(jugadores: List<Jugador>) {
                             border = BorderStroke(1.dp, color_bg)
                         ) {
                             Image(
-                                painter = painterResource(id = jugador.iconoJugador),
+                                painter = painterResource(id = jugador.icono),
                                 contentDescription = "Perfil Snake",
                                 modifier = Modifier.padding(4.dp),
                                 contentScale = ContentScale.Fit
@@ -105,19 +103,17 @@ fun ListaJugadores(jugadores: List<Jugador>) {
                         }
                     }
 
-                    // Obtener el color. Si es null, usamos transparente por defecto.
-                    val colorUsuario = jugador.colorFichas ?: Color.Transparent
-
+                    // Icono correspondiente a la skin
                     Box(
                         modifier = Modifier
                             .size(14.dp)
                             .clip(CircleShape)
-                            .background(colorUsuario)
+                            .background(jugador.color)
                             .border(1.dp, color_fg.copy(alpha = 0.8f), CircleShape)
                     )
 
                     Text(
-                        text = jugador.nombreJugador ?: "",
+                        text = jugador.nombre,
                         style = if (esTurno) SETextTypes.plano.copy(
                             fontWeight = FontWeight.Black,
                             fontSize = 13.sp
@@ -136,36 +132,5 @@ fun ListaJugadores(jugadores: List<Jugador>) {
 @Preview(showBackground = true)
 @Composable
 fun ListaPrev() {
-    val equipoActual = "miEquipo"
-    val listaJugadores = listOf(
-        Jugador(
-            nombreJugador = "Ana",
-            esTurno = equipoActual == "miEquipo",
-            esLider = true,
-            iconoJugador = R.drawable.icono_default,
-            colorFichas = color_fichas_rojas // Color definido en tu theme
-        ),
-        Jugador(
-            nombreJugador = "Luis",
-            esTurno = equipoActual == "equipoAzul",
-            esLider = false,
-            iconoJugador = R.drawable.icono_default,
-            colorFichas = color_fichas_azules
-        ),
-        Jugador(
-            nombreJugador = "Marta",
-            esTurno = equipoActual == "equipoVerde",
-            esLider = false,
-            iconoJugador = R.drawable.icono_default,
-            colorFichas = color_fichas_verdes
-        ),
-        Jugador(
-            nombreJugador = "Diego",
-            esTurno = equipoActual == "equipoAmarillo",
-            esLider = false,
-            iconoJugador = R.drawable.icono_default,
-            colorFichas = color_fichas_amarillas
-        )
-    )
-    ListaJugadores(listaJugadores)
+    ListaJugadores(fakeJugadoresSnapshot)
 }

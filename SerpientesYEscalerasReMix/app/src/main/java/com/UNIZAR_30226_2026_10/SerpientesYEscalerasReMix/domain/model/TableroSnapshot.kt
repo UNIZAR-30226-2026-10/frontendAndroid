@@ -4,21 +4,14 @@ enum class TipoCasilla {
     Normal, Escalera, Serpiente, Bifurcacion, Meta, Vacio
 }
 
-data class FichaSnapshot(
-    val jugadorEmail: String,
-    val fichaId: Int
-)
-
 data class CasillaSnapshot(
-    val numero: Int,
     val esCurva: Boolean,
     val rotacion: Int,
     val efecto: String? = null,
     val tipo: TipoCasilla,
     val siguientes: List<Int>,
     val saltoA: Int? = null,
-    val hayBloqueo: Boolean = false,
-    val fichasEnCasilla: List<FichaSnapshot> = emptyList()
+    val hayBloqueo: Boolean = false
 )
 
 data class TableroSnapshot(

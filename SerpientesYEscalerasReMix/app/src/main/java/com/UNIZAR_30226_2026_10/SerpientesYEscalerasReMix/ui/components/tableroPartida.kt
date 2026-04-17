@@ -9,14 +9,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -28,10 +28,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.res.imageResource
@@ -45,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeFichasSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeTableroSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.FichaSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TableroSnapshot
@@ -52,21 +51,16 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TipoCasil
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SerpientesYEscalerasReMixTheme
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_negative
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_positive
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_unselected
 
-data class Ficha(
-    val id: String,
-    var posicion: Int,
-    val colorHex: String,
-    val equipo: String
-)
-
 @Composable
 fun Tablero(
-    tableroState: TableroSnapshot
+    tableroState: TableroSnapshot,
+    fichasState: List<FichaSnapshot>
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
@@ -93,6 +87,9 @@ fun Tablero(
                         // Serpientes / Escaleras
                         Row(modifier = Modifier.weight(1f)) {
                             for (col in 1..10) {
+
+                                // Codigo correspondiente a una casilla en particular
+
                                 val numCasilla = (fil - 1) * 10 + col
                                 val casilla = tableroState.casillas[numCasilla - 1]
 
@@ -129,7 +126,8 @@ fun Tablero(
                                     )
 
                                     // Fichas
-                                    FichasStackSnapshot(casilla.fichasEnCasilla)
+                                    val fichasCasilla = fichasState.filter { it.casilla == numCasilla }
+                                    FichasStackSnapshot(fichasCasilla)
                                 }
                             }
                         }
@@ -185,19 +183,65 @@ fun Tablero(
 }
 
 @Composable
-fun FichasStackSnapshot(fichas: List<FichaSnapshot>) { // TODO añadir onClick
-    FlowRow(
-        modifier = Modifier.padding(2.dp),
-        maxItemsInEachRow = 3
+fun FichasStackSnapshot(fichas: List<FichaSnapshot>) {
+
+    val fichasProcesadas: List<Pair<Int, FichaSnapshot>> = if (fichas.size > 2) {
+        // Si es la primera casilla (fichas.size > 2), mostrar solo 1 por jugador con cuenta de estas
+        fichas.groupBy { it.idJugador }.map { it.value.size to it.value.first() }
+    } else {
+        // Sino poner todas las fichas (bloqueos y solo una)
+        fichas.map { 1 to it }
+    }
+
+    // Tamaño de la ficha respecto a la casilla (%)
+    val fractionCasilla =
+        if (fichasProcesadas.size == 1) 0.8f
+        else 0.45f
+
+    FlowColumn(
+        modifier = Modifier.fillMaxSize(),
+        maxItemsInEachColumn = 2,
+        horizontalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Center
     ) {
-        fichas.forEach { ficha ->
+        fichasProcesadas.forEach { (cuenta, ficha) ->
             Box(
                 modifier = Modifier
-                    .size(14.dp)
-                    .clip(CircleShape)
-                    .background(color_primary) // TODO Color dependiente de lógica de equipo
-                    .border(1.dp, Color.White, CircleShape)
-            )
+                    .fillMaxWidth(fractionCasilla) // Asegura el 2x2
+                    .aspectRatio(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                if (ficha.idImg != null) {
+
+                    Box(modifier = Modifier.fillMaxSize(0.9f)) {
+                        // Imagen de la ficha
+                        Image(
+                            painter = painterResource(id = ficha.idImg),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize()
+                        )
+
+                        // Cuenta de fichas por jugador en la pantlla inicial y bloqueos
+                        if (cuenta > 1) {
+                            Box(
+                                modifier = Modifier
+                                    .offset(y = (-5).dp, x = 2.dp)
+                                    .align(Alignment.TopEnd)
+                                    .fillMaxSize(0.5f) // El badge ocupa el 50% de la ficha
+                                    .background(color_bg, CircleShape)
+                                    .border(1.dp, color_fg, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = cuenta.toString(),
+                                    fontSize = 6.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -258,7 +302,7 @@ fun TableroPreview() {
             modifier = Modifier.fillMaxSize(),
             color = color_bg
         ) {
-            Tablero(tableroState = fakeTableroSnapshot)
+            Tablero(fakeTableroSnapshot, fakeFichasSnapshot)
         }
     }
 }

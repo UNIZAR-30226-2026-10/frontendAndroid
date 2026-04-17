@@ -1,7 +1,6 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes
 
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.CasillaSnapshot
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.FichaSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TableroSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TipoCasilla
 
@@ -145,26 +144,11 @@ val fakeTableroSnapshot = TableroSnapshot(
             }
 
             CasillaSnapshot(
-                numero = n,
                 esCurva = esCurva,
                 rotacion = rotacion,
                 tipo = tipo,
-                saltoA = salto,
                 siguientes = siguientes,
-                fichasEnCasilla = if (n == 1) listOf(
-                    FichaSnapshot("rojo@game.com", 1),
-                    FichaSnapshot("rojo@game.com", 2),
-                    FichaSnapshot("rojo@game.com", 3),
-                    FichaSnapshot("azul@game.com", 1),
-                    FichaSnapshot("azul@game.com", 2),
-                    FichaSnapshot("azul@game.com", 3),
-                    FichaSnapshot("verde@game.com", 1),
-                    FichaSnapshot("verde@game.com", 2),
-                    FichaSnapshot("verde@game.com", 3),
-                    FichaSnapshot("amarillo@game.com", 1),
-                    FichaSnapshot("amarillo@game.com", 2),
-                    FichaSnapshot("amarillo@game.com", 3)
-                ) else emptyList()
+                saltoA = salto,
             )
         }
 )

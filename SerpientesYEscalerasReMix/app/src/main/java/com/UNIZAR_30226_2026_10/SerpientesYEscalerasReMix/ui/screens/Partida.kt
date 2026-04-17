@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
@@ -19,10 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeFichasSnapshot
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeJugadoresSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeTableroSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Jugador
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ChatBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DadoBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DetallesCarta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ListaJugadores
@@ -32,43 +34,6 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.Tablero
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.rememberSEAppState
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fichas_amarillas
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fichas_azules
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fichas_rojas
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fichas_verdes
-
-val equipoActual = "miEquipo"
-val listaJugadores = listOf(
-    Jugador(
-        nombreJugador = "Ana",
-        esTurno = equipoActual == "miEquipo",
-        esLider = true,
-        iconoJugador = R.drawable.icono_default,
-        colorFichas = color_fichas_rojas // Color definido en tu theme
-    ),
-    Jugador(
-        nombreJugador = "Luis",
-        esTurno = equipoActual == "equipoAzul",
-        esLider = false,
-        iconoJugador = R.drawable.icono_default,
-        colorFichas = color_fichas_azules
-    ),
-    Jugador(
-        nombreJugador = "Marta",
-        esTurno = equipoActual == "equipoVerde",
-        esLider = false,
-        iconoJugador = R.drawable.icono_default,
-        colorFichas = color_fichas_verdes
-    ),
-    Jugador(
-        nombreJugador = "Diego",
-        esTurno = equipoActual == "equipoAmarillo",
-        esLider = false,
-        iconoJugador = R.drawable.icono_default,
-        colorFichas = color_fichas_amarillas
-    )
-)
-
 
 @Composable
 fun Partida(navController: SENavHostController) {
@@ -104,6 +69,7 @@ fun Partida(navController: SENavHostController) {
             ) {
                 SalirPartidaBoton(SEState = navController)
 
+
                 Box(modifier = Modifier.width(200.dp)) {
                     MazoVisual(onSelectCarta = { carta ->
                         cartaSeleccionada = carta
@@ -120,10 +86,10 @@ fun Partida(navController: SENavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Tablero(tableroState = fakeTableroSnapshot)
+                Tablero(fakeTableroSnapshot, fakeFichasSnapshot)
             }
 
-            // Jugadores y Dado
+            // Jugadores, Chat y Dado
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -133,11 +99,30 @@ fun Partida(navController: SENavHostController) {
             ) {
                 // Lista de jugadores arriba a la derecha
                 Box(modifier = Modifier.width(200.dp)) {
-                    ListaJugadores(listaJugadores)
+                    ListaJugadores(fakeJugadoresSnapshot)
                 }
 
-                // Botón del dado abajo a la derecha
-                DadoBoton()
+                // Botón del dado y chat abajo a la derecha
+                Box(modifier = Modifier.fillMaxSize()) {
+                    // El dado centrado
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .offset(x = (-50).dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        DadoBoton()
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp)
+                            .offset(y = (-5).dp, x = 10.dp)
+                    ) {
+                        ChatBoton(onSend = { /* TODO */ })
+                    }
+                }
             }
         }
 
