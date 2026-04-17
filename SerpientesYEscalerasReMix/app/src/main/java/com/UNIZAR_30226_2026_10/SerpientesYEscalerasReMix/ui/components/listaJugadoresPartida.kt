@@ -56,7 +56,7 @@ fun ListaJugadores(jugadores: List<Jugador>) {
     ) {
         Text(
             text = "TURNO",
-            style = SETextTypes.itemTitulo,
+            style = SETextTypes.mediano,
             modifier = Modifier.padding(bottom = 6.dp)
         )
 

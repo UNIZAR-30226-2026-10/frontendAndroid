@@ -3,6 +3,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,8 +23,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -36,6 +39,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_secondary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selected
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_unselected
 
@@ -60,7 +64,7 @@ fun MazoVisual(onSelectCarta: (Carta) -> Unit) {
                 Box(
                     modifier = Modifier
                         .aspectRatio(0.66f)
-                        .background(color_bg, RoundedCornerShape(8.dp))
+                        .background(color_secondary, RoundedCornerShape(8.dp))
                         .drawBehind {
                             drawRoundRect(
                                 color = color_fg.copy(alpha = 0.4f),
@@ -76,7 +80,7 @@ fun MazoVisual(onSelectCarta: (Carta) -> Unit) {
                     modifier = Modifier
                         .aspectRatio(0.66f)
                         .clickable { onSelectCarta(carta) },
-                    colors = CardDefaults.cardColors(containerColor = color_bg),
+                    colors = CardDefaults.cardColors(containerColor = color_secondary),
                     border = BorderStroke(2.dp, color_primary),
                     shape = RoundedCornerShape(8.dp)
                 ) {
@@ -95,7 +99,7 @@ fun MazoVisual(onSelectCarta: (Carta) -> Unit) {
                                 val strokeWidth = 2.dp.toPx()
                                 val y = size.height + 4.dp.toPx()
                                 drawLine(
-                                    color_selected,
+                                    color_primary,
                                     Offset(0f, y),
                                     Offset(size.width, y),
                                     strokeWidth
@@ -107,7 +111,12 @@ fun MazoVisual(onSelectCarta: (Carta) -> Unit) {
                         Image(
                             painter = painterResource(id = carta.imagen),
                             contentDescription = "imagen carta",
-                            modifier = Modifier.width(100.dp)
+                            modifier = Modifier
+                                .width(100.dp)
+                                .aspectRatio(1f) // Para ver bien el borde en la partida
+                                .clip(RoundedCornerShape(2.dp))
+                                .border(width = 2.dp, color = color_bg),
+                            contentScale = ContentScale.Crop
                         )
 
                         // Efecto

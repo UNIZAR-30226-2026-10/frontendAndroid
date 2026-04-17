@@ -68,12 +68,14 @@ data class Ficha(
 fun Tablero(
     tableroState: TableroSnapshot
 ) {
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(8.dp), contentAlignment = Alignment.Center) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
         // BoxWithConstraints para medir el tamaño real en píxeles
-        BoxWithConstraints(modifier = Modifier.aspectRatio(1f).fillMaxWidth()) {
+        BoxWithConstraints(
+            modifier = Modifier
+                .aspectRatio(1f)
+                .fillMaxWidth()
+        ) {
 
             val tableroSizePx = constraints.maxWidth.toFloat()
             val casillaPx = tableroSizePx / 10
@@ -136,12 +138,15 @@ fun Tablero(
             }
 
 
-
             // Convertir el drawable a ImageBitmap
             val bmpSerpiente = ImageBitmap.imageResource(id = R.drawable.serpiente)
             val bmpEscalera = ImageBitmap.imageResource(id = R.drawable.escalera)
 
-            Canvas(modifier = Modifier.aspectRatio(1f).fillMaxWidth()) {
+            Canvas(
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .fillMaxWidth()
+            ) {
                 tableroState.casillas.forEachIndexed { index, casilla ->
                     val numOrigen = index + 1
                     if (casilla.saltoA != null) {
@@ -154,7 +159,8 @@ fun Tablero(
                         val anguloRad = kotlin.math.atan2(dy, dx)
                         val anguloDeg = (anguloRad * (180.0 / kotlin.math.PI)).toFloat()
 
-                        val bitmap = if (casilla.tipo == TipoCasilla.Serpiente) bmpSerpiente else bmpEscalera
+                        val bitmap =
+                            if (casilla.tipo == TipoCasilla.Serpiente) bmpSerpiente else bmpEscalera
                         val grosor = if (casilla.tipo == TipoCasilla.Serpiente) {
                             60.dp.toPx() // Grosor constante para serpientes
                         } else {
@@ -164,7 +170,10 @@ fun Tablero(
                         rotate(anguloDeg, pivot = start) {
                             drawImage(
                                 image = bitmap,
-                                dstOffset = IntOffset(start.x.toInt(), (start.y - grosor / 2).toInt()),
+                                dstOffset = IntOffset(
+                                    start.x.toInt(),
+                                    (start.y - grosor / 2).toInt()
+                                ),
                                 dstSize = IntSize(distancia.toInt(), grosor.toInt())
                             )
                         }

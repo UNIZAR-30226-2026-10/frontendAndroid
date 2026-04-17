@@ -2,9 +2,10 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
@@ -85,62 +86,70 @@ fun Partida(navController: SENavHostController) {
         modifier = Modifier.fillMaxSize(),
         color = color_bg
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        // Usamos un Row para dividir la pantalla en 3 secciones horizontales
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
 
-            // Tablero (Componente principal)
-            Tablero(tableroState = fakeTableroSnapshot)
-
-            // Interfaz Superior: Botón Salir y Lista de Jugadores
-            Row(
+            // Salir y Mazo
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                    .fillMaxHeight()
+                    .weight(1f), // Toma el espacio de la izquierda
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.Start
             ) {
-                // Botón para salir de la partida
                 SalirPartidaBoton(SEState = navController)
 
-                // Lista de jugadores en la partida
-                Box(modifier = Modifier.width(200.dp)) {
-                    ListaJugadores(listaJugadores)
-                }
-            }
-
-            // Interfaz Inferior: Mazo de cartas y Botón del Dado
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 20.dp, start = 16.dp, end = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
-            ) {
-                // Mazo visual con las cartas del jugador
                 Box(modifier = Modifier.width(200.dp)) {
                     MazoVisual(onSelectCarta = { carta ->
                         cartaSeleccionada = carta
                         mostrarDialogoCarta = true
                     })
                 }
+            }
 
-                // Botón circular para tirar el dado
+            // Tablero (Componente principal)
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(2f), // El tablero recibe más espacio
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Tablero(tableroState = fakeTableroSnapshot)
+            }
+
+            // Jugadores y Dado
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Lista de jugadores arriba a la derecha
+                Box(modifier = Modifier.width(200.dp)) {
+                    ListaJugadores(listaJugadores)
+                }
+
+                // Botón del dado abajo a la derecha
                 DadoBoton()
             }
+        }
 
-            // Diálogo de detalles de carta (se activa al pulsar una carta del mazo)
-            if (mostrarDialogoCarta && cartaSeleccionada != null) {
-                DetallesCarta(
-                    carta = cartaSeleccionada!!,
-                    esMiTurno = esMiTurno,
-                    yaJugadoCarta = yaJugadoCarta,
-                    onClose = { mostrarDialogoCarta = false },
-                    onJugar = { carta ->
-                        println("Jugando carta: ${carta.nombre}")
-                        mostrarDialogoCarta = false
-                    }
-                )
-            }
+        // Diálogos
+        if (mostrarDialogoCarta && cartaSeleccionada != null) {
+            DetallesCarta(
+                carta = cartaSeleccionada!!,
+                esMiTurno = esMiTurno,
+                yaJugadoCarta = yaJugadoCarta,
+                onClose = { mostrarDialogoCarta = false },
+                onJugar = { /* Lógica de juego */ }
+            )
         }
     }
 }

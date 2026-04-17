@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
@@ -39,6 +40,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_negative
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_positive
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_secondary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selected
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_unselected
 
@@ -70,7 +72,7 @@ fun CartaContent(
             .padding(16.dp)
             .fillMaxHeight()
             .border(5.dp, color_primary, RoundedCornerShape(24.dp)),
-        colors = CardDefaults.cardColors(containerColor = color_bg),
+        colors = CardDefaults.cardColors(containerColor = color_secondary),
         shape = RoundedCornerShape(24.dp)
     ) {
         Column(
@@ -85,7 +87,7 @@ fun CartaContent(
                 modifier = Modifier.drawBehind {
                     val strokeWidth = 2.dp.toPx()
                     val y = size.height + 4.dp.toPx()
-                    drawLine(color_selected, Offset(0f, y), Offset(size.width, y), strokeWidth)
+                    drawLine(color_primary, Offset(0f, y), Offset(size.width, y), strokeWidth)
                 }
             )
 
@@ -99,8 +101,11 @@ fun CartaContent(
                 Image(
                     painter = painterResource(id = carta.imagen),
                     contentDescription = "imagen carta",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Fit // IMPORTANTE: No se corta, se ajusta
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .clip(RoundedCornerShape(8.dp))
+                        .border(width = 2.dp, color = color_bg, shape = RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
                 )
             }
 
