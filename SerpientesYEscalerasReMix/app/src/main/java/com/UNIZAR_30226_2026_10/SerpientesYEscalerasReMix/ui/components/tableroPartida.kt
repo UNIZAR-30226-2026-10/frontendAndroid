@@ -135,44 +135,82 @@ fun Tablero(
                 }
             }
 
+            // Capa de serpientes y escaleras
+            ColocarSerpientesEscaleras(tableroState, casillaPx)
+        }
+    }
+}
 
-            // Convertir el drawable a ImageBitmap
-            val bmpSerpiente = ImageBitmap.imageResource(id = R.drawable.serpiente)
-            val bmpEscalera = ImageBitmap.imageResource(id = R.drawable.escalera)
+@Composable
+fun ColocarSerpientesEscaleras(tableroState: TableroSnapshot, casillaPx: Float) {
+    val bmpSerpienteCabeza = ImageBitmap.imageResource(id = R.drawable.serpiente_base_cabeza)
+    val bmpSerpienteCuerpo = ImageBitmap.imageResource(id = R.drawable.serpiente_base_cuerpo)
+    val bmpSerpienteCola = ImageBitmap.imageResource(id = R.drawable.serpiente_base_cola)
+    val bmpEscalera = ImageBitmap.imageResource(id = R.drawable.escalera)
 
-            Canvas(
-                modifier = Modifier
-                    .aspectRatio(1f)
-                    .fillMaxWidth()
-            ) {
-                tableroState.casillas.forEachIndexed { index, casilla ->
-                    val numOrigen = index + 1
-                    if (casilla.saltoA != null) {
-                        val start = getCenterOfCasilla(numOrigen, casillaPx)
-                        val end = getCenterOfCasilla(casilla.saltoA, casillaPx)
+    Canvas(
+        modifier = Modifier
+            .aspectRatio(1f)
+            .fillMaxWidth()
+    ) {
+        tableroState.casillas.forEachIndexed { index, casilla ->
+            val numOrigen = index + 1
+            if (casilla.saltoA != null) {
+                val start = getCenterOfCasilla(numOrigen, casillaPx)
+                val end = getCenterOfCasilla(casilla.saltoA, casillaPx)
 
-                        val dx = end.x - start.x
-                        val dy = end.y - start.y
-                        val distancia = kotlin.math.sqrt(dx * dx + dy * dy)
-                        val anguloRad = kotlin.math.atan2(dy, dx)
-                        val anguloDeg = (anguloRad * (180.0 / kotlin.math.PI)).toFloat()
+                val dx = end.x - start.x
+                val dy = end.y - start.y
+                val distancia = kotlin.math.sqrt(dx * dx + dy * dy)
+                val anguloRad = kotlin.math.atan2(dy, dx)
+                val anguloDeg = (anguloRad * (180.0 / kotlin.math.PI)).toFloat()
 
-                        val bitmap =
-                            if (casilla.tipo == TipoCasilla.Serpiente) bmpSerpiente else bmpEscalera
-                        val grosor = if (casilla.tipo == TipoCasilla.Serpiente) {
-                            60.dp.toPx() // Grosor constante para serpientes
-                        } else {
-                            20.dp.toPx() // Grosor constante para escaleras (más anchas)
+                // Ajustes de tamaño: grosorSerpiente reducido al 50% y largos calculados por ratio de aspecto (834/288 para cabeza)
+                val grosorSerpiente = if (casilla.tipo == TipoCasilla.Serpiente) casillaPx * 0.3f else casillaPx * 0.2f
+                val largoCabeza = grosorSerpiente * (834f / 288f)
+                val largoCola = grosorSerpiente * 3f
+
+                val grosorEscalera = casillaPx * 0.7f
+                val largoEscalera = distancia
+                val anchoEscalera = grosorEscalera * (bmpEscalera.width.toFloat() / bmpEscalera.height.toFloat())
+
+
+                rotate(anguloDeg, pivot = start) {
+                    if (casilla.tipo == TipoCasilla.Serpiente) {
+                        val distanciaRestante = (distancia - largoCabeza - largoCola).coerceAtLeast(0f)
+                        val ratioCuerpo = 281f / 254f
+                        val anchoCuerpoBase = grosorSerpiente * ratioCuerpo
+                        val numCuerpos = (distanciaRestante / anchoCuerpoBase).toInt().coerceAtLeast(1)
+                        val anchoCuerpoReal = distanciaRestante / numCuerpos
+
+                        drawImage(
+                            image = bmpSerpienteCabeza,
+                            dstOffset = IntOffset(start.x.toInt(), (start.y - grosorSerpiente / 2).toInt()),
+                            dstSize = IntSize(largoCabeza.toInt(), grosorSerpiente.toInt())
+                        )
+
+                        for (i in 0 until numCuerpos) {
+                            drawImage(
+                                image = bmpSerpienteCuerpo,
+                                dstOffset = IntOffset((start.x + largoCabeza + i * anchoCuerpoReal).toInt(), (start.y - grosorSerpiente / 2).toInt()),
+                                dstSize = IntSize((anchoCuerpoReal + 1).toInt(), grosorSerpiente.toInt())
+                            )
                         }
 
-                        rotate(anguloDeg, pivot = start) {
+                        drawImage(
+                            image = bmpSerpienteCola,
+                            dstOffset = IntOffset((start.x + distancia - largoCola).toInt(), (start.y - grosorSerpiente / 2).toInt()),
+                            dstSize = IntSize(largoCola.toInt(), grosorSerpiente.toInt())
+                        )
+                    } else {
+                        val numTramos = (largoEscalera / anchoEscalera).toInt().coerceAtLeast(1)
+                        val anchoTramoReal = largoEscalera / numTramos
+
+                        for (i in 0 until numTramos) {
                             drawImage(
-                                image = bitmap,
-                                dstOffset = IntOffset(
-                                    start.x.toInt(),
-                                    (start.y - grosor / 2).toInt()
-                                ),
-                                dstSize = IntSize(distancia.toInt(), grosor.toInt())
+                                image = bmpEscalera,
+                                dstOffset = IntOffset((start.x + i * anchoTramoReal).toInt(), (start.y - grosorEscalera / 2).toInt()),
+                                dstSize = IntSize((anchoTramoReal + 1).toInt(), grosorEscalera.toInt())
                             )
                         }
                     }
