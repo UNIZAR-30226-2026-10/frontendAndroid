@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -126,7 +127,8 @@ fun Tablero(
                                     )
 
                                     // Fichas
-                                    val fichasCasilla = fichasState.filter { it.casilla == numCasilla }
+                                    val fichasCasilla =
+                                        fichasState.filter { it.casilla == numCasilla }
                                     FichasStackSnapshot(fichasCasilla)
                                 }
                             }
@@ -165,43 +167,78 @@ fun ColocarSerpientesEscaleras(tableroState: TableroSnapshot, casillaPx: Float) 
                 val anguloRad = kotlin.math.atan2(dy, dx)
                 val anguloDeg = (anguloRad * (180.0 / kotlin.math.PI)).toFloat()
 
-                // Ajustes de tamaño: grosorSerpiente reducido al 50% y largos calculados por ratio de aspecto (834/288 para cabeza)
-                val grosorSerpiente = if (casilla.tipo == TipoCasilla.Serpiente) casillaPx * 0.3f else casillaPx * 0.2f
+                // Ajustar tamaño de las serpientes y escaleras
+                val grosorSerpiente =
+                    if (casilla.tipo == TipoCasilla.Serpiente) casillaPx * 0.3f else casillaPx * 0.2f
                 val largoCabeza = grosorSerpiente * (834f / 288f)
                 val largoCola = grosorSerpiente * 3f
+                val debeReflejar = anguloDeg in 90.0..<180.0
 
                 val grosorEscalera = casillaPx * 0.7f
                 val largoEscalera = distancia
-                val anchoEscalera = grosorEscalera * (bmpEscalera.width.toFloat() / bmpEscalera.height.toFloat())
-
+                val anchoEscalera =
+                    grosorEscalera * (bmpEscalera.width.toFloat() / bmpEscalera.height.toFloat())
 
                 rotate(anguloDeg, pivot = start) {
                     if (casilla.tipo == TipoCasilla.Serpiente) {
-                        val distanciaRestante = (distancia - largoCabeza - largoCola).coerceAtLeast(0f)
+                        // Para que la serpiente este siempre boca arriba
+
+                        val distanciaRestante =
+                            (distancia - largoCabeza - largoCola).coerceAtLeast(0f)
                         val ratioCuerpo = 281f / 254f
                         val anchoCuerpoBase = grosorSerpiente * ratioCuerpo
-                        val numCuerpos = (distanciaRestante / anchoCuerpoBase).toInt().coerceAtLeast(1)
+                        val numCuerpos =
+                            (distanciaRestante / anchoCuerpoBase).toInt().coerceAtLeast(1)
                         val anchoCuerpoReal = distanciaRestante / numCuerpos
 
-                        drawImage(
-                            image = bmpSerpienteCabeza,
-                            dstOffset = IntOffset(start.x.toInt(), (start.y - grosorSerpiente / 2).toInt()),
-                            dstSize = IntSize(largoCabeza.toInt(), grosorSerpiente.toInt())
-                        )
-
-                        for (i in 0 until numCuerpos) {
+                        // Cabeza
+                        withTransform({
+                            if (debeReflejar) scale(1f, -1f, pivot = Offset(start.x + anchoCuerpoReal / 2, start.y))
+                        }) {
                             drawImage(
-                                image = bmpSerpienteCuerpo,
-                                dstOffset = IntOffset((start.x + largoCabeza + i * anchoCuerpoReal).toInt(), (start.y - grosorSerpiente / 2).toInt()),
-                                dstSize = IntSize((anchoCuerpoReal + 1).toInt(), grosorSerpiente.toInt())
+                                image = bmpSerpienteCabeza,
+                                dstOffset = IntOffset(
+                                    start.x.toInt(),
+                                    (start.y - grosorSerpiente / 2).toInt()
+                                ),
+                                dstSize = IntSize(largoCabeza.toInt(), grosorSerpiente.toInt())
                             )
                         }
 
-                        drawImage(
-                            image = bmpSerpienteCola,
-                            dstOffset = IntOffset((start.x + distancia - largoCola).toInt(), (start.y - grosorSerpiente / 2).toInt()),
-                            dstSize = IntSize(largoCola.toInt(), grosorSerpiente.toInt())
-                        )
+                        // Segmentos cuerpo
+                        for (i in 0 until numCuerpos) {
+                            val xPos = start.x + largoCabeza + i * anchoCuerpoReal
+                            withTransform({
+                                if (debeReflejar) scale(1f, -1f, pivot = Offset(xPos + anchoCuerpoReal / 2, start.y))
+                            }) {
+                                drawImage(
+                                    image = bmpSerpienteCuerpo,
+                                    dstOffset = IntOffset(
+                                        (start.x + largoCabeza + i * anchoCuerpoReal).toInt(),
+                                        (start.y - grosorSerpiente / 2).toInt()
+                                    ),
+                                    dstSize = IntSize(
+                                        (anchoCuerpoReal + 1).toInt(),
+                                        grosorSerpiente.toInt()
+                                    )
+                                )
+                            }
+                        }
+
+                        // Cola
+                        val xPosCola = start.x + distancia - largoCola
+                        withTransform({
+                            if (debeReflejar) scale(1f, -1f, pivot = Offset(xPosCola + anchoCuerpoReal / 2, start.y))
+                        }) {
+                            drawImage(
+                                image = bmpSerpienteCola,
+                                dstOffset = IntOffset(
+                                    (start.x + distancia - largoCola).toInt(),
+                                    (start.y - grosorSerpiente / 2).toInt()
+                                ),
+                                dstSize = IntSize(largoCola.toInt(), grosorSerpiente.toInt())
+                            )
+                        }
                     } else {
                         val numTramos = (largoEscalera / anchoEscalera).toInt().coerceAtLeast(1)
                         val anchoTramoReal = largoEscalera / numTramos
@@ -209,8 +246,14 @@ fun ColocarSerpientesEscaleras(tableroState: TableroSnapshot, casillaPx: Float) 
                         for (i in 0 until numTramos) {
                             drawImage(
                                 image = bmpEscalera,
-                                dstOffset = IntOffset((start.x + i * anchoTramoReal).toInt(), (start.y - grosorEscalera / 2).toInt()),
-                                dstSize = IntSize((anchoTramoReal + 1).toInt(), grosorEscalera.toInt())
+                                dstOffset = IntOffset(
+                                    (start.x + i * anchoTramoReal).toInt(),
+                                    (start.y - grosorEscalera / 2).toInt()
+                                ),
+                                dstSize = IntSize(
+                                    (anchoTramoReal + 1).toInt(),
+                                    grosorEscalera.toInt()
+                                )
                             )
                         }
                     }

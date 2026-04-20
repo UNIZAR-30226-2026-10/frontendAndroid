@@ -9,9 +9,9 @@ data class CasillaSnapshot(
     val rotacion: Int,
     val efecto: String? = null,
     val tipo: TipoCasilla,
-    val siguientes: List<Int>,
+    val siguientes: List<Int>, // Ignorable *Legacy
     val saltoA: Int? = null,
-    val hayBloqueo: Boolean = false
+    val hayBloqueo: Boolean = false // Ignorable *Legacy
 )
 
 data class TableroSnapshot(
