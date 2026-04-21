@@ -18,16 +18,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_secondary
 
-@Preview
 @Composable
-fun DadoBoton() {
+fun DadoBoton(onClick: () -> Unit) {
     Surface(
         modifier = Modifier
             .padding(8.dp)
@@ -35,7 +33,8 @@ fun DadoBoton() {
         shape = RoundedCornerShape(24.dp),
         color = color_secondary,
         border = BorderStroke(2.dp, color_primary),
-        shadowElevation = 8.dp
+        shadowElevation = 8.dp,
+        onClick = onClick
     ) {
         Column(
             modifier = Modifier

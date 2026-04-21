@@ -32,12 +32,23 @@ fun prepararOrientacion(SEState: SENavHostController, Orientation: Int) {
 }
 
 // Busca Icono de jugador en R
-fun buscarIconoR(icono: String): Int {
+fun buscarIconoJugadorR(icono: String): Int {
     // TODO ajustar debidamente a los iconos de R (una vez sean creados, etc)
     val iconoR = when (icono) {
         "default" -> R.drawable.icono_default
         "bot"     -> R.drawable.icono_bots
         else -> R.drawable.icono_default
+    }
+
+    return iconoR
+}
+
+// Busca Icono de carta en R
+fun buscarIconoCartaR(icono: String): Int {
+    // TODO ajustar debidamente a los iconos de R (una vez sean creados, etc)
+    val iconoR = when (icono) {
+        "Moises" -> R.drawable.carta_moises
+        else -> R.drawable.carta_moises
     }
 
     return iconoR

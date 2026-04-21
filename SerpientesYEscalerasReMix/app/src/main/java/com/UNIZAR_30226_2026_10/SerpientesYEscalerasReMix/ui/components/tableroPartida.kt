@@ -1,10 +1,11 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components
 
-import androidx.compose.foundation.BorderStroke
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -19,8 +20,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
@@ -30,19 +29,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeFichasSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeTableroSnapshot
@@ -53,15 +51,17 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SerpientesYEscalerasReMixTheme
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fg
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_negative
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_positive
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_unselected
 
 @Composable
 fun Tablero(
     tableroState: TableroSnapshot,
-    fichasState: List<FichaSnapshot>
+    fichasState: List<FichaSnapshot>,
+    seleccionFichas: Boolean,
+    seleccionarFicha: (Int) -> Unit,
+    seleccionCasilla: Boolean,
+    casillasAElegir: List<Int>,
+    seleccionarCasilla: (Int) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
@@ -94,10 +94,21 @@ fun Tablero(
                                 val numCasilla = (fil - 1) * 10 + col
                                 val casilla = tableroState.casillas[numCasilla - 1]
 
+                                // En caso de que sea el momento de elegir una casilla a la que moverse
+                                val esCasillaElegible =
+                                    seleccionCasilla && casillasAElegir.contains(numCasilla)
+                                val debeOscurecer = seleccionCasilla && !esCasillaElegible
+
                                 Box(
                                     modifier = Modifier
                                         .weight(1f)
-                                        .fillMaxHeight(),
+                                        .fillMaxHeight()
+                                        .then( // Añadir acción de elegir solo cuando esCasillaElegible
+                                            if (esCasillaElegible) {
+                                                Modifier
+                                                    .clickable { seleccionarCasilla(numCasilla) }
+                                            } else Modifier
+                                        ),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     // Selección de imagen
@@ -129,7 +140,21 @@ fun Tablero(
                                     // Fichas
                                     val fichasCasilla =
                                         fichasState.filter { it.casilla == numCasilla }
-                                    FichasStackSnapshot(fichasCasilla)
+
+                                    FichasStackSnapshot(
+                                        fichas = fichasCasilla,
+                                        seleccionFichas = seleccionFichas,
+                                        seleccionarFicha = seleccionarFicha
+                                    )
+
+                                    // En caso de que tenga que oscurecerse
+                                    if (debeOscurecer) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(Color.Black.copy(alpha = 0.6f))
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -168,9 +193,9 @@ fun ColocarSerpientesEscaleras(tableroState: TableroSnapshot, casillaPx: Float) 
                 val anguloDeg = (anguloRad * (180.0 / kotlin.math.PI)).toFloat()
 
                 // Ajustar tamaño de las serpientes y escaleras
-                val grosorSerpiente =
-                    if (casilla.tipo == TipoCasilla.Serpiente) casillaPx * 0.3f else casillaPx * 0.2f
+                val grosorSerpiente = casillaPx * 0.3f
                 val largoCabeza = grosorSerpiente * (834f / 288f)
+                val anchoCabeza = casillaPx * 0.35f
                 val largoCola = grosorSerpiente * 3f
                 val debeReflejar = anguloDeg in 90.0..<180.0
 
@@ -193,15 +218,19 @@ fun ColocarSerpientesEscaleras(tableroState: TableroSnapshot, casillaPx: Float) 
 
                         // Cabeza
                         withTransform({
-                            if (debeReflejar) scale(1f, -1f, pivot = Offset(start.x + anchoCuerpoReal / 2, start.y))
+                            if (debeReflejar) scale(
+                                1f,
+                                -1f,
+                                pivot = Offset(start.x + anchoCuerpoReal / 2, start.y)
+                            )
                         }) {
                             drawImage(
                                 image = bmpSerpienteCabeza,
                                 dstOffset = IntOffset(
-                                    start.x.toInt(),
-                                    (start.y - grosorSerpiente / 2).toInt()
+                                    start.x.toInt() + 2,
+                                    (start.y - grosorSerpiente / 2).toInt() - 4
                                 ),
-                                dstSize = IntSize(largoCabeza.toInt(), grosorSerpiente.toInt())
+                                dstSize = IntSize(largoCabeza.toInt(), anchoCabeza.toInt())
                             )
                         }
 
@@ -209,7 +238,11 @@ fun ColocarSerpientesEscaleras(tableroState: TableroSnapshot, casillaPx: Float) 
                         for (i in 0 until numCuerpos) {
                             val xPos = start.x + largoCabeza + i * anchoCuerpoReal
                             withTransform({
-                                if (debeReflejar) scale(1f, -1f, pivot = Offset(xPos + anchoCuerpoReal / 2, start.y))
+                                if (debeReflejar) scale(
+                                    1f,
+                                    -1f,
+                                    pivot = Offset(xPos + anchoCuerpoReal / 2, start.y)
+                                )
                             }) {
                                 drawImage(
                                     image = bmpSerpienteCuerpo,
@@ -228,7 +261,11 @@ fun ColocarSerpientesEscaleras(tableroState: TableroSnapshot, casillaPx: Float) 
                         // Cola
                         val xPosCola = start.x + distancia - largoCola
                         withTransform({
-                            if (debeReflejar) scale(1f, -1f, pivot = Offset(xPosCola + anchoCuerpoReal / 2, start.y))
+                            if (debeReflejar) scale(
+                                1f,
+                                -1f,
+                                pivot = Offset(xPosCola + anchoCuerpoReal / 2, start.y)
+                            )
                         }) {
                             drawImage(
                                 image = bmpSerpienteCola,
@@ -264,7 +301,11 @@ fun ColocarSerpientesEscaleras(tableroState: TableroSnapshot, casillaPx: Float) 
 }
 
 @Composable
-fun FichasStackSnapshot(fichas: List<FichaSnapshot>) {
+fun FichasStackSnapshot(
+    fichas: List<FichaSnapshot>,
+    seleccionFichas: Boolean = false,
+    seleccionarFicha: (Int) -> Unit = {}
+) {
 
     val fichasProcesadas: List<Pair<Int, FichaSnapshot>> = if (fichas.size > 2) {
         // Si es la primera casilla (fichas.size > 2), mostrar solo 1 por jugador con cuenta de estas
@@ -286,10 +327,22 @@ fun FichasStackSnapshot(fichas: List<FichaSnapshot>) {
         verticalArrangement = Arrangement.Center
     ) {
         fichasProcesadas.forEach { (cuenta, ficha) ->
+
+            // Lógica de validación para mostrar recuadro y permitir click
+            val esFichaSeleccionable = seleccionFichas && ficha.esUsuario && !ficha.meta
+
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth(fractionCasilla) // Asegura el 2x2
-                    .aspectRatio(1f),
+                    .aspectRatio(1f)
+                    .then( // Añadir borde
+                        if (esFichaSeleccionable) {
+                            Modifier
+                                .border(2.dp, color_primary, RoundedCornerShape(4.dp))
+                                .clickable { seleccionarFicha(ficha.id) }
+                        } else Modifier
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 if (ficha.idImg != null) {
@@ -335,45 +388,6 @@ fun getCenterOfCasilla(numCasilla: Int, casillaPx: Float): Offset {
     return Offset(x, y)
 }
 
-@Composable
-fun DialogConfirmacionEscalera(saltoA: Int, onConfirm: () -> Unit, onCancel: () -> Unit) {
-    Dialog(onDismissRequest = {}) {
-        Card(
-            colors = CardDefaults.cardColors(containerColor = color_unselected),
-            shape = RoundedCornerShape(16.dp),
-            border = BorderStroke(2.dp, color_primary)
-        ) {
-            Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("🪜", fontSize = 40.sp)
-                Text(
-                    "¡HAS CAÍDO EN UNA ESCALERA!",
-                    style = SETextTypes.grande.copy(fontWeight = FontWeight.Bold),
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    "¿Quieres subir a la casilla $saltoA?",
-                    style = SETextTypes.sombreado,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(
-                        onClick = onConfirm,
-                        colors = ButtonDefaults.buttonColors(containerColor = color_positive)
-                    ) {
-                        Text("SÍ", style = SETextTypes.plano)
-                    }
-                    Button(
-                        onClick = onCancel,
-                        colors = ButtonDefaults.buttonColors(containerColor = color_negative)
-                    ) {
-                        Text("NO", style = SETextTypes.plano)
-                    }
-                }
-            }
-        }
-    }
-}
-
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp,orientation=landscape")
 @Composable
 fun TableroPreview() {
@@ -383,7 +397,15 @@ fun TableroPreview() {
             modifier = Modifier.fillMaxSize(),
             color = color_bg
         ) {
-            Tablero(fakeTableroSnapshot, fakeFichasSnapshot)
+            Tablero(
+                fakeTableroSnapshot,
+                fakeFichasSnapshot,
+                false,
+                { ficha -> Log.d("A", "ficha sel: $ficha") },
+                false,
+                listOf(2, 8),
+                { casilla -> Log.d("A", "casilla sel: $casilla") }
+            )
         }
     }
 }

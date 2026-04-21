@@ -1,4 +1,4 @@
-package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens
+package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Partida
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,21 +12,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeFichasSnapshot
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeJugadoresSnapshot
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeTableroSnapshot
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ChatBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DadoBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DetallesCarta
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoChat
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ListaJugadores
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MazoVisual
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.SalirPartidaBoton
@@ -36,16 +32,12 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.remember
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 
 @Composable
-fun Partida(navController: SENavHostController) {
-    // Estados para controlar la lógica de la partida
-    var cartaSeleccionada by remember { mutableStateOf<Carta?>(null) }
-    var mostrarDialogoCarta by remember { mutableStateOf(false) }
-
-    // Estos estados idealmente vendrían de un ViewModel
-    val equipoActual = "miEquipo"
-    val esMiTurno = true
-    val yaJugadoCarta = false
-
+fun PartidaScreen(
+    navController: SENavHostController,
+    viewModel: PartidaViewModel = viewModel()
+) {
+    // Estado del contenido de la pantalla
+    val uiState by viewModel.uiState.collectAsState()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -71,10 +63,10 @@ fun Partida(navController: SENavHostController) {
 
 
                 Box(modifier = Modifier.width(200.dp)) {
-                    MazoVisual(onSelectCarta = { carta ->
-                        cartaSeleccionada = carta
-                        mostrarDialogoCarta = true
-                    })
+                    MazoVisual(
+                        onSelectCarta = { viewModel.onCartaSeleccionada(it) },
+                        manoState = uiState.mano
+                    )
                 }
             }
 
@@ -86,7 +78,7 @@ fun Partida(navController: SENavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Tablero(fakeTableroSnapshot, fakeFichasSnapshot)
+                Tablero(uiState.tablero, uiState.fichas)
             }
 
             // Jugadores, Chat y Dado
@@ -99,7 +91,7 @@ fun Partida(navController: SENavHostController) {
             ) {
                 // Lista de jugadores arriba a la derecha
                 Box(modifier = Modifier.width(200.dp)) {
-                    ListaJugadores(fakeJugadoresSnapshot)
+                    ListaJugadores(uiState.jugadores)
                 }
 
                 // Botón del dado y chat abajo a la derecha
@@ -111,7 +103,7 @@ fun Partida(navController: SENavHostController) {
                             .offset(x = (-50).dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        DadoBoton()
+                        DadoBoton({ viewModel.lanzarDado() })
                     }
 
                     Box(
@@ -120,21 +112,33 @@ fun Partida(navController: SENavHostController) {
                             .padding(16.dp)
                             .offset(y = (-5).dp, x = 10.dp)
                     ) {
-                        ChatBoton(onSend = { /* TODO */ })
+                        ChatBoton(onClick = { viewModel.cerrarChat() })
                     }
                 }
             }
         }
 
         // Diálogos
-        if (mostrarDialogoCarta && cartaSeleccionada != null) {
+        if (uiState.mostrarDialogoCarta) {
             DetallesCarta(
-                carta = cartaSeleccionada!!,
-                esMiTurno = esMiTurno,
-                yaJugadoCarta = yaJugadoCarta,
-                onClose = { mostrarDialogoCarta = false },
-                onJugar = { /* Lógica de juego */ }
+                carta = uiState.cartaEnDetalle,
+                esMiTurno = uiState.esMiTurno,
+                yaJugadoCarta = uiState.yaJugadoCarta,
+                onClose = { viewModel.onCerrarDetalleCarta() },
+                onJugar = { viewModel.onJugarCarta(it) }
             )
+        }
+
+        if (uiState.mostrarDialogoChat) {
+            DialogoChat(
+                uiState.chat,
+                onClose = { viewModel.cerrarChat() },
+                onSend = { viewModel.enviarMsgChat(it) },
+            )
+        }
+
+        if (uiState.mostrarDialogoEscalera) {
+            // TODO añadir DialogoEscalera
         }
     }
 }
@@ -146,6 +150,6 @@ fun PartidaScreenPreview() {
     // Usamos el tema de tu proyecto
     MaterialTheme {
         // PASAMOS LOS DATOS MOCK AQUÍ
-        Partida(SEState)
+        PartidaScreen(SEState)
     }
 }

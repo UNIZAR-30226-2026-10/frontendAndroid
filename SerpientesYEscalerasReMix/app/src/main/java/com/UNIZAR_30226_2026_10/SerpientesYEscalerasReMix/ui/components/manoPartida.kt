@@ -33,8 +33,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeManoCartas
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarIconoCartaR
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fg
@@ -44,13 +45,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selecte
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_unselected
 
 @Composable
-fun MazoVisual(onSelectCarta: (Carta) -> Unit) {
-    val mano = listOf(
-        Carta(1, "Moises", imagen =  R.drawable.carta_moises, efecto = "Te saltas el bloqueo"),
-        Carta(2, "Moises", imagen = R.drawable.carta_moises, efecto = "Te saltas el bloqueo"),
-        Carta(3, "Moises", imagen = R.drawable.carta_moises, efecto = "Te saltas el bloqueo"),
-        null
-    )
+fun MazoVisual(onSelectCarta: (Carta) -> Unit, manoState: MutableList<Carta?>) {
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -58,8 +53,8 @@ fun MazoVisual(onSelectCarta: (Carta) -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(mano.size) { idx ->
-            val carta = mano[idx]
+        items(manoState.size) { idx ->
+            val carta = manoState[idx]
             if (carta == null) {
                 Box(
                     modifier = Modifier
@@ -109,7 +104,7 @@ fun MazoVisual(onSelectCarta: (Carta) -> Unit) {
 
                         // Imagen de la carta
                         Image(
-                            painter = painterResource(id = carta.imagen),
+                            painter = painterResource(id = buscarIconoCartaR(carta.nombre)),
                             contentDescription = "imagen carta",
                             modifier = Modifier
                                 .width(100.dp)
@@ -126,7 +121,7 @@ fun MazoVisual(onSelectCarta: (Carta) -> Unit) {
                             border = BorderStroke(1.dp, color_selected.copy(alpha = 0.5f))
                         ) {
                             Text(
-                                text = "\"${carta.efecto}\"",
+                                text = "\"${carta.descripcion}\"",
                                 style = SETextTypes.plano.copy(fontStyle = FontStyle.Italic),
                                 modifier = Modifier.padding(12.dp),
                                 textAlign = TextAlign.Center
@@ -142,5 +137,5 @@ fun MazoVisual(onSelectCarta: (Carta) -> Unit) {
 @Preview
 @Composable
 fun MazoPrev() {
-    MazoVisual({ _ -> })
+    MazoVisual({ _ -> }, fakeManoCartas)
 }

@@ -33,8 +33,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Calidad
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarIconoCartaR
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_negative
@@ -99,7 +101,7 @@ fun CartaContent(
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = carta.imagen),
+                    painter = painterResource(id = buscarIconoCartaR(carta.nombre)),
                     contentDescription = "imagen carta",
                     modifier = Modifier
                         .wrapContentSize()
@@ -116,7 +118,7 @@ fun CartaContent(
                 border = BorderStroke(1.dp, color_selected.copy(alpha = 0.5f))
             ) {
                 Text(
-                    text = "\"${carta.efecto}\"",
+                    text = "\"${carta.descripcion}\"",
                     style = SETextTypes.plano.copy(fontStyle = FontStyle.Italic),
                     modifier = Modifier.padding(12.dp),
                     textAlign = TextAlign.Center
@@ -154,12 +156,7 @@ fun CartaContent(
 @Preview(showBackground = true)
 @Composable
 fun DetallesPrev() {
-    val carta = Carta(
-        id = 1,
-        nombre = "moises",
-        imagen = R.drawable.carta_moises,
-        efecto = "Divide las aguas y avanza casillas -- saltate un bloqueo"
-    )
+    val carta = Carta("Moises", "Te saltas el bloqueo", tipo = Tipo.Defensiva, calidad = Calidad.Epica)
 
     CartaContent(
         carta = carta,

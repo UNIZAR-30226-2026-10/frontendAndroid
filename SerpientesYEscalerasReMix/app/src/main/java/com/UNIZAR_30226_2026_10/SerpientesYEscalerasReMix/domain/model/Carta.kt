@@ -14,11 +14,11 @@ enum class Calidad {
 }
 
 data class Carta (
-    val id: Int,
-    val nombre: String = "Carta $id",
-    val descripcion: String = "Descripción de la carta $id",
-    val efecto: String = "Efecto $id", //TEMP FIXME
-    val imagen: Int, //TEMP FIXME
-    val tipo: Tipo = Tipo.Ofensiva, //TEMP FIXME
-    val calidad: Calidad = Calidad.Comun //TEMP FIXME
+    val nombre: String,
+    val descripcion: String,
+    val tipo: Tipo,
+    val calidad: Calidad,
+    val id: Int? = null,
+    val efecto: String? = null,
+    val imagen: Int? = null
 )
