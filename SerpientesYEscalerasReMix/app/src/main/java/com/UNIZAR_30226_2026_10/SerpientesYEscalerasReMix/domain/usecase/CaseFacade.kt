@@ -33,4 +33,6 @@ class CaseFacade(context: Context) {
     public val jugarContinuarCase = JugarContinuarCase(email, username)
 
     public val jugarCrearCase = JugarCrearCase(email, username, _lobbyId)
+
+    public val perfilCase = PerfilCase(email, username)
 }
