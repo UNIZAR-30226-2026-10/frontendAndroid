@@ -2,19 +2,24 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase
 
 import android.content.Context
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PartidaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class CaseFacade(context: Context) {
+class CaseFacade(
+    context: Context, // TODO eliminar de aqui
 
+    // Repositorios
+    // TODO ir añadiendo aqui las interfaces que se vayan creando, fuera seran instanciadas como toquen
+    private val partidaRepository: PartidaRepository,
+    ) {
+
+    // TODO Cambiar e iniciar esto en MainActivity junto con remote, luego cerceriorarse que todo se crea bien con su repo, etc
     // Creación del almacen local
     private val local = LocalStorage(context)
 
-    // TODO Creación de la clase remote relacionada con la API y añadirla en los constructores
-    // private val remoteApi =
-
-    // estado compartido entre usecases
+    // estado compartido entre usecases TODO eliminar de aqui y recuperar del repository correspondiente
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email.asStateFlow()
 
@@ -23,6 +28,12 @@ class CaseFacade(context: Context) {
 
     private val _lobbyId = MutableStateFlow("")
     val lobbyId: StateFlow<String> = _lobbyId.asStateFlow()
+
+    private val _matchId = MutableStateFlow("")
+    val matchId: StateFlow<String> = _lobbyId.asStateFlow()
+
+    // Repositorios
+
 
 
     // Crear Todos los casos de uso, asignando local y remoteApi segun corresponda
@@ -33,4 +44,8 @@ class CaseFacade(context: Context) {
     public val jugarContinuarCase = JugarContinuarCase(email, username)
 
     public val jugarCrearCase = JugarCrearCase(email, username, _lobbyId)
+
+    // Casos de uso de Partida
+    public val syncPartidaCase = SyncPartidaCase(partidaRepository, email, matchId)
+    public val moverFichaCase = MoverFichaCase(partidaRepository, email, matchId)
 }

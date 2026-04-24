@@ -1,9 +1,16 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,13 +25,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,11 +44,29 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selected
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selectedText
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_transparent
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_unselected
 
 @Composable
-fun ListaJugadores(jugadoresState: JugadoresSnapshot) {
+fun ListaJugadores(
+    jugadoresState: JugadoresSnapshot,
+    seleccionCarta: Boolean,
+    onSeleccionCarta: (String) -> Unit
+) {
+
+    // Animacion para la seleccion si seleccionCarta
+    val transition = rememberInfiniteTransition(label = "parpadeo")
+    val alphaAnimado by transition.animateFloat(
+        initialValue = 0.5f,
+        targetValue = 0.8f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1200, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "alpha"
+    )
+
     Column(
         modifier = Modifier
             .width(200.dp)
@@ -51,7 +76,7 @@ fun ListaJugadores(jugadoresState: JugadoresSnapshot) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "TURNO ${jugadoresState.turnoActual}",
+            text = "RONDA ${jugadoresState.ronda}",
             style = SETextTypes.mediano,
             modifier = Modifier.padding(bottom = 6.dp)
         )
@@ -60,15 +85,26 @@ fun ListaJugadores(jugadoresState: JugadoresSnapshot) {
             var numJugador: Int = 0
             jugadoresState.jugadores.forEach { jugador ->
                 numJugador++
-                val esTurno = numJugador == jugadoresState.ronda
+                val esTurno = numJugador == jugadoresState.turno
+
+                val colorJugadorFondo =
+                    if(seleccionCarta) color_selectedText.copy(alpha = alphaAnimado)
+                    else if (esTurno) color_selected
+                    else color_unselected
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(CircleShape)
-                        .background(if (esTurno) color_selected else color_bg)
-                        .border(1.dp, if (esTurno) color_fg else color_transparent, CircleShape)
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                        .background(colorJugadorFondo)
+                        .border(1.dp, if (esTurno && !seleccionCarta) color_fg else color_transparent, CircleShape)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .then( // seleccionar jugador para accion de una carta
+                            if (seleccionCarta) {
+                                Modifier
+                                    .clickable { onSeleccionCarta(jugador.email) }
+                            } else Modifier
+                        ),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -114,11 +150,7 @@ fun ListaJugadores(jugadoresState: JugadoresSnapshot) {
 
                     Text(
                         text = jugador.nombre,
-                        style = if (esTurno) SETextTypes.plano.copy(
-                            fontWeight = FontWeight.Black,
-                            fontSize = 13.sp
-                        )
-                        else SETextTypes.plano.copy(fontSize = 13.sp),
+                        style = SETextTypes.plano.copy(fontSize = 13.sp),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
@@ -132,5 +164,5 @@ fun ListaJugadores(jugadoresState: JugadoresSnapshot) {
 @Preview(showBackground = true)
 @Composable
 fun ListaPrev() {
-    ListaJugadores(fakeJugadoresSnapshot)
+    ListaJugadores(fakeJugadoresSnapshot, true, onSeleccionCarta = {a -> })
 }

@@ -15,7 +15,7 @@ data class EfectoActivo(
 
 data class JugadorEstado(
     val esLider: Boolean = false,
-    val email: String? = null,
+    val email: String,
     val nombre: String,
     val icono: Int,
     val fase: FaseJuego,
@@ -27,7 +27,7 @@ data class JugadorEstado(
 )
 
 data class JugadoresSnapshot(
-    val turnoActual: Int,
+    val turno: Int,
     val ronda: Int,
     val jugadores: List<JugadorEstado>
 )

@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -23,6 +26,9 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ChatBoto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DadoBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DetallesCarta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoChat
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoEscalera
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoIndicacionPartida
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoPuntuacionDado
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ListaJugadores
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MazoVisual
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.SalirPartidaBoton
@@ -36,8 +42,24 @@ fun PartidaScreen(
     navController: SENavHostController,
     viewModel: PartidaViewModel = viewModel()
 ) {
+    // VIEWMODEL
+
     // Estado del contenido de la pantalla
     val uiState by viewModel.uiState.collectAsState()
+
+    // Activar polling al entrar en la pantalla
+    LaunchedEffect(Unit) {
+        viewModel.iniciarPolling()
+    }
+
+    // Desactivar polling cuando la pantalla no sea visible
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.detenerPolling()
+        }
+    }
+
+    // INTERFAZ
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -78,7 +100,19 @@ fun PartidaScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Tablero(uiState.tablero, uiState.fichas)
+                Tablero(
+                    tableroState = uiState.tablero,
+                    fichasState = uiState.fichas,
+                    seleccionFicha = uiState.seleccionFichas,
+                    seleccionarFicha = { ficha -> viewModel.onSeleccionFicha(ficha) },
+                    seleccionCasilla = uiState.seleccionCasilla,
+                    casillasAElegir = uiState.casillasAElegir,
+                    seleccionarCasilla = { casilla, esBifurcacion -> viewModel.onSeleccionCasilla(casilla, esBifurcacion) },
+                    seleccionFichaCarta = uiState.seleccionFichaCarta,
+                    seleccionarFichaCarta = { ficha -> viewModel.onSeleccionFichaCarta(ficha) },
+                    seleccionCasillaCarta = uiState.seleccionCasillaCarta,
+                    seleccionarCasillaCarta = { casilla -> viewModel.onSeleccionCasillaCarta(casilla) }
+                )
             }
 
             // Jugadores, Chat y Dado
@@ -91,7 +125,10 @@ fun PartidaScreen(
             ) {
                 // Lista de jugadores arriba a la derecha
                 Box(modifier = Modifier.width(200.dp)) {
-                    ListaJugadores(uiState.jugadores)
+                    ListaJugadores(
+                        uiState.jugadores,
+                        uiState.seleccionJugadorCarta,
+                        onSeleccionCarta = { email -> viewModel.onSeleccionJugadorCarta(email) })
                 }
 
                 // Botón del dado y chat abajo a la derecha
@@ -103,7 +140,7 @@ fun PartidaScreen(
                             .offset(x = (-50).dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        DadoBoton({ viewModel.lanzarDado() })
+                        DadoBoton({ viewModel.onLanzarDado() })
                     }
 
                     Box(
@@ -138,8 +175,27 @@ fun PartidaScreen(
         }
 
         if (uiState.mostrarDialogoEscalera) {
-            // TODO añadir DialogoEscalera
+            DialogoEscalera(
+                uiState.casillaEscalera,
+                onAceptar = { viewModel.onSubirEscalera() },
+                onRechazar = { viewModel.onCerrarDialogoEscalera() }
+            )
         }
+
+        if (uiState.mostrarDialogoIndicacion) {
+            DialogoIndicacionPartida(
+                uiState.indicacion,
+                modifier = Modifier
+                    .offset(y = (-195).dp)
+                    .wrapContentSize()
+            )
+        }
+
+        DialogoPuntuacionDado(
+            uiState.puntuacionDado,
+            uiState.mostrarDialogoPuntuacion,
+            modifier = Modifier.wrapContentSize()
+        )
     }
 }
 

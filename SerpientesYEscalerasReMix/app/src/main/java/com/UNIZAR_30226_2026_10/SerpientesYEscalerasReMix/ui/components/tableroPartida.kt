@@ -1,6 +1,5 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,6 +44,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeFichasSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeTableroSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.FichaSnapshot
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Movimiento
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TableroSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TipoCasilla
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
@@ -57,11 +57,20 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
 fun Tablero(
     tableroState: TableroSnapshot,
     fichasState: List<FichaSnapshot>,
-    seleccionFichas: Boolean,
+
+    seleccionFicha: Boolean,
     seleccionarFicha: (Int) -> Unit,
+
     seleccionCasilla: Boolean,
-    casillasAElegir: List<Int>,
-    seleccionarCasilla: (Int) -> Unit
+    casillasAElegir: List<Movimiento>, // Usado también con seleccionCasillaCarta
+    seleccionarCasilla: (Int, Boolean) -> Unit,
+
+    seleccionFichaCarta: Boolean,
+    seleccionarFichaCarta: (Int) -> Unit,
+
+    seleccionCasillaCarta: Boolean,
+    seleccionarCasillaCarta: (Int) -> Unit
+
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
@@ -95,9 +104,12 @@ fun Tablero(
                                 val casilla = tableroState.casillas[numCasilla - 1]
 
                                 // En caso de que sea el momento de elegir una casilla a la que moverse
+                                val haySeleccion = seleccionCasilla || seleccionCasillaCarta
+
                                 val esCasillaElegible =
-                                    seleccionCasilla && casillasAElegir.contains(numCasilla)
-                                val debeOscurecer = seleccionCasilla && !esCasillaElegible
+                                    haySeleccion && casillasAElegir.any { it.casillaId == numCasilla }
+
+                                val debeOscurecer = haySeleccion && !esCasillaElegible
 
                                 Box(
                                     modifier = Modifier
@@ -106,7 +118,13 @@ fun Tablero(
                                         .then( // Añadir acción de elegir solo cuando esCasillaElegible
                                             if (esCasillaElegible) {
                                                 Modifier
-                                                    .clickable { seleccionarCasilla(numCasilla) }
+                                                    .clickable {
+                                                        if (seleccionCasilla) {
+                                                            seleccionarCasilla(numCasilla, casilla.siguientes.size > 1) // casilla.siguientes.size > 1 = esBifurcacion
+                                                        } else { // seleccionCasillaCarta
+                                                            seleccionarCasillaCarta(numCasilla)
+                                                        }
+                                                    }
                                             } else Modifier
                                         ),
                                     contentAlignment = Alignment.Center
@@ -143,8 +161,10 @@ fun Tablero(
 
                                     FichasStackSnapshot(
                                         fichas = fichasCasilla,
-                                        seleccionFichas = seleccionFichas,
-                                        seleccionarFicha = seleccionarFicha
+                                        seleccionFicha = seleccionFicha,
+                                        seleccionarFicha = seleccionarFicha,
+                                        seleccionFichaCarta = seleccionFichaCarta,
+                                        seleccionarFichaCarta = seleccionarFichaCarta
                                     )
 
                                     // En caso de que tenga que oscurecerse
@@ -303,8 +323,11 @@ fun ColocarSerpientesEscaleras(tableroState: TableroSnapshot, casillaPx: Float) 
 @Composable
 fun FichasStackSnapshot(
     fichas: List<FichaSnapshot>,
-    seleccionFichas: Boolean = false,
-    seleccionarFicha: (Int) -> Unit = {}
+    seleccionFicha: Boolean = false,
+    seleccionarFicha: (Int) -> Unit = {},
+
+    seleccionFichaCarta: Boolean = false,
+    seleccionarFichaCarta: (Int) -> Unit = {}
 ) {
 
     val fichasProcesadas: List<Pair<Int, FichaSnapshot>> = if (fichas.size > 2) {
@@ -329,7 +352,8 @@ fun FichasStackSnapshot(
         fichasProcesadas.forEach { (cuenta, ficha) ->
 
             // Lógica de validación para mostrar recuadro y permitir click
-            val esFichaSeleccionable = seleccionFichas && ficha.esUsuario && !ficha.meta
+            val esFichaSeleccionable =
+                (seleccionFicha || seleccionFichaCarta) && ficha.esUsuario && !ficha.meta
 
 
             Box(
@@ -340,7 +364,13 @@ fun FichasStackSnapshot(
                         if (esFichaSeleccionable) {
                             Modifier
                                 .border(2.dp, color_primary, RoundedCornerShape(4.dp))
-                                .clickable { seleccionarFicha(ficha.id) }
+                                .clickable {
+                                    if (seleccionFicha) {
+                                        seleccionarFicha(ficha.id)
+                                    } else { // seleccionFichaCarta
+                                        seleccionarFichaCarta(ficha.id)
+                                    }
+                                }
                         } else Modifier
                     ),
                 contentAlignment = Alignment.Center
@@ -397,14 +427,35 @@ fun TableroPreview() {
             modifier = Modifier.fillMaxSize(),
             color = color_bg
         ) {
+            val movimientos = listOf<Movimiento>(
+                Movimiento(
+                    fichaId = 1,
+                    casillaId = 2,
+                    esBifurcacion = false,
+                    pasosRestantes = 0
+                ),
+
+                Movimiento(
+                    fichaId = 1,
+                    casillaId = 8,
+                    esBifurcacion = false,
+                    pasosRestantes = 0
+                )
+            )
+
             Tablero(
                 fakeTableroSnapshot,
                 fakeFichasSnapshot,
                 false,
-                { ficha -> Log.d("A", "ficha sel: $ficha") },
+                { ficha -> },
                 false,
-                listOf(2, 8),
-                { casilla -> Log.d("A", "casilla sel: $casilla") }
+                movimientos,
+                { casilla, esBifurcacion ->  },
+                false,
+                { ficha -> },
+                false,
+                { casilla -> }
+
             )
         }
     }

@@ -9,6 +9,5 @@ class FichaSnapshot (
     val casilla: Int, // 0..100
     val meta: Boolean = false,
     val esUsuario: Boolean = false,
-    val idImgBase: Int,
     val idImg: Int? = null // null al ser construido por repository, pero inicializada SIEMPRE en usecase
 )
