@@ -1,17 +1,15 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Partida
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeFichasSnapshot
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeJugadoresSnapshot
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeManoCartas
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeTableroSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.FichaSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.JugadoresSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Movimiento
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.MsgChat
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TableroSnapshot
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TipoCasilla
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -23,8 +21,38 @@ import kotlinx.coroutines.launch
 
 class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
+    companion object {
+        fun Factory(cF: CaseFacade): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return PartidaViewModel(cF) as T
+                }
+            }
+    }
+
+
     private val _uiState = MutableStateFlow(PartidaUiState())
     val uiState = _uiState.asStateFlow()
+
+    init {
+        // Conexión de Flows del Repository a UI State
+        viewModelScope.launch {
+            launch { cF.tablero.collect { data -> _uiState.update { it.copy(tablero = data) } } }
+            launch { cF.fichas.collect { data -> _uiState.update { it.copy(fichas = data) } } }
+            launch {
+                cF.jugadores.collect { data ->
+                    _uiState.update {
+                        it.copy(
+                            jugadores = data,
+                            esMiTurno = data.jugadores.getOrNull(data.turno)?.email == cF.email.value
+                        )
+                    }
+                }
+            }
+            launch { cF.mano.collect { data -> _uiState.update { it.copy(mano = data.toMutableList()) } } }
+            launch { cF.chat.collect { data -> _uiState.update { it.copy(chat = data) } } }
+        }
+    }
 
     // Funciones POLLING
 
@@ -55,6 +83,7 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                 mostrarDialogoCarta = diag == "Carta",
                 mostrarDialogoChat = diag == "Chat",
                 mostrarDialogoEscalera = diag == "Escalera",
+                mostrarDialogoBifurcacion = diag == "Bifurcacion"
             )
         }
     }
@@ -63,7 +92,7 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
     fun onLanzarDado() {
         viewModelScope.launch {
-            val dadoPair = cF.moverFichaCase()
+            val dadoPair = cF.lanzarDadoCase()
             val puntuacionDado = dadoPair.first
             val casillasPosibles = dadoPair.second
 
@@ -93,78 +122,161 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
     // Función llamada tras tirar el dado y elegir una ficha que mover
     fun onSeleccionFicha(fichaId: Int) {
-
-        // Eleccion de casilla
-        _uiState.update {
-            it.copy(
-                mostrarDialogoIndicacion = true,
-                indicacion = "Seleccione una casilla",
-                seleccionFichas = false,
-
-                // Mostrar solo las casillas desde la ficha
-                casillasAElegir = cF.moverFichaCase.filtrarMovimientosPorFicha(it.casillasAElegir, fichaId),
-                seleccionCasilla = true
-            )
-        }
-    }
-
-    // Función llamada tras elegir una ficha que mover, para elegir el destino
-    // o al elegir una bifucación
-    fun onSeleccionCasilla(casillaId: Int, esBifurcacion: Boolean) {
-        // si es bifurcacion llamar de nuevo para doble eleccion
-        // si es escalera mostrar el dialogo correspondiente
-
-        if (!esBifurcacion) {
+        viewModelScope.launch {
+            // Eleccion de casilla
             _uiState.update {
                 it.copy(
-                    mostrarDialogoIndicacion = false,
-                    indicacion = "",
-                    seleccionCasilla = false
-                )
-
-                // TODO llamada usecase
-            }
-        } else {
-            // TODO llamada usecase
-
-            _uiState.update {
-                it.copy( //TODO
                     mostrarDialogoIndicacion = true,
                     indicacion = "Seleccione una casilla",
                     seleccionFichas = false,
 
-                    casillasAElegir = emptyList(), // TODO
+                    fichaSeleccionada = fichaId,
+
+                    // Mostrar solo las casillas desde la ficha
+                    casillasAElegir = cF.lanzarDadoCase(it.casillasAElegir, fichaId),
                     seleccionCasilla = true
                 )
             }
         }
     }
 
-    fun onCerrarDialogoEscalera() {
-        coordinarDialogos("")
+    // Función llamada tras elegir una ficha que mover, para elegir el destino
+    // o al elegir una bifucación
+    fun onSeleccionCasilla(casillaId: Int) {
+        // si es bifurcacion o escalera mostrar dialogo correspondiente
+
+        viewModelScope.launch {
+            // Obtener movimiento correspondiente
+            val movDestino = _uiState.value.casillasAElegir.find { it.casillaId == casillaId }!!
+
+            if (_uiState.value.tablero.casillas[casillaId].tipo == TipoCasilla.Escalera) {
+                _uiState.update {
+                    it.copy(
+                        casillaEscaleraIni = casillaId,
+                        casillaEscaleraFin = _uiState.value.tablero.casillas[casillaId].saltoA!!
+                    )
+                }
+                coordinarDialogos("Escalera")
+            } else if (movDestino.esBifurcacion && movDestino.pasosRestantes > 0) {
+                _uiState.update {
+                    it.copy(
+                        casillaBifurcacionIni = casillaId,
+                        casillaA = _uiState.value.tablero.casillas[casillaId].siguientes[0],
+                        casillaB = _uiState.value.tablero.casillas[casillaId].siguientes[1]
+                    )
+                }
+                coordinarDialogos("Bifurcacion")
+            } else {
+                _uiState.update {
+                    it.copy(
+                        mostrarDialogoIndicacion = false,
+                        indicacion = "",
+                        seleccionCasilla = false,
+
+                        casillasAElegir = emptyList(),
+                    )
+                }
+
+                cF.confirmarDestinoCase(movDestino)
+            }
+        }
     }
 
-    fun onSubirEscalera() { // Todo añadir params necesarios
-        // Todo enviar al backend decision (Siempre que llegues aqui no te quedan movs)
+    fun onCerrarDialogoEscalera() {
+
+        viewModelScope.launch {
+            val casillaIniAux = _uiState.value.casillaEscaleraIni
+            _uiState.update {
+                it.copy(
+                    mostrarDialogoIndicacion = false,
+                    indicacion = "",
+                    seleccionCasilla = false,
+
+                    casillaEscaleraIni = 0,
+                    casillaEscaleraFin = 0,
+
+                    casillasAElegir = emptyList(),
+                )
+            }
+
+            coordinarDialogos("")
+
+            val movDestino = _uiState.value.casillasAElegir.find { it.casillaId == casillaIniAux }!!
+
+            cF.confirmarDestinoCase(movDestino)
+        }
+    }
+
+    fun onSubirEscalera() {
+
+        viewModelScope.launch {
+            val movAux = Movimiento(
+                fichaId = _uiState.value.fichaSeleccionada,
+                casillaId = _uiState.value.casillaEscaleraFin,
+                // Siempre que llegues aqui no te quedan movs
+                esBifurcacion = false,
+                pasosRestantes = 0
+            )
+
+            _uiState.update {
+                it.copy(
+                    mostrarDialogoIndicacion = false,
+                    indicacion = "",
+                    seleccionCasilla = false,
+
+                    casillaEscaleraIni = 0,
+                    casillaEscaleraFin = 0,
+
+                    casillasAElegir = emptyList(),
+                )
+            }
+
+            coordinarDialogos("")
+
+            cF.confirmarDestinoCase(movAux)
+        }
+    }
+
+    fun onSeleccionBifurcacion(casillaId: Int) {
+
+        viewModelScope.launch {
+            val anteriorCasilla = _uiState.value.casillaBifurcacionIni
+            _uiState.update {
+                it.copy(
+                    mostrarDialogoIndicacion = false,
+                    indicacion = "",
+                    seleccionCasilla = false,
+
+                    casillaBifurcacionIni = 0,
+                    casillaA = 0,
+                    casillaB = 0,
+
+                    casillasAElegir = emptyList(),
+                )
+            }
+
+            coordinarDialogos("")
+
+            val movDestino = _uiState.value.casillasAElegir.find { it.casillaId == anteriorCasilla }!!
+            cF.confirmarDestinoCase(movDestino, casillaId)
+        }
     }
 
     // Funciones CHAT
 
     fun mostrarChat() {
         viewModelScope.launch {
-            // Todo llamada a chat
+            cF.chatCase.recibir()
             coordinarDialogos("Chat")
         }
     }
 
-    fun cerrarChat() {
-        coordinarDialogos("")
-    }
+    fun cerrarChat() = coordinarDialogos("")
 
     fun enviarMsgChat(msg: String) {
         viewModelScope.launch {
-            // TODO
-            // Actualizar _uiState con el nuevo TableroSnapshot/FichasSnapshot
+            val mensaje = MsgChat(sender = cF.username.value, message = msg)
+            cF.chatCase.enviar(mensaje)
         }
     }
 
@@ -180,36 +292,130 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
     }
 
     fun onJugarCarta(carta: Carta) {
-        viewModelScope.launch {
-            // TODO
-            coordinarDialogos("")
+        _uiState.update { it.copy(cartaJugada = carta) }
+
+        when (carta.nombre) {
+            "Wild Frank", "Carpintero" -> {
+                _uiState.update {
+                    it.copy(
+                        seleccionCasillaCarta = true,
+
+                        casillasAElegirCarta = it.tablero.casillas.mapIndexedNotNull { index, casilla ->
+                            if (casilla.tipo != TipoCasilla.Vacio && index != 0 && index != 99) index + 1 else null
+                        },
+
+                        mostrarDialogoIndicacion = true,
+                        indicacion = "Seleccione casilla de INICIO"
+                    )
+                }
+            }
+
+            "Mal de ojo", "Pickpocket", "Dado envenenado", "Serpiente en tu bota", "Bolsillo roto", "Noqueo" -> {
+                _uiState.update {
+                    it.copy(
+                        seleccionJugadorCarta = true,
+
+                        mostrarDialogoIndicacion = true,
+                        indicacion = "Seleccione un jugador objetivo"
+                    )
+                }
+            }
+
+            "Robo de identidad" -> {
+                _uiState.update {
+                    it.copy(
+                        seleccionFichaCarta = true,
+
+                        mostrarDialogoIndicacion = true,
+                        indicacion = "Seleccione una de sus fichas"
+                    )
+                }
+            }
+
+            else -> { // Cartas sin objetivo (Ej: Dado dorado, Antidoto, Exceso de medios)
+                ejecutarUsoCarta()
+                coordinarDialogos("")
+            }
+        }
+
+    }
+
+    fun onSeleccionJugadorCarta(emailObjetivo: String) {
+        ejecutarUsoCarta(target = emailObjetivo)
+        _uiState.update {
+            it.copy(
+                seleccionJugadorCarta = false,
+                mostrarDialogoIndicacion = false,
+                indicacion = ""
+            )
         }
     }
 
-    fun onSeleccionJugadorCarta(email: String) {
-        viewModelScope.launch {
-            // TODO
+    fun onSeleccionFichaCarta(fichaId: Int) {
+        // Para "Robo de identidad", 'who' es el ID de la ficha según el backend
+        ejecutarUsoCarta(target = fichaId.toString())
+        _uiState.update {
+            it.copy(
+                mostrarDialogoIndicacion = false,
+                indicacion = "",
+
+                seleccionFichaCarta = false
+            )
         }
     }
 
     fun onSeleccionCasillaCarta(casillaId: Int) {
-        viewModelScope.launch {
-            // TODO
+
+        if (_uiState.value.casillaCartaIni == null) { // Primera selección (Inicio)
+            val cartaNombre = _uiState.value.cartaJugada?.nombre ?: return
+
+            val casillasAux =
+                if (cartaNombre == "Wild Frank") _uiState.value.casillasAElegirCarta.filter { it > casillaId }
+                else _uiState.value.casillasAElegirCarta.filter { it < casillaId }
+
+            _uiState.update {
+                it.copy(
+                    casillaCartaIni = casillaId,
+                    indicacion = "Seleccione casilla de FIN",
+
+                    casillasAElegirCarta = casillasAux
+                )
+            }
+        } else { // Segunda selección (Fin) y ejecución
+            ejecutarUsoCarta(inicio = _uiState.value.casillaCartaIni!!, fin = casillaId)
+            _uiState.update {
+                it.copy(
+                    mostrarDialogoIndicacion = false,
+                    indicacion = "",
+
+                    seleccionCasillaCarta = false,
+                    casillaCartaIni = null
+                )
+            }
         }
     }
-    fun onSeleccionFichaCarta(fichaId: Int) {
+
+    private fun ejecutarUsoCarta(
+        target: String? = null,
+        inicio: Int? = null,
+        fin: Int? = null
+    ) {
+        val cartaId = _uiState.value.cartaJugada?.nombre ?: return
+
         viewModelScope.launch {
-            // TODO
+            cF.jugarCartaCase(cartaId, target, inicio, fin)
+            _uiState.update { it.copy(cartaEnDetalle = null, mostrarDialogoIndicacion = false) }
         }
     }
 }
 
-data class PartidaUiState( // Todo cambiar por lineas comentadas (esta asi para poder usar preview)
+data class PartidaUiState(
+    // Todo cambiar por lineas comentadas (esta asi para poder usar preview)
     // Contenido dinamico
-    val tablero: TableroSnapshot = fakeTableroSnapshot, // TableroSnapshot(emptyList()),
-    val fichas: List<FichaSnapshot> = fakeFichasSnapshot, // emptyList(),
-    val jugadores: JugadoresSnapshot = fakeJugadoresSnapshot, // JugadoresSnapshot(0, 0, emptyList()),
-    val mano: MutableList<Carta?> = fakeManoCartas, // mutableListOf(),
+    val tablero: TableroSnapshot = TableroSnapshot(emptyList()),
+    val fichas: List<FichaSnapshot> = emptyList(),
+    val jugadores: JugadoresSnapshot = JugadoresSnapshot(0, 0, emptyList()),
+    val mano: MutableList<Carta?> = mutableListOf(),
     val cartaEnDetalle: Carta? = null,
     val esMiTurno: Boolean = false,
     val yaJugadoCarta: Boolean = false,
@@ -217,6 +423,7 @@ data class PartidaUiState( // Todo cambiar por lineas comentadas (esta asi para 
 
     // Fases de la partida
     val seleccionFichas: Boolean = false,
+    val fichaSeleccionada: Int = 0,
     val seleccionCasilla: Boolean = false,
     val casillasAElegir: List<Movimiento> = emptyList(),
 
@@ -225,16 +432,28 @@ data class PartidaUiState( // Todo cambiar por lineas comentadas (esta asi para 
     val mostrarDialogoChat: Boolean = false,
 
     val mostrarDialogoEscalera: Boolean = false,
-    val casillaEscalera: Int = 0,
+    val casillaEscaleraIni: Int = 0,
+    val casillaEscaleraFin: Int = 0,
 
-    val mostrarDialogoIndicacion: Boolean = false,
-    val indicacion: String = "",
+    val mostrarDialogoBifurcacion: Boolean = false,
+    val casillaBifurcacionIni: Int = 0,
+    val casillaA: Int = 0,
+    val casillaB: Int = 0,
+
 
     val mostrarDialogoPuntuacion: Boolean = false,
     val puntuacionDado: Int = 0,
 
+    val mostrarDialogoIndicacion: Boolean = false,
+    val indicacion: String = "",
+
     // Control de cartas
+    val cartaJugada: Carta? = null,
+
     val seleccionJugadorCarta: Boolean = false,
     val seleccionFichaCarta: Boolean = false,
-    val seleccionCasillaCarta: Boolean = false
+
+    val seleccionCasillaCarta: Boolean = false,
+    val casillasAElegirCarta: List<Int> = emptyList(),
+    val casillaCartaIni: Int? = null
 )

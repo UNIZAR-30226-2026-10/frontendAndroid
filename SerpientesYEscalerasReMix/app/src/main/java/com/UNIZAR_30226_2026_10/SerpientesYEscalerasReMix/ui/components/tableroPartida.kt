@@ -62,14 +62,15 @@ fun Tablero(
     seleccionarFicha: (Int) -> Unit,
 
     seleccionCasilla: Boolean,
-    casillasAElegir: List<Movimiento>, // Usado también con seleccionCasillaCarta
-    seleccionarCasilla: (Int, Boolean) -> Unit,
+    casillasAElegir: List<Movimiento>,
+    seleccionarCasilla: (Int) -> Unit,
 
     seleccionFichaCarta: Boolean,
     seleccionarFichaCarta: (Int) -> Unit,
 
     seleccionCasillaCarta: Boolean,
-    seleccionarCasillaCarta: (Int) -> Unit
+    seleccionarCasillaCarta: (Int) -> Unit,
+    casillasAElegirCarta: List<Int>
 
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -104,12 +105,11 @@ fun Tablero(
                                 val casilla = tableroState.casillas[numCasilla - 1]
 
                                 // En caso de que sea el momento de elegir una casilla a la que moverse
-                                val haySeleccion = seleccionCasilla || seleccionCasillaCarta
-
                                 val esCasillaElegible =
-                                    haySeleccion && casillasAElegir.any { it.casillaId == numCasilla }
+                                    seleccionCasilla && casillasAElegir.any { it.casillaId == numCasilla } ||
+                                            seleccionCasillaCarta && casillasAElegirCarta.any { it == numCasilla }
 
-                                val debeOscurecer = haySeleccion && !esCasillaElegible
+                                val debeOscurecer = (seleccionCasilla || seleccionCasillaCarta) && !esCasillaElegible
 
                                 Box(
                                     modifier = Modifier
@@ -120,7 +120,7 @@ fun Tablero(
                                                 Modifier
                                                     .clickable {
                                                         if (seleccionCasilla) {
-                                                            seleccionarCasilla(numCasilla, casilla.siguientes.size > 1) // casilla.siguientes.size > 1 = esBifurcacion
+                                                            seleccionarCasilla(numCasilla)
                                                         } else { // seleccionCasillaCarta
                                                             seleccionarCasillaCarta(numCasilla)
                                                         }
@@ -450,12 +450,12 @@ fun TableroPreview() {
                 { ficha -> },
                 false,
                 movimientos,
-                { casilla, esBifurcacion ->  },
+                { casilla -> },
                 false,
                 { ficha -> },
                 false,
-                { casilla -> }
-
+                { casilla -> },
+                listOf(1, 2, 3, 4, 5, 6)
             )
         }
     }

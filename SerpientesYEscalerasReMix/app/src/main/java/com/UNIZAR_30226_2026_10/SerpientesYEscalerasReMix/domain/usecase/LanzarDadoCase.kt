@@ -4,7 +4,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Movimient
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PartidaRepository
 import kotlinx.coroutines.flow.StateFlow
 
-class MoverFichaCase(
+class LanzarDadoCase(
     private val repository: PartidaRepository,
     private val email: StateFlow<String>,
     private val matchId: StateFlow<String>
@@ -15,10 +15,8 @@ class MoverFichaCase(
         return repository.lanzarDado(matchId.value, email.value)
     }
 
-    fun filtrarMovimientosPorFicha(movimientos: List<Movimiento>, fichaId: Int): List<Movimiento> {
+    suspend operator fun invoke(movimientos: List<Movimiento>, fichaId: Int): List<Movimiento> {
         // Filtrado de casillas por ficha
         return movimientos.filter { it.fichaId == fichaId }
     }
-
-    fun bifurcacion
 }

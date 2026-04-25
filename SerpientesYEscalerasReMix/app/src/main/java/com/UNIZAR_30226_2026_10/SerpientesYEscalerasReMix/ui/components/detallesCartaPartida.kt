@@ -54,7 +54,7 @@ fun DetallesCarta(
     onClose: () -> Unit,
     onJugar: (Carta) -> Unit
 ) {
-    Dialog(onDismissRequest = onClose) {
+    Dialog(onDismissRequest = { onClose() } ) {
         CartaContent(carta, esMiTurno, yaJugadoCarta, onJugar)
     }
 }

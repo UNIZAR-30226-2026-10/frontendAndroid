@@ -1,5 +1,10 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository
 
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeFichasSnapshot
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeJugadoresSnapshot
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeManoCartas
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeMsgChat
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeTableroSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.FichaSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.JugadoresSnapshot
@@ -30,24 +35,55 @@ class PartidaRepositoryImpl :
         // TODO Mapear DTOs a Domain Models
         // TODO _tablero.value = ...
         // TODO _fichas.value = ...
+        // TODO _jugadores.value = ...
+        // TODO _mano.value = ...
+
+        _tablero.value = fakeTableroSnapshot
+        _fichas.value = fakeFichasSnapshot
+        _jugadores.value = fakeJugadoresSnapshot
+        _mano.value = fakeManoCartas
     }
 
     override suspend fun lanzarDado(matchId: String, email: String): Pair<Int, List<Movimiento>> {
         // TODO POST /api/matches/:match_id/dice
-        return Pair(0, emptyList())
+
+        val fakeMovimientos = listOf<Movimiento>(
+            Movimiento(
+                fichaId = 1,
+                casillaId = 2,
+                esBifurcacion = false,
+                pasosRestantes = 0
+            ),
+
+            Movimiento(
+                fichaId = 1,
+                casillaId = 8,
+                esBifurcacion = false,
+                pasosRestantes = 0
+            )
+        )
+
+        return Pair(1, fakeMovimientos)
     }
 
-    override suspend fun confirmarMovimiento(
+    override suspend fun confirmarMovimiento (
         matchId: String,
         email: String,
         fichaId: Int,
-        destinoId: Int
-    ) {
-        // TODO POST /api/matches/:match_id/final-location
+        destinoId: Int,
+        pasosRestantes: Int?
+    ) : List<Movimiento> {
+        // TODO POST /api/matches/:match_id/final-location con o sin pasos restantes + decision
+        return emptyList()
     }
 
-    override suspend fun jugarCarta(matchId: String, email: String, cartaId: Int, target: String?) {
+    override suspend fun jugarCarta(matchId: String, email: String, cartaId: String, target: String?, inicio: Int?, fin: Int?) {
         // TODO POST /api/matches/:match_id/cards
+    }
+
+    override suspend fun recibirChat(matchId: String) {
+        // TODO _chat.value = ...
+        _chat.value = fakeMsgChat
     }
 
     override suspend fun enviarMensaje(matchId: String, mensaje: MsgChat) {

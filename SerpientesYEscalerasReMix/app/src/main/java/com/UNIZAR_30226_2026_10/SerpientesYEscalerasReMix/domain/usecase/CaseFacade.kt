@@ -45,7 +45,19 @@ class CaseFacade(
 
     public val jugarCrearCase = JugarCrearCase(email, username, _lobbyId)
 
+    // PARTIDA
+
+    // Exposición de flujos del repositorio de Partida
+    val tablero = partidaRepository.tablero
+    val fichas = partidaRepository.fichas
+    val jugadores = partidaRepository.jugadores
+    val mano = partidaRepository.mano
+    val chat = partidaRepository.chat
+
     // Casos de uso de Partida
     public val syncPartidaCase = SyncPartidaCase(partidaRepository, email, matchId)
-    public val moverFichaCase = MoverFichaCase(partidaRepository, email, matchId)
+    public val lanzarDadoCase = LanzarDadoCase(partidaRepository, email, matchId)
+    public val confirmarDestinoCase = ConfirmarDestinoCase(partidaRepository, email, matchId)
+    public val chatCase = ChatCase(partidaRepository, matchId)
+    public val jugarCartaCase = JugarCartaCase(partidaRepository, email, matchId)
 }

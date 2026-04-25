@@ -22,7 +22,8 @@ interface PartidaRepository {
     // Devuelve las casillas posibles y la puntuacion del dado
     suspend fun lanzarDado(matchId: String, email: String): Pair<Int, List<Movimiento>>
 
-    suspend fun confirmarMovimiento(matchId: String, email: String, fichaId: Int, destinoId: Int)
-    suspend fun jugarCarta(matchId: String, email: String, cartaId: Int, target: String?)
+    suspend fun confirmarMovimiento(matchId: String, email: String, fichaId: Int, destinoId: Int, pasosRestantes: Int?): List<Movimiento>
+    suspend fun jugarCarta(matchId: String, email: String, cartaId: String, target: String?, inicio: Int?, fin: Int?)
+    suspend fun recibirChat(matchId: String)
     suspend fun enviarMensaje(matchId: String, mensaje: MsgChat)
 }
