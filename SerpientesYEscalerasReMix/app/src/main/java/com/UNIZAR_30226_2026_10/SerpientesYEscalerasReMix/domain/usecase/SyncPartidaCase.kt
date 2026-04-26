@@ -13,13 +13,21 @@ class SyncPartidaCase(
 
     suspend operator fun invoke() {
 
-        val turno = repository.jugadores.value.turno
-        val jugadorTurno = repository.jugadores.value.jugadores[turno].email
-        val esMiTurno = jugadorTurno == email.value
+        if (repository.jugadores.value.jugadores.isEmpty()) {
+            if (matchId.value.isNotEmpty()) {
+                repository.fetchEstadoCompleto(matchId.value, email.value)
+                init = true
+            }
+        } else {
 
-        if (!init || esMiTurno) {
-            repository.fetchEstadoCompleto(matchId.value, email.value)
-            init = true
+            val turno = repository.jugadores.value.turno
+            val jugadorTurno = repository.jugadores.value.jugadores[turno].email
+            val esMiTurno = jugadorTurno == email.value
+
+            if (!init || esMiTurno) {
+                repository.fetchEstadoCompleto(matchId.value, email.value)
+                init = true
+            }
         }
     }
 }

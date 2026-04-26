@@ -56,7 +56,14 @@ class PartidaRepositoryImpl :
             ),
 
             Movimiento(
-                fichaId = 1,
+                fichaId = 2,
+                casillaId = 2,
+                esBifurcacion = false,
+                pasosRestantes = 0
+            ),
+
+            Movimiento(
+                fichaId = 3,
                 casillaId = 8,
                 esBifurcacion = false,
                 pasosRestantes = 0

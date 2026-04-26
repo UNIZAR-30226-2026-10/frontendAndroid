@@ -20,7 +20,7 @@ class CaseFacade(
     private val local = LocalStorage(context)
 
     // estado compartido entre usecases TODO eliminar de aqui y recuperar del repository correspondiente
-    private val _email = MutableStateFlow("")
+    private val _email = MutableStateFlow("YO@gmail.com") // TODO cambiar y enlazar con repo o repos
     val email: StateFlow<String> = _email.asStateFlow()
 
     private val _username = MutableStateFlow("")
@@ -29,8 +29,8 @@ class CaseFacade(
     private val _lobbyId = MutableStateFlow("")
     val lobbyId: StateFlow<String> = _lobbyId.asStateFlow()
 
-    private val _matchId = MutableStateFlow("")
-    val matchId: StateFlow<String> = _lobbyId.asStateFlow()
+    private val _matchId = MutableStateFlow("1") // TODO cambiar y enlazar con repo o repos
+    val matchId: StateFlow<String> = _matchId.asStateFlow()
 
     // Repositorios
 

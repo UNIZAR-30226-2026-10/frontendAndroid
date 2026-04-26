@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -104,10 +103,9 @@ fun CartaContent(
                     painter = painterResource(id = buscarIconoCartaR(carta.nombre)),
                     contentDescription = "imagen carta",
                     modifier = Modifier
-                        .wrapContentSize()
                         .clip(RoundedCornerShape(8.dp))
                         .border(width = 2.dp, color = color_bg, shape = RoundedCornerShape(8.dp)),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Fit
                 )
             }
 

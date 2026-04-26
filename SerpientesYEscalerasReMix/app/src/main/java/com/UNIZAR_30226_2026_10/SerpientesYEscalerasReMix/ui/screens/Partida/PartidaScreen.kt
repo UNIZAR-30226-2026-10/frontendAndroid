@@ -213,7 +213,7 @@ fun PartidaScreen(
                 DialogoIndicacionPartida(
                     uiState.indicacion,
                     modifier = Modifier
-                        .offset(y = (-195).dp)
+                        .offset(y = (-175).dp)
                         .wrapContentSize()
                 )
             }

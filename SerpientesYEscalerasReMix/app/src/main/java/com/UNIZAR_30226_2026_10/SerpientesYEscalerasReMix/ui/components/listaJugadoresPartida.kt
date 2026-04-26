@@ -84,8 +84,8 @@ fun ListaJugadores(
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             var numJugador: Int = 0
             jugadoresState.jugadores.forEach { jugador ->
-                numJugador++
                 val esTurno = numJugador == jugadoresState.turno
+                numJugador++
 
                 val colorJugadorFondo =
                     if(seleccionCarta) color_selectedText.copy(alpha = alphaAnimado)
@@ -164,5 +164,5 @@ fun ListaJugadores(
 @Preview(showBackground = true)
 @Composable
 fun ListaPrev() {
-    ListaJugadores(fakeJugadoresSnapshot, true, onSeleccionCarta = {a -> })
+    ListaJugadores(fakeJugadoresSnapshot, false, onSeleccionCarta = {a -> })
 }

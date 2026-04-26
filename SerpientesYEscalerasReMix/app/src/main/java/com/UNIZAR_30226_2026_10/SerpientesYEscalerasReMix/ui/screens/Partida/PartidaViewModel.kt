@@ -39,16 +39,7 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
         viewModelScope.launch {
             launch { cF.tablero.collect { data -> _uiState.update { it.copy(tablero = data) } } }
             launch { cF.fichas.collect { data -> _uiState.update { it.copy(fichas = data) } } }
-            launch {
-                cF.jugadores.collect { data ->
-                    _uiState.update {
-                        it.copy(
-                            jugadores = data,
-                            esMiTurno = data.jugadores.getOrNull(data.turno)?.email == cF.email.value
-                        )
-                    }
-                }
-            }
+            launch { cF.jugadores.collect { data -> _uiState.update { it.copy( jugadores = data) } } }
             launch { cF.mano.collect { data -> _uiState.update { it.copy(mano = data.toMutableList()) } } }
             launch { cF.chat.collect { data -> _uiState.update { it.copy(chat = data) } } }
         }
@@ -64,7 +55,27 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
         pollingJob = viewModelScope.launch {
             while (isActive) {
-                cF.syncPartidaCase()
+                try {
+                    cF.syncPartidaCase()
+
+                    _uiState.update { estadoActual ->
+                        val lista = estadoActual.jugadores.jugadores
+                        val indiceTurno = estadoActual.jugadores.turno
+
+                        // Comprobamos si el índice es válido para la lista actual
+                        val esRealmenteMiTurno = if (lista.isNotEmpty() && indiceTurno in lista.indices) {
+                            lista[indiceTurno].email == cF.email.value
+
+                        } else {
+                            false
+                        }
+
+                        estadoActual.copy(esMiTurno = esRealmenteMiTurno)
+                    }
+                } catch (e: Exception) {
+                    // Evita que el polling se rompa por un error de red
+                    println("Error en polling: ${e.message}")
+                }
                 delay(pollingMS)
             }
         }
@@ -91,31 +102,34 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
     // Funciones MOVER FICHAS
 
     fun onLanzarDado() {
-        viewModelScope.launch {
-            val dadoPair = cF.lanzarDadoCase()
-            val puntuacionDado = dadoPair.first
-            val casillasPosibles = dadoPair.second
+        if (!_uiState.value.bloquearDado) {
+            viewModelScope.launch {
+                val dadoPair = cF.lanzarDadoCase()
+                val puntuacionDado = dadoPair.first
+                val casillasPosibles = dadoPair.second
 
-            // Mostrar resultado
-            _uiState.update {
-                it.copy(
-                    mostrarDialogoPuntuacion = true,
-                    puntuacionDado = puntuacionDado
-                )
-            }
+                // Mostrar resultado
+                _uiState.update {
+                    it.copy(
+                        mostrarDialogoPuntuacion = true,
+                        bloquearDado = true,
+                        puntuacionDado = puntuacionDado
+                    )
+                }
 
-            delay(1000)
+                delay(1000)
 
-            // Eleccion de ficha
-            _uiState.update {
-                it.copy(
-                    mostrarDialogoPuntuacion = false,
-                    mostrarDialogoIndicacion = true,
-                    indicacion = "Seleccione una ficha a mover",
+                // Eleccion de ficha
+                _uiState.update {
+                    it.copy(
+                        mostrarDialogoPuntuacion = false,
+                        mostrarDialogoIndicacion = true,
+                        indicacion = "Seleccione una ficha a mover",
 
-                    seleccionFichas = true,
-                    casillasAElegir = casillasPosibles
-                )
+                        seleccionFichas = true,
+                        casillasAElegir = casillasPosibles
+                    )
+                }
             }
         }
     }
@@ -174,6 +188,8 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                         seleccionCasilla = false,
 
                         casillasAElegir = emptyList(),
+
+                        bloquearDado = false
                     )
                 }
 
@@ -196,6 +212,8 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                     casillaEscaleraFin = 0,
 
                     casillasAElegir = emptyList(),
+
+                    bloquearDado = false
                 )
             }
 
@@ -228,6 +246,8 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                     casillaEscaleraFin = 0,
 
                     casillasAElegir = emptyList(),
+
+                    bloquearDado = false
                 )
             }
 
@@ -252,6 +272,8 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                     casillaB = 0,
 
                     casillasAElegir = emptyList(),
+
+                    bloquearDado = false
                 )
             }
 
@@ -294,6 +316,8 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
     fun onJugarCarta(carta: Carta) {
         _uiState.update { it.copy(cartaJugada = carta) }
 
+        coordinarDialogos("")
+
         when (carta.nombre) {
             "Wild Frank", "Carpintero" -> {
                 _uiState.update {
@@ -334,7 +358,6 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
             else -> { // Cartas sin objetivo (Ej: Dado dorado, Antidoto, Exceso de medios)
                 ejecutarUsoCarta()
-                coordinarDialogos("")
             }
         }
 
@@ -370,8 +393,8 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
             val cartaNombre = _uiState.value.cartaJugada?.nombre ?: return
 
             val casillasAux =
-                if (cartaNombre == "Wild Frank") _uiState.value.casillasAElegirCarta.filter { it > casillaId }
-                else _uiState.value.casillasAElegirCarta.filter { it < casillaId }
+                if (cartaNombre == "Wild Frank") _uiState.value.casillasAElegirCarta.filter { it < casillaId }
+                else _uiState.value.casillasAElegirCarta.filter { it > casillaId }
 
             _uiState.update {
                 it.copy(
@@ -442,6 +465,7 @@ data class PartidaUiState(
 
 
     val mostrarDialogoPuntuacion: Boolean = false,
+    val bloquearDado: Boolean = false,
     val puntuacionDado: Int = 0,
 
     val mostrarDialogoIndicacion: Boolean = false,
