@@ -79,3 +79,4 @@ fun AbandonarLobbyBoton(SEState: SENavHostController, onClick: () -> Unit) {
         }
     }
 }
+

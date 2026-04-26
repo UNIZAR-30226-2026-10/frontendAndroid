@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.*
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.*
 
-
+/*
 @Composable
 fun Opciones(
     onClose: () -> Unit = {},
@@ -163,3 +163,4 @@ fun Opciones(
         }
     }
 }
+*/

@@ -34,8 +34,9 @@ class AmigosViewModel(private val cF: CaseFacade) : ViewModel() {
 
     // Referencia al hilo de polling
     private var pollingJob: Job? = null
+    private var pollingMS: Long = 2000 // Consultar cada 2 segundos
 
-    fun iniciarPollingAmigos() {
+    fun iniciarPolling() {
         if (pollingJob?.isActive == true) return
 
         pollingJob = viewModelScope.launch {
@@ -48,12 +49,12 @@ class AmigosViewModel(private val cF: CaseFacade) : ViewModel() {
                         // Opcional: manejar error de red
                     }
                 }
-                delay(2000) // Espera 2 segundos
+                delay(pollingMS)
             }
         }
     }
 
-    fun detenerPollingAmigos() {
+    fun detenerPolling() {
         pollingJob?.cancel()
     }
 
