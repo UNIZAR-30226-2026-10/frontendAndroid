@@ -17,13 +17,13 @@ fun AmigosScreen(SEState: SENavHostController, snackHost: SnackbarHostState, vie
 
     // Activar polling al entrar en la pantalla
     LaunchedEffect(Unit) {
-        viewModel.iniciarPollingAmigos()
+        viewModel.iniciarPolling()
     }
 
     // Desactivar polling cuando la pantalla no sea visible
     DisposableEffect(Unit) {
         onDispose {
-            viewModel.detenerPollingAmigos()
+            viewModel.detenerPolling()
         }
     }
 

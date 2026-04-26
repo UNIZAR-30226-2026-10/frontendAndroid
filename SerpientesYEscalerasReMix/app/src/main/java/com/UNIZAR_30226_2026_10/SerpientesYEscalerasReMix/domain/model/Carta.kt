@@ -17,5 +17,8 @@ data class Carta (
     val nombre: String,
     val descripcion: String,
     val tipo: Tipo,
-    val calidad: Calidad
+    val calidad: Calidad,
+    val id: Int? = null,
+    val efecto: String? = null,
+    val imagen: Int? = null
 )

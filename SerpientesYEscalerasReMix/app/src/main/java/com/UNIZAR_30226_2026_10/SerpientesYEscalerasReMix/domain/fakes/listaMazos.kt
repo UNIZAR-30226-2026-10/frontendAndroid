@@ -9,40 +9,55 @@ val carta1: Carta = Carta(
     nombre = "Carta 1",
     descripcion = "Descripción de la carta 1",
     tipo = Tipo.Ofensiva,
-    calidad = Calidad.Comun
+    calidad = Calidad.Comun,
+    id = 1,
+    efecto = "Efecto de la carta 1",
+    imagen = 0 //TEMP FIXME
 )
 
 val carta2: Carta = Carta(
     nombre = "Carta 2",
     descripcion = "Descripción de la carta 2",
     tipo = Tipo.Defensiva,
-    calidad = Calidad.Rara
+    calidad = Calidad.Rara,
+    id = 2,
+    efecto = "Efecto de la carta 2",
+    imagen = 0 //TEMP FIXME
 )
 
 val carta3: Carta = Carta(
     nombre = "Carta 3",
     descripcion = "Descripción de la carta 3",
     tipo = Tipo.Entorno,
-    calidad = Calidad.Epica
+    calidad = Calidad.Epica,
+    id = 3,
+    efecto = "Efecto de la carta 3",
+    imagen = 0 //TEMP FIXME
 )
 
 val carta4: Carta = Carta(
     nombre = "Carta 4",
     descripcion = "Descripción de la carta 4",
     tipo = Tipo.Ofensiva,
-    calidad = Calidad.Legendaria
+    calidad = Calidad.Legendaria,
+    id = 4,
+    efecto = "Efecto de la carta 4",
+    imagen = 0 //TEMP FIXME
 )
 
 val carta5: Carta = Carta(
     nombre = "Carta 5",
     descripcion = "Descripción de la carta 5",
     tipo = Tipo.Defensiva,
-    calidad = Calidad.Comun
+    calidad = Calidad.Comun,
+    id = 5,
+    efecto = "Efecto de la carta 5",
+    imagen = 0 //TEMP FIXME
 )
 
 val mazoVacio: Mazo = Mazo(
     nombre = "Mazo 1",
-    cartas = emptyList()
+    cartas = emptyList(),
 )
 
 val mazo1: Mazo = Mazo(

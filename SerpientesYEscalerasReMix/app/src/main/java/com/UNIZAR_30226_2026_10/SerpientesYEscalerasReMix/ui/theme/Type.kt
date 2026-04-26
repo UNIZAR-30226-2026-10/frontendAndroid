@@ -15,7 +15,17 @@ object SETextTypes {
         fontSize = 12.sp
     )
 
-    val grande = TextStyle( // Tipografica normal, pasada a MaterialDesign
+    val pequeno = TextStyle(
+        color = color_text,
+        fontSize = 10.sp
+    )
+
+    val mediano = TextStyle(
+        color = color_text,
+        fontSize = 15.sp
+    )
+
+    val grande = TextStyle(
         color = color_text,
         fontSize = 18.sp
     )

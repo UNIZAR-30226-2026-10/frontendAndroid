@@ -37,13 +37,13 @@ fun JugarCrearScreen(SEState: SENavHostController, viewModel: JugarCrearViewMode
         if (viewModel.lobbyId.value == "") { // no se esta uniendo a ningún lobby desde la pantalla de Jugar_Amigos
             viewModel.crearLobby()
         }
-        viewModel.iniciarPollingLobby()
+        viewModel.iniciarPolling()
     }
 
     // Desactivar polling cuando la pantalla no sea visible
     DisposableEffect(Unit) {
         onDispose {
-            viewModel.detenerPollingLobby()
+            viewModel.detenerPolling()
         }
     }
 

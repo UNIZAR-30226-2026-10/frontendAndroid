@@ -2,6 +2,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +18,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.NavHost
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PartidaRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MenuTopBar
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
@@ -32,7 +34,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Inicialización de los casos de uso
-        val caseFacade = CaseFacade(applicationContext)
+        val caseFacade = CaseFacade(
+            applicationContext,
+
+            PartidaRepositoryImpl()
+        )
 
         setContent {
             // Esta línea oculta la barra de soporte
@@ -60,6 +66,8 @@ fun mainScreen(cF: CaseFacade) {
     val email = runBlocking {
         cF.loginRegisterCase.comprobarLogin()
     }
+
+    Log.d("A", email)
 
     // Pantalla incial en función del login
     val pantallaIni = if (email == "") Destinos.LOGIN
