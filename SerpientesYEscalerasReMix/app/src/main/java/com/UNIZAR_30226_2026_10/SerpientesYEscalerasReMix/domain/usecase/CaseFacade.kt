@@ -45,6 +45,7 @@ class CaseFacade(
 
     public val jugarCrearCase = JugarCrearCase(email, username, _lobbyId)
 
+    public val perfilCase = PerfilCase(email, username)
     // PARTIDA
 
     // Exposición de flujos del repositorio de Partida
