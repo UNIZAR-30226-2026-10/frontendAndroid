@@ -33,7 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.JugadorLobby
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarIconoR
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarIconoJugadorR
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fg
@@ -85,8 +85,8 @@ fun JugadorItem(
         }
 
         if (jugador != null) {
-            val icono = if (jugador.isBot) buscarIconoR("bot")
-            else buscarIconoR(jugador.profileIcon)
+            val icono = if (jugador.isBot) buscarIconoJugadorR("bot")
+            else buscarIconoJugadorR(jugador.profileIcon)
 
             Box(
                 modifier = Modifier.offset(y = offsetIcono)

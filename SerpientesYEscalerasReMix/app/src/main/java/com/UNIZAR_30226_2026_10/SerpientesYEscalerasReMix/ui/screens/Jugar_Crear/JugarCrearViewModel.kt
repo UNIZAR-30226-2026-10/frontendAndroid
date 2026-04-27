@@ -1,6 +1,5 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Crear
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -29,21 +28,22 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
     val lobbyId: StateFlow<String> = cF.lobbyId
 
     private var pollingJob: Job? = null
+    private var pollingMS: Long = 2000 // Consultar cada 2 segundos
+
 
     // Polling del lobby
-    fun iniciarPollingLobby() {
+    fun iniciarPolling() {
         if (pollingJob?.isActive == true) return
 
         pollingJob = viewModelScope.launch {
             while (isActive) {
-                Log.d("A", "hola")
                 cF.jugarCrearCase.obtenerEstadoLobby()
-                delay(2000) // Consultar cada 2 segundos
+                delay(pollingMS)
             }
         }
     }
 
-    fun detenerPollingLobby() {
+    fun detenerPolling() {
         pollingJob?.cancel()
     }
 
