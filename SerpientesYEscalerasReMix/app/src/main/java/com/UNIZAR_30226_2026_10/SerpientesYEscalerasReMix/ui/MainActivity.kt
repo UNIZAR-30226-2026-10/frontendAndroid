@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -74,7 +75,15 @@ fun MainScreen(cF: CaseFacade) {
         cF.loginRegisterCase.comprobarLogin()
     }
 
-    Log.d("A", email)
+    // Prueba de Conectividad Logging/Debug
+    LaunchedEffect(Unit) {
+        val isConnected = cF.pruebaConexionCase()
+        if (isConnected) {
+            Log.d("RETROFIT_TEST", "✅ Conexión exitosa y GSON configurado")
+        } else {
+            Log.e("RETROFIT_TEST", "❌ Fallo de conexión al dominio")
+        }
+    }
 
     // Pantalla incial en función del login
     val pantallaIni = if (email == "") Destinos.LOGIN

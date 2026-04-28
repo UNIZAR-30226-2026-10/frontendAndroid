@@ -8,22 +8,22 @@ import retrofit2.http.GET
 interface ApiService {
 
     // FUNCIONES PARA PRUEBAS Y LOGGING EN MAIN_ACTIVITY
-    @GET("api/achievements/ping")
+    @GET("achievements/ping")
     suspend fun pingAchievements(): Response<Unit>
 
-    @GET("api/auth/ping")
+    @GET("auth/ping")
     suspend fun pingAuth(): Response<Unit>
 
-    @GET("api/cards/ping")
+    @GET("cards/ping")
     suspend fun pingCards(): Response<Unit>
 
-    @GET("api/lobbies/ping")
+    @GET("lobbies/ping")
     suspend fun pingLobbies(): Response<Unit>
 
-    @GET("api/matches/ping")
+    @GET("matches/ping")
     suspend fun pingMatches(): Response<Unit>
 
-    @GET("api/users/ping")
+    @GET("users/ping")
     suspend fun pingUsers(): Response<Unit>
 
     // FUNCIONES AUTH
