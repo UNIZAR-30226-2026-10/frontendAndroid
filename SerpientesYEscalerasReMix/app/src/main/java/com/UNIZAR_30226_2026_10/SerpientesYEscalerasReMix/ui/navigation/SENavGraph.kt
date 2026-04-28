@@ -14,6 +14,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Conti
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Crear.JugarCrearScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Crear.JugarCrearViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Login.LoginScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Login.LoginViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.LogrosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.MazosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Partida.PartidaScreen
@@ -41,7 +42,10 @@ object Destinos {
 //      Extiende a NavGraphBuilder para poder llamarse dentro de un NavHost
 fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHostState, cF: CaseFacade) {
     composable(Destinos.LOGIN) {
-        LoginScreen(SEState, snackHost, cF)
+        val loginViewModel: LoginViewModel = viewModel(
+            factory = LoginViewModel.Factory(cF, snackHost)
+        )
+        LoginScreen(SEState, loginViewModel)
     }
 
     composable(Destinos.REGISTER) {

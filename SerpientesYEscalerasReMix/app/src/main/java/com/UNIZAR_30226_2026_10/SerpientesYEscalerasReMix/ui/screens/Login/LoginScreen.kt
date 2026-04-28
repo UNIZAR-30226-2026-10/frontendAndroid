@@ -13,22 +13,17 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.fijarOrientacion
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
@@ -36,20 +31,18 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.prepararOrientacion
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes.seleccionable
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes.subtitulo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes.titulo
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_secondary
 
 @Composable
-fun LoginScreen(SEState: SENavHostController, snackHost: SnackbarHostState, cF: CaseFacade) {
-    // Para poder ejecutar corutines
-    val scope = rememberCoroutineScope()
+fun LoginScreen(
+    navController: SENavHostController,
+    viewModel: LoginViewModel = viewModel()
+) {
+    // Estado observable de la pantalla
+    val uiState by viewModel.uiState.collectAsState()
 
     // Ver la pantalla en vertical
     fijarOrientacion(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-
-    // Variables en las que ir guardando el texto introducido
-    var emailForm by remember { mutableStateOf("") }
-    var passwordForm by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -63,15 +56,15 @@ fun LoginScreen(SEState: SENavHostController, snackHost: SnackbarHostState, cF: 
 
             Spacer(Modifier.height(10.dp))
 
-            Text("Iniciar Sesión", style = subtitulo)
+            Text("¡Bienvenido! Inicia Sesión", style = subtitulo)
 
             Spacer(Modifier.height(40.dp))
 
             // Campo de Usuario (e-mail)
             OutlinedTextField(
-                value = emailForm,
-                onValueChange = { emailForm = it },
-                label = { Text("Usuario") },
+                value = uiState.email,
+                onValueChange = { viewModel.onEmailChange(it) },
+                label = { Text("Correo electrónico") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -80,8 +73,8 @@ fun LoginScreen(SEState: SENavHostController, snackHost: SnackbarHostState, cF: 
 
             // Campo de Contraseña
             OutlinedTextField(
-                value = passwordForm,
-                onValueChange = { passwordForm = it },
+                value = uiState.password,
+                onValueChange = { viewModel.onPasswordChange(it) },
                 label = { Text("Contraseña") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -93,48 +86,31 @@ fun LoginScreen(SEState: SENavHostController, snackHost: SnackbarHostState, cF: 
             Spacer(Modifier.height(24.dp))
 
             Button(
-                onClick = { loginButtonAction(emailForm, passwordForm, scope, snackHost, SEState, cF) },
+                onClick = { viewModel.login(
+                    {
+                        // Preparar la orientación en horizontal y navegar
+                        prepararOrientacion(navController, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+                        navController.goTo(Destinos.JUGAR_CREAR)
+                    }
+                ) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                colors = ButtonDefaults.buttonColors(),
+                colors = ButtonDefaults.buttonColors(color_secondary),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text("INICIAR SESIÓN")
             }
 
-            TextButton(onClick = { registerButtonAction(SEState) }) {
-                Text(text = "¿No tienes cuenta? Regístrate aquí", style = seleccionable)
+            TextButton(
+                onClick = {
+                    // Preparar la orientación en vertical y navegar
+                    prepararOrientacion(navController, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+                    navController.goTo(Destinos.REGISTER)
+                }
+            ) {
+                Text(text = "¿No tienes cuenta? Registrate", style = seleccionable)
             }
         }
     }
-}
-
-fun loginButtonAction(
-    emailForm: String, passwordForm: String, scope: CoroutineScope,
-    snackHost: SnackbarHostState, SEState: SENavHostController, cF: CaseFacade
-) {
-    scope.launch {
-        val invalidForms = emailForm == "" || passwordForm == ""
-        val loginSuccess = !invalidForms && cF.loginRegisterCase.iniciarSesion(emailForm, passwordForm)
-        if (loginSuccess) {
-            // Preparar la orientación en horizontal
-            prepararOrientacion(SEState, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
-
-            SEState.goTo(Destinos.JUGAR_CREAR)
-        } else {
-            snackHost.showSnackbar(
-                message = "Usuario o Contraseña incorrectos, porfavor Introduzcalos de nuevo.",
-                duration = SnackbarDuration.Short
-            )
-        }
-        print("hola")
-    }
-}
-
-fun registerButtonAction(SEState: SENavHostController) {
-    // Preparar la orientación en vertical
-    prepararOrientacion(SEState, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-
-    SEState.goTo(Destinos.REGISTER)
 }
