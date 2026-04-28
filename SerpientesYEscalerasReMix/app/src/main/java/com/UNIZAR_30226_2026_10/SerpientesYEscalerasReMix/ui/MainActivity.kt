@@ -18,6 +18,8 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.NavHost
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.ConexionRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PartidaRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MenuTopBar
@@ -33,9 +35,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Inicialización de data.remote, Retrofit
+        val apiService = ApiClient.apiService
+
         // Inicialización de los casos de uso
         val caseFacade = CaseFacade(
-            applicationContext,
+            applicationContext, // TODO elminar e instanciarComo Retrofit
+
+            ConexionRepositoryImpl(apiService),
 
             PartidaRepositoryImpl()
         )
@@ -52,14 +59,14 @@ class MainActivity : ComponentActivity() {
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
             // Dibujar los elementos de la app
-            mainScreen(caseFacade)
+            MainScreen(caseFacade)
         }
     }
 }
 
 
 @Composable
-fun mainScreen(cF: CaseFacade) {
+fun MainScreen(cF: CaseFacade) {
     // Estado de la pantalla a mostrar
     val SEState = rememberSEAppState()
 
