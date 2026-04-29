@@ -21,6 +21,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Partida.Par
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Partida.PartidaViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Register.RegisterScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Register.RegisterViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.TiendaScreen
 
 // clase objeto utilizada como un enum. Define los destinos usados en los grafos de navegación
@@ -40,23 +41,26 @@ object Destinos {
 
 // Función que encapsula la navegación del menu superior de la aplicación.
 //      Extiende a NavGraphBuilder para poder llamarse dentro de un NavHost
-fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHostState, cF: CaseFacade) {
+fun NavGraphBuilder.navGraph(navController: SENavHostController, snackHost: SnackbarHostState, cF: CaseFacade) {
     composable(Destinos.LOGIN) {
         val loginViewModel: LoginViewModel = viewModel(
             factory = LoginViewModel.Factory(cF, snackHost)
         )
-        LoginScreen(SEState, loginViewModel)
+        LoginScreen(navController, loginViewModel)
     }
 
     composable(Destinos.REGISTER) {
-        RegisterScreen(SEState, snackHost, cF)
+        val registerViewModel: RegisterViewModel = viewModel(
+            factory = RegisterViewModel.Factory(cF, snackHost)
+        )
+        RegisterScreen(navController, registerViewModel)
     }
 
     composable(Destinos.JUGAR_CREAR) {
         val jugarCrearViewModel: JugarCrearViewModel = viewModel(
             factory = JugarCrearViewModel.Factory(cF)
         )
-        JugarCrearScreen(SEState, jugarCrearViewModel)
+        JugarCrearScreen(navController, jugarCrearViewModel)
     }
 
     composable(Destinos.JUGAR_CONTINUAR,
@@ -70,7 +74,7 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
         val jugarContinuarViewModel: JugarContinuarViewModel = viewModel(
             factory = JugarContinuarViewModel.Factory(cF)
         )
-        JugarContinuarScreen(SEState, jugarContinuarViewModel)
+        JugarContinuarScreen(navController, jugarContinuarViewModel)
     }
 
     composable(
@@ -85,29 +89,29 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
         val amigosViewModel: AmigosViewModel = viewModel(
             factory = AmigosViewModel.Factory(cF)
         )
-        AmigosScreen(SEState, snackHost, amigosViewModel)
+        AmigosScreen(navController, snackHost, amigosViewModel)
     }
 
     composable(Destinos.MAZOS){
-        MazosScreen(SEState)
+        MazosScreen(navController)
     }
 
     composable(Destinos.LOGROS) {
-        LogrosScreen(SEState)
+        LogrosScreen(navController)
     }
 
     composable(Destinos.TIENDA) {
-        TiendaScreen(SEState)
+        TiendaScreen(navController)
     }
 
     composable(Destinos.PERFIL) {
-        Perfil(SEState)
+        Perfil(navController)
     }
 
     composable(Destinos.PARTIDA) {
         val partidaViewModel: PartidaViewModel = viewModel(
             factory = PartidaViewModel.Factory(cF)
         )
-        PartidaScreen(SEState, partidaViewModel)
+        PartidaScreen(navController, partidaViewModel)
     }
 }
