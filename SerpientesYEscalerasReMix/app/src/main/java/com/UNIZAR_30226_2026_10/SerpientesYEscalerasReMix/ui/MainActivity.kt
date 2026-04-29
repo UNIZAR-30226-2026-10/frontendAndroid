@@ -39,6 +39,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Inicialización de data.remote, Retrofit
+        ApiClient.init(applicationContext)
         val apiService = ApiClient.apiService
 
         // Inicialización de data.local

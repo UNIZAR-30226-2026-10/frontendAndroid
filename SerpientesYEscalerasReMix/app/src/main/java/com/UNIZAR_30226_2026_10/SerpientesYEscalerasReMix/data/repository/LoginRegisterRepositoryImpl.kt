@@ -1,7 +1,10 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository
 
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiService
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LoginRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.RegisterRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.LoginRegisterRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,51 +22,79 @@ class LoginRegisterRepositoryImpl(
     override val username: StateFlow<String> = _username.asStateFlow()
 
     override suspend fun comprobarLogin(): String {
-        if (local.getLogin()) {
-            val email = local.getEmail()
-            val passwd = local.getPasswd()
-            
-            // Iniciamos sesión automáticamente
-            iniciarSesion(email, passwd)
-            
-            return email
-        } else {
-            return ""
+
+        return try {
+            val response = api.cookieLogin()
+
+            if (response.isSuccessful && response.body() != null) {
+                val user = response.body()!!
+
+                // Actualizar estados globales
+                _email.value = user.email
+                _username.value = user.username
+
+                // Local como logueado
+                local.setLogin(true)
+                local.setEmail(user.email)
+
+                user.email
+            } else {
+                // Si la cookie expiró o no existe (401), limpiamos
+                cerrarSesion()
+                ""
+            }
+        } catch (e: Exception) {
+                ""
         }
     }
 
     override suspend fun iniciarSesion(email: String, passwd: String): Boolean {
-        // TODO: Implementar llamada real usando api.apiService
-        val loginExitoso = true
+        return try {
+            val response = api.login(LoginRequest(email, passwd))
 
-        if (loginExitoso) {
-            local.setLogin(true)
-            local.setEmail(email)
-            _email.value = email
-            _username.value = "Usuario" // TODO: Obtener de la respuesta de la API
-            return true
+            if (response.isSuccessful && response.body() != null) {
+                val user = response.body()!!
+
+                // Local como logueado
+                local.setLogin(true)
+                local.setEmail(user.email)
+
+                // Actualizar estados globales
+                _email.value = user.email
+                _username.value = user.username
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            false
         }
-        return false
     }
 
     override suspend fun cerrarSesion() {
         local.clearLogin()
+        ApiClient.clearCookies()
         _email.value = ""
         _username.value = ""
     }
 
     override suspend fun registrarse(username: String, email: String, passwd: String): Boolean {
-        // TODO: Implementar llamada real usando api.apiService
-        val registroExitoso = true
 
-        if (registroExitoso) {
-            local.setLogin(true)
-            local.setEmail(email)
-            local.setPasswd(passwd)
-            _email.value = email
-            _username.value = username
-            return true
+        return try {
+            val response = api.register(RegisterRequest(email, username, passwd))
+
+            if (response.isSuccessful) {
+                local.setLogin(true)
+                local.setEmail(email)
+                _email.value = email
+                _username.value = username
+
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            false
         }
-        return false
     }
 }
