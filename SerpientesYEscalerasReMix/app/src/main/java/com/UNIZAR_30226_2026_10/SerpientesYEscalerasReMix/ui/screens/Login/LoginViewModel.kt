@@ -49,16 +49,16 @@ class LoginViewModel(private val cF: CaseFacade, private val snackHost: Snackbar
     }
 
     fun login(onSuccess: () -> Unit) {
-        val currentEmail = _uiState.value.email
-        val currentPassword = _uiState.value.password
+        val email = _uiState.value.email
+        val passwd = _uiState.value.password
 
-        if (!currentEmail.matches(emailRegex)) {
+        if (!email.matches(emailRegex)) {
             showErrorSnackbar("Incluye un signo \"@\" en la dirección de correo electrónico. La dirección \"${uiState.value.email}\" no incluye el signo \"@\"")
-        } else if (currentPassword.isBlank()) {
+        } else if (passwd.isBlank()) {
             showErrorSnackbar("La contraseña no puede estar vacía")
         } else {
             viewModelScope.launch {
-                val success = cF.loginRegisterCase.iniciarSesion(currentEmail, currentPassword)
+                val success = cF.inciarSesionCase(email, passwd)
                 if (success) {
                     onSuccess()
                 } else {

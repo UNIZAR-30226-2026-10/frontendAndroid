@@ -58,7 +58,7 @@ fun LogoutBoton(scope: CoroutineScope, SEState: SENavHostController, cF: CaseFac
 
 fun logoutBotonAccion(scope: CoroutineScope, SEState: SENavHostController, cF: CaseFacade) {
     scope.launch {
-        cF.loginRegisterCase.cerrarSesion()
+        // cF.loginRegisterCase.cerrarSesion() TODO CHANGE
 
         // Preparar el cambio a vertical para el login
         prepararOrientacion(SEState, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
 class RegisterViewModel(private val cF: CaseFacade, private val snackHost: SnackbarHostState) : ViewModel() {
 
     // CONSTRUCCIÓN
@@ -52,18 +53,21 @@ class RegisterViewModel(private val cF: CaseFacade, private val snackHost: Snack
     }
 
     fun register(onSuccess: () -> Unit) {
-        val state = _uiState.value
+        val email = _uiState.value.email
+        val username = _uiState.value.username
+        val passwd = _uiState.value.password
+        val confirmPasswd = _uiState.value.confirmPassword
 
-        if (!state.email.matches(emailRegex)) {
+        if (!email.matches(emailRegex)) {
             showErrorSnackbar("Incluye un signo \"@\" en la dirección de correo electrónico. La dirección \"${uiState.value.email}\" no incluye el signo \"@\"")
-        } else if (state.password != state.confirmPassword) {
+        } else if (passwd != confirmPasswd) {
             showErrorSnackbar("Las contraseñas no coinciden")
-        } else if (state.username.isBlank()) {
+        } else if (username.isBlank()) {
             showErrorSnackbar("El nombre es obligatorio")
         } else {
             viewModelScope.launch {
                 val success =
-                    cF.loginRegisterCase.registrarse(state.username, state.email, state.password)
+                    cF.registrarseCase(username, email, passwd)
                 if (success) {
                     onSuccess()
                 } else {

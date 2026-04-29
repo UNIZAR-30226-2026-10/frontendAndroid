@@ -19,8 +19,10 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.NavHost
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.ConexionRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.LoginRegisterRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PartidaRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MenuTopBar
@@ -39,13 +41,14 @@ class MainActivity : ComponentActivity() {
         // Inicialización de data.remote, Retrofit
         val apiService = ApiClient.apiService
 
+        // Inicialización de data.local
+        val localStorage = LocalStorage(applicationContext)
+
         // Inicialización de los casos de uso
         val caseFacade = CaseFacade(
-            applicationContext, // TODO elminar e instanciarComo Retrofit
-
-            ConexionRepositoryImpl(apiService),
-
-            PartidaRepositoryImpl()
+            pruebaConexionRepository =  ConexionRepositoryImpl(apiService),
+            loginRegisterRepository = LoginRegisterRepositoryImpl(apiService, localStorage),
+            partidaRepository =  PartidaRepositoryImpl()
         )
 
         setContent {
@@ -72,7 +75,7 @@ fun MainScreen(cF: CaseFacade) {
     val SEState = rememberSEAppState()
 
     val email = runBlocking {
-        cF.loginRegisterCase.comprobarLogin()
+        cF.comprobarLoginCase.invoke()
     }
 
     // Prueba de Conectividad Logging/Debug
