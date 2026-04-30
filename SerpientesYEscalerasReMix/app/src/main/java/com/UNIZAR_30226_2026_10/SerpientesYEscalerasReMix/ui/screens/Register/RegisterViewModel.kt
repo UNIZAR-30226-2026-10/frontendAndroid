@@ -27,6 +27,10 @@ class RegisterViewModel(private val cF: CaseFacade, private val snackHost: Snack
     val uiState = _uiState.asStateFlow()
 
     private val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[a-z]+\$".toRegex()
+    private val numRegex = ".*[0-9].*".toRegex()
+    private val upperRegex = ".*[A-Z].*".toRegex()
+    private val lowerRegex = ".*[a-z].*".toRegex()
+    private val specialRegex = ".*[!@#$%^&*(),.?\":{}|<>].*".toRegex()
 
     // FUNCIONES
 
@@ -60,11 +64,23 @@ class RegisterViewModel(private val cF: CaseFacade, private val snackHost: Snack
 
         if (!email.matches(emailRegex)) {
             showErrorSnackbar("Incluye un signo \"@\" en la dirección de correo electrónico. La dirección \"${uiState.value.email}\" no incluye el signo \"@\"")
-        } else if (passwd != confirmPasswd) {
-            showErrorSnackbar("Las contraseñas no coinciden")
         } else if (username.isBlank()) {
             showErrorSnackbar("El nombre es obligatorio")
-        } else {
+        } else if (passwd.length < 8) {
+            showErrorSnackbar("La contraseña debe tener al menos 8 caracteres")
+        } else if (passwd.length > 128) {
+            showErrorSnackbar("La contraseña no puede tener más de 128 caracteres")
+        } else if (!passwd.contains(numRegex)) {
+            showErrorSnackbar("La contraseña debe contener al menos un número")
+        } else if (!passwd.contains(upperRegex)) {
+            showErrorSnackbar("La contraseña debe contener al menos una letra mayúscula")
+        } else if (!passwd.contains(lowerRegex)) {
+            showErrorSnackbar("La contraseña debe contener al menos una letra minúscula")
+        } else if (!passwd.contains(specialRegex)) {
+            showErrorSnackbar("La contraseña debe contener al menos un carácter especial")
+        } else if (passwd != confirmPasswd) {
+            showErrorSnackbar("Las contraseñas no coinciden")
+        } else{
             viewModelScope.launch {
                 val success =
                     cF.registrarseCase(username, email, passwd)

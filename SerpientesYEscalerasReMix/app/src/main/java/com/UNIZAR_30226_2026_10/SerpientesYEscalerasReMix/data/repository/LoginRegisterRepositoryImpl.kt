@@ -1,5 +1,6 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository
 
+import android.util.Log
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiService
@@ -44,7 +45,7 @@ class LoginRegisterRepositoryImpl(
                 ""
             }
         } catch (e: Exception) {
-                ""
+            ""
         }
     }
 
@@ -83,7 +84,7 @@ class LoginRegisterRepositoryImpl(
         return try {
             val response = api.register(RegisterRequest(email, username, passwd))
 
-            if (response.isSuccessful) {
+            if (response.isSuccessful && response.body() != null) {
                 local.setLogin(true)
                 local.setEmail(email)
                 _email.value = email
@@ -94,6 +95,7 @@ class LoginRegisterRepositoryImpl(
                 false
             }
         } catch (e: Exception) {
+            Log.e("API_ERROR", "Error: ${e.message}")
             false
         }
     }
