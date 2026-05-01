@@ -32,7 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.JugadorLobby
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.JugadorLobby
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarIconoJugadorR
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg

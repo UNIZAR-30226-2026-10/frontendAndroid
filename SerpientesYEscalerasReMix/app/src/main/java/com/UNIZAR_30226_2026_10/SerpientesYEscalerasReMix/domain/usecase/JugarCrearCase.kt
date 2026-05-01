@@ -1,24 +1,11 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase
 
 import android.util.Log
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.JugadorLobby
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Lobby
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-
-data class Lobby(
-    val id: String,
-    val hostEmail: String,
-    val players: List<JugadorLobby?>
-)
-
-data class JugadorLobby(
-    val email: String,
-    val username: String,
-    val profileIcon: String = "default",
-    val isReady: Boolean,
-    val isBot: Boolean = false,
-    val deckName: String? = null
-)
 
 class JugarCrearCase(
     private val email: StateFlow<String>,
@@ -123,7 +110,7 @@ class JugarCrearCase(
                     username = "Bot_${indexPrimerHueco + 1}",
                     isReady = true, // Los bots suelen estar listos por defecto
                     isBot = true,   // Campo obligatorio en true
-                    deckName = "Mazo Básico"
+                    deckName = "mazo por defecto"
                 )
 
                 val nuevaLista = lobbyActual.players.toMutableList().apply {

@@ -17,8 +17,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.JugadorLobby
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Lobby
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.AbandonarLobbyBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.AmigosBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ContinuarBoton
@@ -27,16 +30,13 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.EmpezarP
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.JugadorItem
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MazoElegirBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.rememberSEAppState
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 
 @Composable
-fun JugarCrearScreen(SEState: SENavHostController, viewModel: JugarCrearViewModel) {
-
+fun JugarCrearScreen(navController: SENavHostController, viewModel: JugarCrearViewModel) {
     // Activar polling al entrar en la pantalla
     LaunchedEffect(Unit) {
-        if (viewModel.lobbyId.value == "") { // no se esta uniendo a ningún lobby desde la pantalla de Jugar_Amigos
-            viewModel.crearLobby()
-        }
         viewModel.iniciarPolling()
     }
 
@@ -47,6 +47,29 @@ fun JugarCrearScreen(SEState: SENavHostController, viewModel: JugarCrearViewMode
         }
     }
 
+    val uiState by viewModel.uiState.collectAsState()
+
+    JugarCrearContent(
+        uiState = uiState,
+        navController = navController,
+        onAnadirBot = { viewModel.onAnadirBot() },
+        onExpulsar = { idx -> viewModel.onExpulsar(idx) },
+        onAbandonar = { viewModel.onAbandonar() },
+        onCambiarListo = { listo -> viewModel.onCambiarListo(listo) },
+        onEmpezarPartida = { viewModel.onEmpezarPartida() }
+    )
+}
+
+@Composable
+fun JugarCrearContent(
+    uiState: JugarCrearUiState,
+    navController: SENavHostController,
+    onAnadirBot: () -> Unit,
+    onExpulsar: (Int) -> Unit,
+    onAbandonar: () -> Unit,
+    onCambiarListo: (Boolean) -> Unit,
+    onEmpezarPartida: () -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -59,9 +82,9 @@ fun JugarCrearScreen(SEState: SENavHostController, viewModel: JugarCrearViewMode
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ContinuarBoton(SEState)
+            ContinuarBoton(navController)
             Text(text = "Lobby", style = SETextTypes.titulo)
-            AmigosBoton(SEState)
+            AmigosBoton(navController)
         }
 
         Row(
@@ -69,95 +92,146 @@ fun JugarCrearScreen(SEState: SENavHostController, viewModel: JugarCrearViewMode
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            LobbyElementos(SEState, viewModel)
+            LobbyElementos(
+                uiState = uiState,
+                navController = navController,
+                onAnadirBot = onAnadirBot,
+                onExpulsar = onExpulsar,
+                onAbandonar = onAbandonar,
+                onCambiarListo = onCambiarListo,
+                onEmpezarPartida = onEmpezarPartida
+            )
         }
     }
 }
 
 @Composable
-fun LobbyElementos(SEState: SENavHostController, viewModel: JugarCrearViewModel) {
-    val lobby by viewModel.lobbyActual.collectAsState()
-    val miEmail by viewModel.email.collectAsState()
-    val hostEmail = lobby?.hostEmail
+fun LobbyElementos(
+    uiState: JugarCrearUiState,
+    navController: SENavHostController,
+    onAnadirBot: () -> Unit,
+    onExpulsar: (Int) -> Unit,
+    onAbandonar: () -> Unit,
+    onCambiarListo: (Boolean) -> Unit,
+    onEmpezarPartida: () -> Unit
+) {
+    val vistaLider = uiState.vistaLider
+    val hostEmail = uiState.lobby?.hostEmail ?: ""
+    val miEmail = uiState.email
 
-    val listaJugadores = lobby?.players ?: emptyList()
-    val vistaLider = miEmail == hostEmail
+    val miJugador = uiState.lobby?.players?.find { it?.email == miEmail }
+    val estaListo = miJugador?.isReady ?: false
+    val todosListos = uiState.lobby?.players?.filterNotNull()?.all { it.isReady } ?: false
 
     val sepVerticalJugadores = 16.dp
     val sepVerticalBotones = 8.dp
+
     Row(horizontalArrangement = Arrangement.Center) {
+        // Columna Izquierda (Jugadores 0 y 2)
         Column(verticalArrangement = Arrangement.spacedBy(sepVerticalJugadores)) {
-            val jugador0 = listaJugadores.getOrNull(0)
+            val jugador0 = uiState.lobby?.players?.getOrNull(0)
             JugadorItem(
                 vistaLider = vistaLider,
                 esLider = jugador0?.email == hostEmail,
                 esElUsuario = jugador0?.email == miEmail,
-                jugador = jugador0,
-                onAnadirBot = { viewModel.anadirBot() },
-                onExpulsar = { viewModel.expulsar(0) }
+                jugador = jugador0?.let { JugadorLobby(it.email, it.username, it.profileIcon, it.isReady, it.isBot, it.deckName) },
+                onAnadirBot = onAnadirBot,
+                onExpulsar = { onExpulsar(0) }
             )
 
-            val jugador2 = listaJugadores.getOrNull(2)
+            val jugador2 = uiState.lobby?.players?.getOrNull(2)
             JugadorItem(
                 vistaLider = vistaLider,
                 esLider = jugador2?.email == hostEmail,
                 esElUsuario = jugador2?.email == miEmail,
-                jugador = jugador2,
-                onAnadirBot = { viewModel.anadirBot() },
-                onExpulsar = { viewModel.expulsar(2) }
+                jugador = jugador2?.let { JugadorLobby(it.email, it.username, it.profileIcon, it.isReady, it.isBot, it.deckName) },
+                onAnadirBot = onAnadirBot,
+                onExpulsar = { onExpulsar(2) }
             )
         }
 
         Spacer(modifier = Modifier.width(25.dp))
 
+        // Columna Central (Botones y Selección)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(sepVerticalBotones)
         ) {
-            MazoElegirBoton("lateGame")
+            MazoElegirBoton(uiState.seleccionMazo.ifEmpty { "Estándar" })
+            
             if (vistaLider) {
                 ElegirTableroBoton(R.drawable.tablero_debug)
             } else {
                 Spacer(modifier = Modifier.height(120.dp))
             }
-            Row() {
-                AbandonarLobbyBoton(SEState, onClick = { viewModel.abandonar() })
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AbandonarLobbyBoton(navController, onClick = onAbandonar)
                 Spacer(modifier = Modifier.width(10.dp))
-                // TODO cambiar la condicion de estaListo y todos listos (quizas mas conveniente pasar el viewmodel y hacerlo alli)
                 EmpezarPartidaBoton(
-                    vistaLider,
-                    vistaLider,
-                    vistaLider,
-                    {},
-                    { a -> viewModel.cambiarPreparado(a) }
+                    esLider = vistaLider,
+                    estaListo = estaListo,
+                    todosListos = todosListos,
+                    onEmpezar = onEmpezarPartida,
+                    onCambiarListo = { nuevoEstado -> onCambiarListo(nuevoEstado) }
                 )
             }
         }
 
         Spacer(modifier = Modifier.width(25.dp))
 
+        // Columna Derecha (Jugadores 1 y 3)
         Column(verticalArrangement = Arrangement.spacedBy(sepVerticalJugadores)) {
-            val jugador1 = listaJugadores.getOrNull(1)
+            val jugador1 = uiState.lobby?.players?.getOrNull(1)
             JugadorItem(
                 vistaLider = vistaLider,
                 esLider = jugador1?.email == hostEmail,
                 esElUsuario = jugador1?.email == miEmail,
-                jugador = jugador1,
-                onAnadirBot = { viewModel.anadirBot() },
-                onExpulsar = { viewModel.expulsar(1) }
+                jugador = jugador1?.let { JugadorLobby(it.email, it.username, it.profileIcon, it.isReady, it.isBot, it.deckName) },
+                onAnadirBot = onAnadirBot,
+                onExpulsar = { onExpulsar(1) }
             )
 
-            val jugador3 = listaJugadores.getOrNull(3)
+            val jugador3 = uiState.lobby?.players?.getOrNull(3)
             JugadorItem(
                 vistaLider = vistaLider,
                 esLider = jugador3?.email == hostEmail,
                 esElUsuario = jugador3?.email == miEmail,
-                jugador = jugador3,
-                onAnadirBot = { viewModel.anadirBot() },
-                onExpulsar = { viewModel.expulsar(3) }
+                jugador = jugador3?.let { JugadorLobby(it.email, it.username, it.profileIcon, it.isReady, it.isBot, it.deckName) },
+                onAnadirBot = onAnadirBot,
+                onExpulsar = { onExpulsar(3) }
             )
         }
-
-        Spacer(modifier = Modifier.width(25.dp))
     }
+}
+
+@Preview(showBackground = true, widthDp = 800, heightDp = 480)
+@Composable
+fun JugarCrearScreenPreview() {
+    val mockLobby = Lobby(
+        id = "123",
+        hostEmail = "host@test.com",
+        players = listOf(
+            JugadorLobby("host@test.com", "HostUser", "p1", isReady = true, isBot = false),
+            JugadorLobby("user2@test.com", "GuestUser", "p2", isReady = false, isBot = false),
+            null,
+            null
+        )
+    )
+    val mockUiState = JugarCrearUiState(
+        lobby = mockLobby,
+        vistaLider = true,
+        email = "host@test.com",
+        seleccionMazo = "Fuego"
+    )
+
+    JugarCrearContent(
+        uiState = mockUiState,
+        navController = rememberSEAppState(),
+        onAnadirBot = {},
+        onExpulsar = {},
+        onAbandonar = {},
+        onCambiarListo = {},
+        onEmpezarPartida = {}
+    )
 }

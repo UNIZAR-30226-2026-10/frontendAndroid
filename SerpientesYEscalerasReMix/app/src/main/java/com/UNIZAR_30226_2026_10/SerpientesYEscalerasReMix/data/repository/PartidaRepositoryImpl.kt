@@ -18,17 +18,23 @@ import kotlinx.coroutines.flow.asStateFlow
 class PartidaRepositoryImpl :
     PartidaRepository { // TODO añadir PartidaRepositoryImpl(private val api: ApiService) o lo que sea
 
+    private val _matchId = MutableStateFlow("")
     private val _tablero = MutableStateFlow(TableroSnapshot(emptyList()))
     private val _fichas = MutableStateFlow<List<FichaSnapshot>>(emptyList())
     private val _jugadores = MutableStateFlow(JugadoresSnapshot(0, 0, emptyList()))
     private val _mano = MutableStateFlow<List<Carta?>>(emptyList())
     private val _chat = MutableStateFlow<List<MsgChat>>(emptyList())
 
+    override val matchId = _matchId.asStateFlow()
     override val tablero = _tablero.asStateFlow()
     override val fichas = _fichas.asStateFlow()
     override val jugadores = _jugadores.asStateFlow()
     override val mano = _mano.asStateFlow()
     override val chat = _chat.asStateFlow()
+
+    override suspend fun setMatchId(matchId: String) {
+        _matchId.value = matchId
+    }
 
     override suspend fun fetchEstadoCompleto(matchId: String, email: String) {
         // TODO Llamar a GET /api/matches/:match_id/board y /players

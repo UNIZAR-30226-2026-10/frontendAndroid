@@ -4,11 +4,10 @@ import CerrarSesionCase
 import IniciarSesionCase
 import RegistrarseCase
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.ConexionRepository
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.JugarCrearRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.LoginRegisterRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PartidaRepository
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class CaseFacade(
     // Repositorios
@@ -20,6 +19,9 @@ class CaseFacade(
     // Login / Registro
     private val loginRegisterRepository: LoginRegisterRepository,
 
+    // Lobby / Jugar_Crear
+    private val jugarCrearRepository: JugarCrearRepository,
+
     // Partida
     private val partidaRepository: PartidaRepository
 ) {
@@ -30,19 +32,13 @@ class CaseFacade(
     val email: StateFlow<String> = loginRegisterRepository.email
     val username: StateFlow<String> = loginRegisterRepository.username
 
-    private val _lobbyId = MutableStateFlow("") // TODO cambiar y enlazar con repo o repos
-    val lobbyId: StateFlow<String> = _lobbyId.asStateFlow()
-
-    private val _matchId = MutableStateFlow("1") // TODO cambiar y enlazar con repo o repos
-    val matchId: StateFlow<String> = _matchId.asStateFlow()
+    val matchId: StateFlow<String> = partidaRepository.matchId
 
     // --- USECASE ---
 
-    val amigosCase = AmigosCase(email, username, _lobbyId) // TODO eleminar
+    val amigosCase = AmigosCase(email, username) // TODO eleminar
 
     val jugarContinuarCase = JugarContinuarCase(email, username) // TODO eleminar
-
-    val jugarCrearCase = JugarCrearCase(email, username, _lobbyId) // TODO eleminar
 
     // TEST/LOG
 
@@ -54,6 +50,20 @@ class CaseFacade(
     val inciarSesionCase = IniciarSesionCase(loginRegisterRepository)
     val registrarseCase = RegistrarseCase(loginRegisterRepository)
     val cerrarSesionCase = CerrarSesionCase(loginRegisterRepository)
+
+    // JUGAR CREAR
+
+    // Exposición de flujos del repositorio de Jugar Crear
+    val lobby = jugarCrearRepository.lobbyActual
+
+    // Casos de uso de Jugar Crear
+    val anadirBotCase = AnadirBotCase(jugarCrearRepository, email)
+    val cambiarPreparadoCase = CambiarPreparadoCase(jugarCrearRepository, email)
+    val seleccionarMazoCase = SeleccionarMazoCase(jugarCrearRepository, email)
+    val seleccionarTableroCase = SeleccionarTableroCase(jugarCrearRepository, email)
+    val abandonarExpulsarCase = AbandonarExpulsarCase(jugarCrearRepository, email, username)
+    val syncLobbyCase = SyncLobbyCase(jugarCrearRepository, email, username)
+    val empezarPartidaCase = EmpezarPartidaCase(jugarCrearRepository, partidaRepository)
 
     // PARTIDA
 

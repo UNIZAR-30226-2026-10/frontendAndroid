@@ -22,6 +22,7 @@ import androidx.navigation.compose.NavHost
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.ConexionRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.JugarCrearRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.LoginRegisterRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PartidaRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
@@ -49,7 +50,8 @@ class MainActivity : ComponentActivity() {
         val caseFacade = CaseFacade(
             pruebaConexionRepository =  ConexionRepositoryImpl(apiService),
             loginRegisterRepository = LoginRegisterRepositoryImpl(apiService, localStorage),
-            partidaRepository =  PartidaRepositoryImpl()
+            partidaRepository =  PartidaRepositoryImpl(),
+            jugarCrearRepository = JugarCrearRepositoryImpl()
         )
 
         setContent {

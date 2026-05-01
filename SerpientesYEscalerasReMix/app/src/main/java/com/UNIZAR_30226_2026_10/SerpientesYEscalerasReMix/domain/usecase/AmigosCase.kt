@@ -14,7 +14,7 @@ data class Usuario( // TODO mover a donde sea pertienente
 class AmigosCase(
     private val email: StateFlow<String>,
     private val username: StateFlow<String>,
-    private val lobbyId: MutableStateFlow<String>
+    private val lobbyId: MutableStateFlow<String> = MutableStateFlow("")
 ) { // TODO añadir remote amigos
 
     suspend fun obtenerAmigos(): List<Usuario> {

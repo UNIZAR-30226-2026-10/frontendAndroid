@@ -3,11 +3,13 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Crea
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Lobby
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.Lobby
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -22,22 +24,32 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
             }
     }
 
-    val lobbyActual: StateFlow<Lobby?> = cF.jugarCrearCase.currentLobby
-    val email: StateFlow<String> = cF.email
-    val username: StateFlow<String> = cF.username
-    val lobbyId: StateFlow<String> = cF.lobbyId
+    private val _uiState = MutableStateFlow(JugarCrearUiState())
 
-    private var pollingJob: Job? = null
+    val uiState = _uiState.asStateFlow()
+
+    init {
+        // Conexión de Flows del Repository a UI State
+        viewModelScope.launch {
+            launch { cF.lobby.collect { data -> _uiState.update { it.copy(lobby = data) } } }
+            launch { cF.email.collect { data -> _uiState.update { it.copy(email = data) } } }
+        }
+    }
+
+    // Funciones POLLING
+
     private var pollingMS: Long = 2000 // Consultar cada 2 segundos
+    private var pollingJob: Job? = null
 
-
-    // Polling del lobby
     fun iniciarPolling() {
         if (pollingJob?.isActive == true) return
 
         pollingJob = viewModelScope.launch {
             while (isActive) {
-                cF.jugarCrearCase.obtenerEstadoLobby()
+                cF.syncLobbyCase()
+                if (_uiState.value.lobby != null) {
+                    _uiState.update { it.copy(vistaLider = _uiState.value.lobby!!.hostEmail == cF.email.value) }
+                }
                 delay(pollingMS)
             }
         }
@@ -48,41 +60,59 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
     }
 
     // Métodos de interacción con el Lobby
-    fun crearLobby() {
+    fun onCambiarListo(listo: Boolean) {
         viewModelScope.launch {
-            cF.jugarCrearCase.crearLobby()
+            cF.cambiarPreparadoCase(listo)
         }
     }
 
-    fun cambiarPreparado(preparado: Boolean) { // TODO
+    fun onSeleccionarMazo(nombreMazo: String) {
         viewModelScope.launch {
-            cF.jugarCrearCase.cambiarEstadoPreparado(preparado)
+            cF.seleccionarMazoCase(nombreMazo)
         }
     }
 
-    fun seleccionarMazo(nombreMazo: String) { // TODO
+    fun onSeleccionarTablero(nombreTablero: String) {
         viewModelScope.launch {
-            cF.jugarCrearCase.seleccionarMazo(nombreMazo)
+            cF.seleccionarTableroCase(nombreTablero)
         }
     }
 
-    fun anadirBot() { // TODO quizas añadir un snackbar si alguien se une antes de que se pueda añadir el bot
+    fun onAnadirBot() {
         viewModelScope.launch {
-            cF.jugarCrearCase.anadirBot()
+            cF.anadirBotCase()
         }
     }
 
-    fun abandonar() {
+    fun onAbandonar() {
         viewModelScope.launch {
-            cF.jugarCrearCase.abandonarExpulsar(email.value)
-            cF.jugarCrearCase.crearLobby()
+            // El caso de uso AbandonarExpulsar ya gestiona la creación de un nuevo lobby 
+            // tras abandonar si el target es el propio usuario.
+            cF.abandonarExpulsarCase(cF.email.value)
         }
     }
 
-    fun expulsar(idx: Int) {
+    fun onExpulsar(idx: Int) {
         viewModelScope.launch {
-            val emailAEliminar = lobbyActual.value?.players?.getOrNull(idx)?.email ?: ""
-            cF.jugarCrearCase.abandonarExpulsar(emailAEliminar)
+            val emailAEliminar = _uiState.value.lobby?.players?.getOrNull(idx)?.email ?: ""
+            if (emailAEliminar.isNotEmpty()) {
+                cF.abandonarExpulsarCase(emailAEliminar)
+            }
+        }
+    }
+
+    fun onEmpezarPartida() {
+        viewModelScope.launch {
+            val lobbyId = _uiState.value.lobby?.id ?: ""
+            cF.empezarPartidaCase(lobbyId)
         }
     }
 }
+
+data class JugarCrearUiState(
+    val lobby: Lobby? = null,
+    val vistaLider: Boolean = false,
+    val seleccionMazo: String = "",
+    val seleccionTablero: String = "",
+    val email: String = "",
+)
