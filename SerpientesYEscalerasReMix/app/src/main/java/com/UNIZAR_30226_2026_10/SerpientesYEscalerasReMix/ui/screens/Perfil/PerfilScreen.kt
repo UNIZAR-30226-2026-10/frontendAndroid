@@ -10,10 +10,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,33 +23,74 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CategoriaCosmetico
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.LogoutBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.*
 
 @Composable
-fun Perfil(_SEState: SENavHostController) {
-    // ESTADO: El nombre que se mostrará y editará
-    var nombreUsuario by remember { mutableStateOf("SerpienteGanadora5") }
-    val statsSimuladas = "35W/12L"
+fun PerfilScreen(_SEState: SENavHostController, viewModel: PerfilViewModel) {
+    val perfil       = viewModel.perfil
+    val cargando     = viewModel.cargando
+    val errorMessage = viewModel.errorMessage
 
-    // Simulación de guardado en Base de Datos
-    val guardarEnBD = { nuevoNombre: String ->
-        // Aquí irá la llamada al ViewModel
-        println("DEBUG: Guardando '$nuevoNombre' en la base de datos...")
+    val nombre = perfil?.nombre ?: ""
+    val stats  = if (perfil != null) "${perfil.victorias}W/${perfil.derrotas}L" else ""
+
+    if (cargando) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = color_primary)
+        }
+        return
+    }
+
+    if (errorMessage != null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(text = errorMessage, color = Color.Red, style = SETextTypes.plano)
+        }
+        return
     }
 
     PerfilContent(
-        nombre = nombreUsuario,
-        stats = statsSimuladas,
-        onNombreConfirmado = { nuevo ->
-            nombreUsuario = nuevo
-            guardarEnBD(nuevo)
+        SEState             = _SEState,
+        cF                  = viewModel.cF,
+        nombre              = nombre,
+        stats               = stats,
+        skinsEscalera       = viewModel.skinsEscalera,
+        skinsSerpiente      = viewModel.skinsSerpiente,
+        skinsFicha          = viewModel.skinsFicha,
+        iconos              = viewModel.iconos,
+        skinEscaleraActual  = perfil?.skinEscaleraActual ?: "",
+        skinSerpienteActual = perfil?.skinSerpienteActual ?: "",
+        skinFichaActual     = perfil?.skinFichaActual ?: "",
+        iconoActual         = perfil?.iconoActual ?: "",
+        onNombreConfirmado  = { nuevo -> viewModel.actualizarNombre(nuevo) },
+        onCosmeticoSeleccionado = { categoria, skinId ->
+            viewModel.actualizarCosmetico(categoria, skinId)
         }
     )
 }
 
 @Composable
-fun PerfilContent(nombre: String, stats: String, onNombreConfirmado: (String) -> Unit) {
+fun PerfilContent(
+    SEState: SENavHostController,
+    cF: CaseFacade,
+    nombre: String,
+    stats: String,
+    skinsEscalera: List<String>,
+    skinsSerpiente: List<String>,
+    skinsFicha: List<String>,
+    iconos: List<String>,
+    skinEscaleraActual: String,
+    skinSerpienteActual: String,
+    skinFichaActual: String,
+    iconoActual: String,
+    onNombreConfirmado: (String) -> Unit,
+    onCosmeticoSeleccionado: (CategoriaCosmetico, String) -> Unit
+) {
+    val scope = rememberCoroutineScope()
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -62,15 +100,37 @@ fun PerfilContent(nombre: String, stats: String, onNombreConfirmado: (String) ->
         shape = RoundedCornerShape(28.dp)
     ) {
         Column {
-            TarjetaUsuario(nombre, stats, onNombreConfirmado)
+            TarjetaUsuario(
+                nombre         = nombre,
+                stats          = stats,
+                SEState        = SEState,
+                cF             = cF,
+                scope          = scope,
+                onNombreConfirmado = onNombreConfirmado
+            )
             Spacer(modifier = Modifier.height(15.dp))
-            SeccionCosmeticos()
+            SeccionCosmeticos(
+                skinsEscalera       = skinsEscalera,
+                skinsSerpiente      = skinsSerpiente,
+                skinsFicha          = skinsFicha,
+                skinEscaleraActual  = skinEscaleraActual,
+                skinSerpienteActual = skinSerpienteActual,
+                skinFichaActual     = skinFichaActual,
+                onCosmeticoSeleccionado = onCosmeticoSeleccionado
+            )
         }
     }
 }
 
 @Composable
-fun TarjetaUsuario(nombre: String, stats: String, onNombreConfirmado: (String) -> Unit) {
+fun TarjetaUsuario(
+    nombre: String,
+    stats: String,
+    SEState: SENavHostController,
+    cF: CaseFacade,
+    scope: kotlinx.coroutines.CoroutineScope,
+    onNombreConfirmado: (String) -> Unit
+) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = color_secondary,
@@ -78,13 +138,22 @@ fun TarjetaUsuario(nombre: String, stats: String, onNombreConfirmado: (String) -
         shape = RoundedCornerShape(24.dp)
     ) {
         Box(modifier = Modifier.padding(8.dp)) {
-            Text(
-                text = stats,
-                style = SETextTypes.grande,
-                color = color_text,
-                modifier = Modifier.align(Alignment.TopEnd)
-            )
 
+            // Esquina superior derecha: stats encima, botón logout debajo
+            Column(
+                modifier = Modifier.align(Alignment.TopEnd),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = stats,
+                    style = SETextTypes.grande,
+                    color = color_text
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                LogoutBoton(scope = scope, SEState = SEState, cF = cF, texto = "Cerrar Sesión")
+            }
+
+            // Fila con avatar + etiqueta + caja nombre
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
@@ -100,14 +169,13 @@ fun TarjetaUsuario(nombre: String, stats: String, onNombreConfirmado: (String) -
 
 @Composable
 fun CajaNombreUsuario(nombreActual: String, onConfirmar: (String) -> Unit) {
-    // Estados locales para la edición
     var editando by remember { mutableStateOf(false) }
     var textoTemporal by remember(nombreActual) { mutableStateOf(nombreActual) }
 
     Surface(
         modifier = Modifier
             .padding(start = 20.dp)
-            .width(460.dp)
+            .width(420.dp)
             .height(40.dp),
         color = color_bg,
         border = BorderStroke(1.dp, if (editando) color_primary else color_text),
@@ -200,7 +268,15 @@ fun EtiquetaNombre() {
 }
 
 @Composable
-fun SeccionCosmeticos() {
+fun SeccionCosmeticos(
+    skinsEscalera: List<String>,
+    skinsSerpiente: List<String>,
+    skinsFicha: List<String>,
+    skinEscaleraActual: String,
+    skinSerpienteActual: String,
+    skinFichaActual: String,
+    onCosmeticoSeleccionado: (CategoriaCosmetico, String) -> Unit
+) {
     Column {
         Text(
             text = "Cosmeticos:",
@@ -213,25 +289,51 @@ fun SeccionCosmeticos() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            CosmeticoItem("Escaleras", R.drawable.tablero_debug)
-            CosmeticoItem("Serpientes", R.drawable.tablero_debug)
-            CosmeticoItem("Fichas", R.drawable.tablero_debug)
+            CosmeticoItem(
+                label       = "Escaleras",
+                imagenRes   = R.drawable.tablero_debug,
+                skinActual  = skinEscaleraActual,
+                opciones    = skinsEscalera,
+                onSeleccion = { skinId -> onCosmeticoSeleccionado(CategoriaCosmetico.ESCALERA, skinId) }
+            )
+            CosmeticoItem(
+                label       = "Serpientes",
+                imagenRes   = R.drawable.tablero_debug,
+                skinActual  = skinSerpienteActual,
+                opciones    = skinsSerpiente,
+                onSeleccion = { skinId -> onCosmeticoSeleccionado(CategoriaCosmetico.SERPIENTE, skinId) }
+            )
+            CosmeticoItem(
+                label       = "Fichas",
+                imagenRes   = R.drawable.tablero_debug,
+                skinActual  = skinFichaActual,
+                opciones    = skinsFicha,
+                onSeleccion = { skinId -> onCosmeticoSeleccionado(CategoriaCosmetico.FICHA, skinId) }
+            )
         }
     }
 }
 
 @Composable
-fun CosmeticoItem(label: String, imagenRes: Int) {
+fun CosmeticoItem(
+    label: String,
+    imagenRes: Int,
+    skinActual: String,
+    opciones: List<String>,
+    onSeleccion: (String) -> Unit
+) {
+    var mostrarMenu by remember { mutableStateOf(false) }
+
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = label, style = SETextTypes.grande, color = color_text)
         Spacer(modifier = Modifier.height(4.dp))
         Box(contentAlignment = Alignment.Center) {
             Surface(
-                modifier = Modifier.size(200.dp, 115.dp)
-                                    .border(2.dp, color_text, RoundedCornerShape(4.dp)),
+                modifier = Modifier
+                    .size(200.dp, 115.dp)
+                    .border(2.dp, color_text, RoundedCornerShape(4.dp)),
                 color = color_bg,
-                shape = RoundedCornerShape(4.dp),
-
+                shape = RoundedCornerShape(4.dp)
             ) {
                 Image(
                     painter = painterResource(id = imagenRes),
@@ -240,15 +342,36 @@ fun CosmeticoItem(label: String, imagenRes: Int) {
                     contentScale = ContentScale.Crop,
                     colorFilter = ColorFilter.tint(Color.Black.copy(alpha = 0.4f), BlendMode.Darken)
                 )
-
-                // Icono de edición (el lápiz blanco)
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Editar",
-                    tint = color_text,
-                    modifier = Modifier
-                        .size(60.dp)
-                )
+                IconButton(
+                    onClick = { mostrarMenu = true },
+                    modifier = Modifier.size(60.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Editar $label",
+                        tint = color_text,
+                        modifier = Modifier.size(60.dp)
+                    )
+                }
+            }
+            DropdownMenu(
+                expanded = mostrarMenu,
+                onDismissRequest = { mostrarMenu = false }
+            ) {
+                opciones.forEach { skinId ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = skinId,
+                                color = if (skinId == skinActual) color_primary else color_text
+                            )
+                        },
+                        onClick = {
+                            mostrarMenu = false
+                            onSeleccion(skinId)
+                        }
+                    )
+                }
             }
         }
     }

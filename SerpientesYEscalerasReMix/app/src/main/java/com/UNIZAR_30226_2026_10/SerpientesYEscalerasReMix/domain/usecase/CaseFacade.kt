@@ -13,7 +13,7 @@ class CaseFacade(
     // Repositorios
     // TODO ir añadiendo aqui las interfaces que se vayan creando, fuera seran instanciadas como toquen
     private val partidaRepository: PartidaRepository,
-    ) {
+) {
 
     // TODO Cambiar e iniciar esto en MainActivity junto con remote, luego cerceriorarse que todo se crea bien con su repo, etc
     // Creación del almacen local
@@ -32,11 +32,6 @@ class CaseFacade(
     private val _matchId = MutableStateFlow("1") // TODO cambiar y enlazar con repo o repos
     val matchId: StateFlow<String> = _matchId.asStateFlow()
 
-    // Repositorios
-
-
-
-    // Crear Todos los casos de uso, asignando local y remoteApi segun corresponda
     public val loginRegisterCase = LoginRegisterCase(local, _email, _username)
 
     public val amigosCase = AmigosCase(email, username, _lobbyId)
@@ -45,7 +40,12 @@ class CaseFacade(
 
     public val jugarCrearCase = JugarCrearCase(email, username, _lobbyId)
 
-    public val perfilCase = PerfilCase(email, username)
+    // Casos de uso de Perfil
+    public val obtenerPerfilCase     = ObtenerPerfilCase(email, username)
+    public val actualizarNombreCase  = ActualizarNombreCase(email)
+    public val actualizarSkinCase    = ActualizarSkinCase(email)
+    public val obtenerCosmeticosCase = ObtenerCosmeticosCase()
+
     // PARTIDA
 
     // Exposición de flujos del repositorio de Partida
