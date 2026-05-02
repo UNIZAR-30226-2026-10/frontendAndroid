@@ -56,7 +56,8 @@ fun JugarCrearScreen(navController: SENavHostController, viewModel: JugarCrearVi
         onExpulsar = { idx -> viewModel.onExpulsar(idx) },
         onAbandonar = { viewModel.onAbandonar() },
         onCambiarListo = { listo -> viewModel.onCambiarListo(listo) },
-        onEmpezarPartida = { viewModel.onEmpezarPartida() }
+        onEmpezarPartida = { viewModel.onEmpezarPartida() },
+        onElegirTablero = { tablero -> viewModel.onSeleccionarTablero(tablero) }
     )
 }
 
@@ -68,7 +69,8 @@ fun JugarCrearContent(
     onExpulsar: (Int) -> Unit,
     onAbandonar: () -> Unit,
     onCambiarListo: (Boolean) -> Unit,
-    onEmpezarPartida: () -> Unit
+    onEmpezarPartida: () -> Unit,
+    onElegirTablero: (String) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -99,7 +101,8 @@ fun JugarCrearContent(
                 onExpulsar = onExpulsar,
                 onAbandonar = onAbandonar,
                 onCambiarListo = onCambiarListo,
-                onEmpezarPartida = onEmpezarPartida
+                onEmpezarPartida = onEmpezarPartida,
+                onElegirTablero = onElegirTablero
             )
         }
     }
@@ -113,7 +116,8 @@ fun LobbyElementos(
     onExpulsar: (Int) -> Unit,
     onAbandonar: () -> Unit,
     onCambiarListo: (Boolean) -> Unit,
-    onEmpezarPartida: () -> Unit
+    onEmpezarPartida: () -> Unit,
+    onElegirTablero: (String) -> Unit
 ) {
     val vistaLider = uiState.vistaLider
     val hostEmail = uiState.lobby?.hostEmail ?: ""
@@ -160,7 +164,9 @@ fun LobbyElementos(
             MazoElegirBoton(uiState.seleccionMazo.ifEmpty { "Estándar" })
             
             if (vistaLider) {
-                ElegirTableroBoton(R.drawable.tablero_debug)
+                ElegirTableroBoton(
+                    tableroResId = R.drawable.tablero_debug,
+                    onClick = { tablero -> onElegirTablero(tablero) })
             } else {
                 Spacer(modifier = Modifier.height(120.dp))
             }
@@ -232,6 +238,7 @@ fun JugarCrearScreenPreview() {
         onExpulsar = {},
         onAbandonar = {},
         onCambiarListo = {},
-        onEmpezarPartida = {}
+        onEmpezarPartida = {},
+        onElegirTablero = { tablero -> }
     )
 }
