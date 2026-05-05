@@ -14,7 +14,7 @@ class CaseFacade(
     // Repositorios
     // TODO ir añadiendo aqui las interfaces que se vayan creando, fuera seran instanciadas como toquen
     private val pruebaConexionRepository: ConexionRepository,
-    
+
     private val partidaRepository: PartidaRepository
 ) {
 
@@ -34,7 +34,6 @@ class CaseFacade(
 
     private val _matchId = MutableStateFlow("1") // TODO cambiar y enlazar con repo o repos
     val matchId: StateFlow<String> = _matchId.asStateFlow()
-    
 
     // Crear Todos los casos de uso, asignando local y remoteApi segun corresponda
     val loginRegisterCase = LoginRegisterCase(local, _email, _username)
@@ -44,7 +43,13 @@ class CaseFacade(
     val jugarContinuarCase = JugarContinuarCase(email, username)
 
     val jugarCrearCase = JugarCrearCase(email, username, _lobbyId)
-    
+
+    // Casos de uso de Perfil
+    public val obtenerPerfilCase     = ObtenerPerfilCase(email, username)
+    public val actualizarNombreCase  = ActualizarNombreCase(email)
+    public val actualizarSkinCase    = ActualizarSkinCase(email)
+    public val obtenerCosmeticosCase = ObtenerCosmeticosCase()
+
     // PARTIDA
 
     // Exposición de flujos del repositorio de Partida
@@ -60,9 +65,9 @@ class CaseFacade(
     val confirmarDestinoCase = ConfirmarDestinoCase(partidaRepository, email, matchId)
     val chatCase = ChatCase(partidaRepository, matchId)
     val jugarCartaCase = JugarCartaCase(partidaRepository, email, matchId)
-    
+
     // TEST/LOG
-    
+
     // Caso de uso de prueba ping con API/Retrofit
     val pruebaConexionCase = PruebaConexionCase(pruebaConexionRepository)
 }
