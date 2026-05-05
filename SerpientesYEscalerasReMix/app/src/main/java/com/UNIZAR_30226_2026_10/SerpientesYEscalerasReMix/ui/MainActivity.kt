@@ -21,6 +21,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.NavHost
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.AmigosRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.ConexionRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.JugarCrearRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.LoginRegisterRepositoryImpl
@@ -51,7 +52,8 @@ class MainActivity : ComponentActivity() {
             pruebaConexionRepository =  ConexionRepositoryImpl(apiService),
             loginRegisterRepository = LoginRegisterRepositoryImpl(apiService, localStorage),
             partidaRepository =  PartidaRepositoryImpl(),
-            jugarCrearRepository = JugarCrearRepositoryImpl()
+            jugarCrearRepository = JugarCrearRepositoryImpl(apiService),
+            amigosRepository = AmigosRepositoryImpl(apiService)
         )
 
         setContent {

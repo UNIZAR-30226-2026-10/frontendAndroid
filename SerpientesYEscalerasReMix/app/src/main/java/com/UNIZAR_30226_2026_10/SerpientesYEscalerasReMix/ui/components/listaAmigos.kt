@@ -40,7 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.Usuario
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Usuario
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_secondary
@@ -144,12 +144,6 @@ fun InformacionAmigo(usuario: Usuario, expandido: Boolean, onClick: () -> Unit) 
                     .clip(CircleShape)
                     .border(1.dp, color_bg, CircleShape)
             )
-            /* Legacy online/offline indicator
-            Surface(
-                shape = CircleShape,
-                color = if (usuario.estaOnline) color_positive else color_offline,
-                modifier = Modifier.size(20.dp)
-            ) {} */
         }
 
         Spacer(modifier = Modifier.width(16.dp))

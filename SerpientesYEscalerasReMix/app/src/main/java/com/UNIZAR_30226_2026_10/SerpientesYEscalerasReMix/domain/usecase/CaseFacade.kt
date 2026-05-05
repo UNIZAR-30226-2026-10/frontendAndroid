@@ -3,6 +3,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase
 import CerrarSesionCase
 import IniciarSesionCase
 import RegistrarseCase
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.AmigosRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.ConexionRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.JugarCrearRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.LoginRegisterRepository
@@ -23,7 +24,10 @@ class CaseFacade(
     private val jugarCrearRepository: JugarCrearRepository,
 
     // Partida
-    private val partidaRepository: PartidaRepository
+    private val partidaRepository: PartidaRepository,
+
+    // Amigos
+    private val amigosRepository: AmigosRepository
 ) {
 
     // --- GENERAL STATE ---
@@ -35,8 +39,6 @@ class CaseFacade(
     val matchId: StateFlow<String> = partidaRepository.matchId
 
     // --- USECASE ---
-
-    val amigosCase = AmigosCase(email, username) // TODO eleminar
 
     val jugarContinuarCase = JugarContinuarCase(email, username) // TODO eleminar
 
@@ -64,6 +66,14 @@ class CaseFacade(
     val abandonarExpulsarCase = AbandonarExpulsarCase(jugarCrearRepository, username)
     val syncLobbyCase = SyncLobbyCase(jugarCrearRepository, username)
     val empezarPartidaCase = EmpezarPartidaCase(jugarCrearRepository, partidaRepository)
+
+    // AMIGOS
+    val obtenerAmigosCase = ObtenerAmigosCase(amigosRepository)
+    val buscarAmigosCase = BuscarAmigosCase(amigosRepository)
+    val anadirAmigoCase = AnadirAmigoCase(amigosRepository)
+    val eliminarAmigoCase = EliminarAmigoCase(amigosRepository)
+    val invitarAmigoLobbyCase = InvitarAmigoLobbyCase(amigosRepository)
+    val getAmigoLobbyCase = GetAmigoLobbyCase(amigosRepository)
 
     // PARTIDA
 

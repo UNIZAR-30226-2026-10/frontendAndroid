@@ -1,35 +1,38 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Amigos
 
+import android.content.pm.ActivityInfo
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.Usuario
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Usuario
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.CabeceraAmigos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ListaAmigos
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.fijarOrientacion
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.rememberSEAppState
-import kotlinx.coroutines.launch
 
 @Composable
-fun AmigosScreen(navHost: SENavHostController, snackHost: SnackbarHostState, viewModel: AmigosViewModel) {
-    val scope = rememberCoroutineScope()
+fun AmigosScreen(
+    navController: SENavHostController,
+    viewModel: AmigosViewModel
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
-    // Activar polling al entrar en la pantalla
+    // Mantener orientación horizontal para esta pantalla
+    fijarOrientacion(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+
     LaunchedEffect(Unit) {
         viewModel.iniciarPolling()
     }
 
-    // Desactivar polling cuando la pantalla no sea visible
     DisposableEffect(Unit) {
         onDispose {
             viewModel.detenerPolling()
@@ -37,23 +40,14 @@ fun AmigosScreen(navHost: SENavHostController, snackHost: SnackbarHostState, vie
     }
 
     AmigosContent(
-        usuarios = viewModel.listaAmigosMostrada,
-        navHost = navHost,
+        usuarios = uiState.listaAmigosMostrada,
+        navHost = navController,
         onSearch = { viewModel.buscarAmigos(it) },
         onInvitar = { viewModel.invitarAmigo(it) },
         onUnirse = { nombre ->
-            viewModel.unirseAPartida(
-                nombre,
-                onSuccess = { navHost.goTo(Destinos.JUGAR_CREAR) },
-                onError = {
-                    scope.launch {
-                        snackHost.showSnackbar(
-                            message = "No te has podido unir al lobby de $nombre",
-                            duration = SnackbarDuration.Short
-                        )
-                    }
-                }
-            )
+            viewModel.unirseAPartida(nombre) {
+                navController.goTo(Destinos.JUGAR_CREAR)
+            }
         },
         onBorrar = { viewModel.borrarAmigo(it) },
         onAnadir = { viewModel.anadirAmigo(it) }
@@ -74,8 +68,7 @@ fun AmigosContent(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Cabecera, buscar amigos y volver a la pantalla anterior
-        CabeceraAmigos(navHost, onSearch = onSearch, onAdd = {})
+        CabeceraAmigos(navHost, onSearch = onSearch, onAdd = { onAnadir(it) })
 
         ListaAmigos(
             usuarios = usuarios,
@@ -87,24 +80,21 @@ fun AmigosContent(
     }
 }
 
-@Preview(widthDp = 800, heightDp = 480)
+@Preview(showBackground = true, device = "spec:width=1280dp,height=800dp,orientation=landscape")
 @Composable
-fun AmigosScreenPreview() {
+fun AmigosPreview() {
     val mockUsuarios = listOf(
-        Usuario("Ivan", estaOnline = true, haInvitado = false, esAmigo = true, estadoTexto = "En el lobby"),
-        Usuario("Paco", estaOnline = false, haInvitado = true, esAmigo = true, estadoTexto = "Desconectado"),
-        Usuario("Maria", estaOnline = true, haInvitado = false, esAmigo = false, estadoTexto = "Jugando")
+        Usuario("Juan", "En línea", true, true),
+        Usuario("Maria", "Te ha invitado", true, true, true),
+        Usuario("Pedro", "Desconectado", false, true)
     )
-
-    MaterialTheme {
-        AmigosContent(
-            usuarios = mockUsuarios,
-            navHost = rememberSEAppState(),
-            onSearch = {},
-            onInvitar = {},
-            onUnirse = {},
-            onBorrar = {},
-            onAnadir = {}
-        )
-    }
+    AmigosContent(
+        usuarios = mockUsuarios,
+        navHost = rememberSEAppState(),
+        onSearch = {},
+        onInvitar = {},
+        onUnirse = {},
+        onBorrar = {},
+        onAnadir = {}
+    )
 }
