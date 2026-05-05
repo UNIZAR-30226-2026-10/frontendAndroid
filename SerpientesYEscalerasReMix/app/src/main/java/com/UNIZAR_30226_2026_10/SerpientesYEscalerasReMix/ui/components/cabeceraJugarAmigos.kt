@@ -42,8 +42,9 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 
 @Composable
 fun CabeceraAmigos(
-    SEState: SENavHostController,
-    onSearch: (String) -> Unit
+    navHost: SENavHostController,
+    onSearch: (String) -> Unit,
+    onAdd: (String) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -54,7 +55,7 @@ fun CabeceraAmigos(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         // Vovler a Crear Partida
-        CrearBoton(SEState, "izq")
+        CrearBoton(navHost, "izq")
 
         Spacer(Modifier.width(80.dp))
 
@@ -65,6 +66,10 @@ fun CabeceraAmigos(
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
+
+        AnadirAmigoBoton(onAdd)
+
+        Spacer(Modifier.width(10.dp))
 
         AmigosSearch(onSearch)
     }
@@ -81,7 +86,7 @@ fun AmigosSearch(onSearch: (String) -> Unit) {
         border = BorderStroke(2.dp, color_primary),
         modifier = Modifier
             .height(40.dp)
-            .width(300.dp)
+            .width(250.dp)
     ) {
         BasicTextField(
             value = searchText,
