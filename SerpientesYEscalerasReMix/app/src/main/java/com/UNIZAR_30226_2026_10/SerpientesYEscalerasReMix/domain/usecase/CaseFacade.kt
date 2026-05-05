@@ -57,12 +57,12 @@ class CaseFacade(
     val lobby = jugarCrearRepository.lobbyActual
 
     // Casos de uso de Jugar Crear
-    val anadirBotCase = AnadirBotCase(jugarCrearRepository, email)
-    val cambiarPreparadoCase = CambiarPreparadoCase(jugarCrearRepository, email)
-    val seleccionarMazoCase = SeleccionarMazoCase(jugarCrearRepository, email)
-    val seleccionarTableroCase = SeleccionarTableroCase(jugarCrearRepository, email)
-    val abandonarExpulsarCase = AbandonarExpulsarCase(jugarCrearRepository, email, username)
-    val syncLobbyCase = SyncLobbyCase(jugarCrearRepository, email, username)
+    val anadirBotCase = AnadirBotCase(jugarCrearRepository, username)
+    val cambiarPreparadoCase = CambiarPreparadoCase(jugarCrearRepository, username)
+    val seleccionarMazoCase = SeleccionarMazoCase(jugarCrearRepository, username)
+    val seleccionarTableroCase = SeleccionarTableroCase(jugarCrearRepository, username)
+    val abandonarExpulsarCase = AbandonarExpulsarCase(jugarCrearRepository, username)
+    val syncLobbyCase = SyncLobbyCase(jugarCrearRepository, username)
     val empezarPartidaCase = EmpezarPartidaCase(jugarCrearRepository, partidaRepository)
 
     // PARTIDA

@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 class SeleccionarTableroCase(
     private val repository: JugarCrearRepository,
-    private val email: StateFlow<String>
+    private val username: StateFlow<String>
 ) {
-    suspend operator fun invoke(tablero: String) = repository.seleccionarTablero(email.value, tablero)
+    suspend operator fun invoke(tablero: String) = repository.seleccionarTablero(username.value, tablero)
 }

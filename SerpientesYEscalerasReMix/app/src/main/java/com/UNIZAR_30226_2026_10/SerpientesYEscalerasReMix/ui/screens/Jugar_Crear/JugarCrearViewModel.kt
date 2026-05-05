@@ -32,7 +32,7 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
         // Conexión de Flows del Repository a UI State
         viewModelScope.launch {
             launch { cF.lobby.collect { data -> _uiState.update { it.copy(lobby = data) } } }
-            launch { cF.email.collect { data -> _uiState.update { it.copy(email = data) } } }
+            launch { cF.username.collect { data -> _uiState.update { it.copy(username = data) } } }
         }
     }
 
@@ -48,7 +48,7 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
             while (isActive) {
                 cF.syncLobbyCase()
                 if (_uiState.value.lobby != null) {
-                    _uiState.update { it.copy(vistaLider = _uiState.value.lobby!!.hostEmail == cF.email.value) }
+                    _uiState.update { it.copy(vistaLider = _uiState.value.lobby!!.hostEmail == cF.username.value) }
                 }
                 delay(pollingMS)
             }
@@ -86,17 +86,15 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
 
     fun onAbandonar() {
         viewModelScope.launch {
-            // El caso de uso AbandonarExpulsar ya gestiona la creación de un nuevo lobby 
-            // tras abandonar si el target es el propio usuario.
-            cF.abandonarExpulsarCase(cF.email.value)
+            cF.abandonarExpulsarCase(cF.username.value)
         }
     }
 
     fun onExpulsar(idx: Int) {
         viewModelScope.launch {
-            val emailAEliminar = _uiState.value.lobby?.players?.getOrNull(idx)?.email ?: ""
-            if (emailAEliminar.isNotEmpty()) {
-                cF.abandonarExpulsarCase(emailAEliminar)
+            val usernameAEliminar = _uiState.value.lobby?.players?.getOrNull(idx)?.username ?: ""
+            if (usernameAEliminar.isNotEmpty()) {
+                cF.abandonarExpulsarCase(usernameAEliminar)
             }
         }
     }
@@ -114,5 +112,5 @@ data class JugarCrearUiState(
     val vistaLider: Boolean = false,
     val seleccionMazo: String = "",
     val seleccionTablero: String = "",
-    val email: String = "",
+    val username: String = "",
 )

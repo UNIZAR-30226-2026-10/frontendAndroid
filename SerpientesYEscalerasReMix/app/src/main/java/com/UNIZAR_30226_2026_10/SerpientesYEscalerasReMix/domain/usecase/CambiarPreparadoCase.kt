@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 class CambiarPreparadoCase(
     private val repository: JugarCrearRepository,
-    private val email: StateFlow<String>
+    private val username: StateFlow<String>
 ) {
-    suspend operator fun invoke(listo: Boolean) = repository.cambiarPreparado(email.value, listo)
+    suspend operator fun invoke(listo: Boolean) = repository.cambiarPreparado(username.value, listo)
 }

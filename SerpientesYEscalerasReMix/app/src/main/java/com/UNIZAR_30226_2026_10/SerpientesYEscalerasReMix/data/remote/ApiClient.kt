@@ -2,15 +2,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote
 
 import android.content.Context
 import android.util.Log
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AceptarInvitacionRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AnadirBotRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AuthReply
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.CrearLobbyRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.InvitacionRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LobbyReply
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LoginRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.RegisterRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SeleccionMazoRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.*
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
@@ -21,12 +13,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.HTTP
-import retrofit2.http.POST
-import retrofit2.http.PUT
-import retrofit2.http.Path
+import retrofit2.http.*
 
 interface ApiService {
 
@@ -65,6 +52,9 @@ interface ApiService {
     @POST("lobbies")
     suspend fun createLobby(@Body request: CrearLobbyRequest): Response<LobbyReply>
 
+    @GET("lobbies/by-player/{username}")
+    suspend fun getLobbyByPlayer(@Path("username") username: String): Response<LobbyReply>
+
     @GET("lobbies/{lobbyId}")
     suspend fun getLobby(@Path("lobbyId") lobbyId: String): Response<LobbyReply>
 
@@ -80,14 +70,17 @@ interface ApiService {
     @PUT("lobbies/{lobbyId}/board")
     suspend fun setBoard(@Path("lobbyId") lobbyId: String, @Body body: Map<String, String>): Response<ResponseBody>
 
-    @PUT("lobbies/{lobbyId}/players/{email}/deck")
-    suspend fun selectDeck(@Path("lobbyId") lobbyId: String, @Path("email") email: String, @Body request: SeleccionMazoRequest): Response<ResponseBody>
+    @PUT("lobbies/{lobbyId}/players/{username}/deck")
+    suspend fun selectDeck(@Path("lobbyId") lobbyId: String, @Path("username") username: String, @Body request: SeleccionMazoRequest): Response<ResponseBody>
 
-    @PUT("lobbies/{lobbyId}/players/{email}/ready")
-    suspend fun setReady(@Path("lobbyId") lobbyId: String, @Path("email") email: String, @Body body: Map<String, Boolean>): Response<ResponseBody>
+    @PUT("lobbies/{lobbyId}/players/{username}/ready")
+    suspend fun setReady(@Path("lobbyId") lobbyId: String, @Path("username") username: String, @Body body: Map<String, Boolean>): Response<ResponseBody>
 
-    @HTTP(method = "DELETE", path = "lobbies/{lobbyId}/players/{email}", hasBody = true)
-    suspend fun leaveOrExpel(@Path("lobbyId") lobbyId: String, @Path("email") email: String, @Body body: Map<String, String>): Response<ResponseBody>
+    @HTTP(method = "DELETE", path = "lobbies/{lobbyId}/players/{username}", hasBody = true)
+    suspend fun leaveOrExpel(@Path("lobbyId") lobbyId: String, @Path("username") username: String, @Body body: Map<String, String>): Response<ResponseBody>
+
+    @POST("lobbies/{lobbyId}/start")
+    suspend fun startMatch(@Path("lobbyId") lobbyId: String): Response<Map<String, String>>
 }
 
 object ApiClient {

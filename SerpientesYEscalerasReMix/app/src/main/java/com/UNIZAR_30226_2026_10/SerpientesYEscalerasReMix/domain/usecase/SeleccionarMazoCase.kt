@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 class SeleccionarMazoCase(
     private val repository: JugarCrearRepository,
-    private val email: StateFlow<String>
+    private val username: StateFlow<String>
 ) {
-    suspend operator fun invoke(mazo: String) = repository.seleccionarMazo(email.value, mazo)
+    suspend operator fun invoke(mazo: String) = repository.seleccionarMazo(username.value, mazo)
 }

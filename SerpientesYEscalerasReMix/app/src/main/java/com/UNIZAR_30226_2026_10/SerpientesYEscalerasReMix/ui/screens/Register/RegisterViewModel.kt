@@ -77,7 +77,7 @@ class RegisterViewModel(private val cF: CaseFacade, private val snackHost: Snack
         } else if (!passwd.contains(lowerRegex)) {
             showErrorSnackbar("La contraseña debe contener al menos una letra minúscula")
         } else if (!passwd.contains(specialRegex)) {
-            showErrorSnackbar("La contraseña debe contener al menos un carácter especial")
+            showErrorSnackbar("La contraseña debe contener al menos un carácter especial de los siguientes: \n ! @ # $ % ^ & * ( ) , . ? \" : { } | < >")
         } else if (passwd != confirmPasswd) {
             showErrorSnackbar("Las contraseñas no coinciden")
         } else{

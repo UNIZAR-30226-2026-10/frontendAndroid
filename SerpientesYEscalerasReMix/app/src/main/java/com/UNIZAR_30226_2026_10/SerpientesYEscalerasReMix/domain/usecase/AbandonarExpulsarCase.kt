@@ -5,15 +5,12 @@ import kotlinx.coroutines.flow.StateFlow
 
 class AbandonarExpulsarCase(
     private val repository: JugarCrearRepository,
-    private val email: StateFlow<String>,
     private val username: StateFlow<String>,
     ) {
-    suspend operator fun invoke(target: String) {
-        if (target == email.value) { // Abandonar
-            repository.abandonarExpulsar(email.value, email.value)
-            repository.crearLobby(email.value, username.value)
-        } else {
-            repository.abandonarExpulsar(email.value, target)
+    suspend operator fun invoke(targetUsername: String) {
+        repository.abandonarExpulsar(username.value, targetUsername)
+        if (targetUsername == username.value) { // Abandonar
+            repository.crearLobby(username.value)
         }
     }
 }

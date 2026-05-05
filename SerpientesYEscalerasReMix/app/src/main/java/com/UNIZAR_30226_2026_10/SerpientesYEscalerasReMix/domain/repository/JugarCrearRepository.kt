@@ -9,11 +9,12 @@ interface JugarCrearRepository {
 
     suspend fun setLobbyId(lobbyId: String)
     suspend fun fetchLobby()
-    suspend fun crearLobby(email: String, username: String) // Actualiza lobbyId
+    suspend fun fetchLobbyByPlayer(username: String)
+    suspend fun crearLobby(username: String) // Actualiza lobbyId
     suspend fun anadirBot(requestedBy: String)
-    suspend fun cambiarPreparado(email: String, listo: Boolean)
-    suspend fun seleccionarMazo(email: String, mazo: String)
-    suspend fun seleccionarTablero(email: String, tablero: String)
-    suspend fun abandonarExpulsar(email: String, emailTarget: String)
+    suspend fun cambiarPreparado(username: String, listo: Boolean)
+    suspend fun seleccionarMazo(username: String, mazo: String)
+    suspend fun seleccionarTablero(requestedBy: String, tablero: String)
+    suspend fun abandonarExpulsar(requestedBy: String, targetUsername: String)
     suspend fun empezarPartida(): String // Devuelve matchId
 }
