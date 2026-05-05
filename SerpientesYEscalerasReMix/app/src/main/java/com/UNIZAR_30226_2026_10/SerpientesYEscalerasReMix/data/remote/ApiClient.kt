@@ -2,7 +2,18 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote
 
 import android.content.Context
 import android.util.Log
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.*
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AceptarInvitacionRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AnadirBotRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AuthReply
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.CrearLobbyRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.InvitacionRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LeaveOrExpelRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LobbyReply
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LoginRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.RegisterRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SeleccionMazoRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SetBoardRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SetReadyRequest
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
@@ -13,7 +24,12 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.HTTP
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
 
 interface ApiService {
 
@@ -68,23 +84,24 @@ interface ApiService {
     suspend fun respondInvitation(@Path("lobbyId") lobbyId: String, @Body request: AceptarInvitacionRequest): Response<ResponseBody>
 
     @PUT("lobbies/{lobbyId}/board")
-    suspend fun setBoard(@Path("lobbyId") lobbyId: String, @Body body: Map<String, String>): Response<ResponseBody>
+    suspend fun setBoard(@Path("lobbyId") lobbyId: String, @Body body: SetBoardRequest): Response<ResponseBody>
 
     @PUT("lobbies/{lobbyId}/players/{username}/deck")
     suspend fun selectDeck(@Path("lobbyId") lobbyId: String, @Path("username") username: String, @Body request: SeleccionMazoRequest): Response<ResponseBody>
 
     @PUT("lobbies/{lobbyId}/players/{username}/ready")
-    suspend fun setReady(@Path("lobbyId") lobbyId: String, @Path("username") username: String, @Body body: Map<String, Boolean>): Response<ResponseBody>
+    suspend fun setReady(@Path("lobbyId") lobbyId: String, @Path("username") username: String, @Body body: SetReadyRequest): Response<ResponseBody>
 
     @HTTP(method = "DELETE", path = "lobbies/{lobbyId}/players/{username}", hasBody = true)
-    suspend fun leaveOrExpel(@Path("lobbyId") lobbyId: String, @Path("username") username: String, @Body body: Map<String, String>): Response<ResponseBody>
+    suspend fun leaveOrExpel(@Path("lobbyId") lobbyId: String, @Path("username") username: String, @Body body: LeaveOrExpelRequest): Response<ResponseBody>
 
     @POST("lobbies/{lobbyId}/start")
-    suspend fun startMatch(@Path("lobbyId") lobbyId: String): Response<Map<String, String>>
+    suspend fun startMatch(@Path("lobbyId") lobbyId: String): Response<Map<String, String>> // TODO cambiar
 }
 
 object ApiClient {
-    private const val API_URL = "http://syeremix.switzerlandnorth.cloudapp.azure.com/api/"
+    // private const val API_URL = "http://syeremix.switzerlandnorth.cloudapp.azure.com/api/"
+    private const val API_URL = "http://192.168.1.36:3000/api/"
 
     private var _apiService: ApiService? = null
     private var _cookieJar: PersistentCookieJar? = null
@@ -128,6 +145,7 @@ object ApiClient {
 
         // Cliente OKHttp
         val okHttpClient = OkHttpClient.Builder()
+            .protocols(listOf(okhttp3.Protocol.HTTP_1_1)) // TODO ELIMINAR ESTA LINEA CUANDO NO SE TRABAJE EN LOCAL 192.168.1.36
             .addNetworkInterceptor(forceInsecureInterceptor)
             .addNetworkInterceptor(loggingInterceptor)
             .cookieJar(cookieJar)

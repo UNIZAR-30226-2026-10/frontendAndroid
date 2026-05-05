@@ -48,7 +48,7 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
             while (isActive) {
                 cF.syncLobbyCase()
                 if (_uiState.value.lobby != null) {
-                    _uiState.update { it.copy(vistaLider = _uiState.value.lobby!!.hostEmail == cF.username.value) }
+                    _uiState.update { it.copy(vistaLider = _uiState.value.lobby!!.hostUsername == _uiState.value.username) }
                 }
                 delay(pollingMS)
             }
@@ -112,5 +112,5 @@ data class JugarCrearUiState(
     val vistaLider: Boolean = false,
     val seleccionMazo: String = "",
     val seleccionTablero: String = "",
-    val username: String = "",
+    val username: String = ""
 )

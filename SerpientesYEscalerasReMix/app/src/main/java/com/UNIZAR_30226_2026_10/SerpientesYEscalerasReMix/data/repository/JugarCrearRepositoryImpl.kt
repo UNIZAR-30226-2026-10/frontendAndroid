@@ -2,7 +2,14 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository
 
 import android.util.Log
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.*
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AnadirBotRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.CrearLobbyRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.JugadoresLobbyReply
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LeaveOrExpelRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LobbyReply
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SeleccionMazoRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SetBoardRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SetReadyRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.JugadorLobby
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Lobby
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.JugarCrearRepository
@@ -17,7 +24,7 @@ class JugarCrearRepositoryImpl : JugarCrearRepository {
     private val _lobbyId = MutableStateFlow("")
     override val lobbyId: StateFlow<String> = _lobbyId.asStateFlow()
 
-    private val _lobbyActual = MutableStateFlow(Lobby("", "", emptyList()))
+    private val _lobbyActual = MutableStateFlow(Lobby("", "", emptyList(), ""))
     override val lobbyActual: StateFlow<Lobby> = _lobbyActual.asStateFlow()
 
     override suspend fun setLobbyId(lobbyId: String) {
@@ -79,7 +86,7 @@ class JugarCrearRepositoryImpl : JugarCrearRepository {
 
     override suspend fun cambiarPreparado(username: String, listo: Boolean) {
         try {
-            api.setReady(_lobbyId.value, username, mapOf("ready" to listo))
+            api.setReady(_lobbyId.value, username, SetReadyRequest(listo))
             fetchLobby()
         } catch (e: Exception) {
             Log.e("API_ERROR", "Exception changing ready state", e)
@@ -97,7 +104,7 @@ class JugarCrearRepositoryImpl : JugarCrearRepository {
 
     override suspend fun seleccionarTablero(requestedBy: String, tablero: String) {
         try {
-            api.setBoard(_lobbyId.value, mapOf("requested_by" to requestedBy, "board" to tablero))
+            api.setBoard(_lobbyId.value, SetBoardRequest( tablero, requestedBy))
             fetchLobby()
         } catch (e: Exception) {
             Log.e("API_ERROR", "Exception selecting board", e)
@@ -106,13 +113,7 @@ class JugarCrearRepositoryImpl : JugarCrearRepository {
 
     override suspend fun abandonarExpulsar(requestedBy: String, targetUsername: String) {
         try {
-            api.leaveOrExpel(_lobbyId.value, targetUsername, mapOf("requested_by" to requestedBy))
-            if (requestedBy == targetUsername) {
-                _lobbyId.value = ""
-                _lobbyActual.value = Lobby("", "", emptyList())
-            } else {
-                fetchLobby()
-            }
+            val result = api.leaveOrExpel(_lobbyId.value, targetUsername, LeaveOrExpelRequest(requestedBy))
         } catch (e: Exception) {
             Log.e("API_ERROR", "Exception leaving/expelling", e)
         }
@@ -134,18 +135,18 @@ class JugarCrearRepositoryImpl : JugarCrearRepository {
 
     private fun LobbyReply.toDomain() = Lobby(
         id = idLobby,
-        hostEmail = idCreador,
+        hostUsername = idCreador,
         players = jugadores.map { it.toDomain() }.let { list ->
             val mutable = list.toMutableList<JugadorLobby?>()
             while (mutable.size < 4) mutable.add(null)
             mutable
-        }
+        },
+        tableroSelect = tablero
     )
 
     private fun JugadoresLobbyReply.toDomain() = JugadorLobby(
-        email = idJugador,
         username = nombre,
-        profileIcon = icono,
+        profileIcon = if(icono != null) icono else "default",
         isReady = estaListo,
         isBot = esIA,
         deckName = nombreMazo

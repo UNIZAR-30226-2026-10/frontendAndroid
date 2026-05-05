@@ -57,7 +57,8 @@ fun JugarCrearScreen(navController: SENavHostController, viewModel: JugarCrearVi
         onAbandonar = { viewModel.onAbandonar() },
         onCambiarListo = { listo -> viewModel.onCambiarListo(listo) },
         onEmpezarPartida = { viewModel.onEmpezarPartida() },
-        onElegirTablero = { tablero -> viewModel.onSeleccionarTablero(tablero) }
+        onElegirTablero = { tablero -> viewModel.onSeleccionarTablero(tablero) },
+        onElegirMazo = { mazo -> viewModel.onSeleccionarMazo(mazo) }
     )
 }
 
@@ -70,7 +71,8 @@ fun JugarCrearContent(
     onAbandonar: () -> Unit,
     onCambiarListo: (Boolean) -> Unit,
     onEmpezarPartida: () -> Unit,
-    onElegirTablero: (String) -> Unit
+    onElegirTablero: (String) -> Unit,
+    onElegirMazo: (String) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -102,7 +104,8 @@ fun JugarCrearContent(
                 onAbandonar = onAbandonar,
                 onCambiarListo = onCambiarListo,
                 onEmpezarPartida = onEmpezarPartida,
-                onElegirTablero = onElegirTablero
+                onElegirTablero = onElegirTablero,
+                onElegirMazo = onElegirMazo
             )
         }
     }
@@ -117,13 +120,14 @@ fun LobbyElementos(
     onAbandonar: () -> Unit,
     onCambiarListo: (Boolean) -> Unit,
     onEmpezarPartida: () -> Unit,
-    onElegirTablero: (String) -> Unit
+    onElegirTablero: (String) -> Unit,
+    onElegirMazo: (String) -> Unit
 ) {
     val vistaLider = uiState.vistaLider
-    val hostEmail = uiState.lobby?.hostEmail ?: ""
-    val miEmail = uiState.email
+    val hostUsername = uiState.lobby?.hostUsername ?: ""
+    val username = uiState.username
 
-    val miJugador = uiState.lobby?.players?.find { it?.email == miEmail }
+    val miJugador = uiState.lobby?.players?.find { it?.username == username }
     val estaListo = miJugador?.isReady ?: false
     val todosListos = uiState.lobby?.players?.filterNotNull()?.all { it.isReady } ?: false
 
@@ -136,9 +140,9 @@ fun LobbyElementos(
             val jugador0 = uiState.lobby?.players?.getOrNull(0)
             JugadorItem(
                 vistaLider = vistaLider,
-                esLider = jugador0?.email == hostEmail,
-                esElUsuario = jugador0?.email == miEmail,
-                jugador = jugador0?.let { JugadorLobby(it.email, it.username, it.profileIcon, it.isReady, it.isBot, it.deckName) },
+                esLider = jugador0?.username == hostUsername,
+                esElUsuario = jugador0?.username == username,
+                jugador = jugador0,
                 onAnadirBot = onAnadirBot,
                 onExpulsar = { onExpulsar(0) }
             )
@@ -146,9 +150,9 @@ fun LobbyElementos(
             val jugador2 = uiState.lobby?.players?.getOrNull(2)
             JugadorItem(
                 vistaLider = vistaLider,
-                esLider = jugador2?.email == hostEmail,
-                esElUsuario = jugador2?.email == miEmail,
-                jugador = jugador2?.let { JugadorLobby(it.email, it.username, it.profileIcon, it.isReady, it.isBot, it.deckName) },
+                esLider = jugador2?.username == hostUsername,
+                esElUsuario = jugador2?.username == username,
+                jugador = jugador2,
                 onAnadirBot = onAnadirBot,
                 onExpulsar = { onExpulsar(2) }
             )
@@ -161,7 +165,7 @@ fun LobbyElementos(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(sepVerticalBotones)
         ) {
-            MazoElegirBoton(uiState.seleccionMazo.ifEmpty { "Estándar" })
+            MazoElegirBoton(uiState.seleccionMazo.ifEmpty { "Estándar" }, onClick = onElegirMazo)
             
             if (vistaLider) {
                 ElegirTableroBoton(
@@ -179,7 +183,7 @@ fun LobbyElementos(
                     estaListo = estaListo,
                     todosListos = todosListos,
                     onEmpezar = onEmpezarPartida,
-                    onCambiarListo = { nuevoEstado -> onCambiarListo(nuevoEstado) }
+                    onCambiarListo = { nuevoEstado -> onCambiarListo(!nuevoEstado) }
                 )
             }
         }
@@ -191,9 +195,9 @@ fun LobbyElementos(
             val jugador1 = uiState.lobby?.players?.getOrNull(1)
             JugadorItem(
                 vistaLider = vistaLider,
-                esLider = jugador1?.email == hostEmail,
-                esElUsuario = jugador1?.email == miEmail,
-                jugador = jugador1?.let { JugadorLobby(it.email, it.username, it.profileIcon, it.isReady, it.isBot, it.deckName) },
+                esLider = jugador1?.username == hostUsername,
+                esElUsuario = jugador1?.username == username,
+                jugador = jugador1,
                 onAnadirBot = onAnadirBot,
                 onExpulsar = { onExpulsar(1) }
             )
@@ -201,9 +205,9 @@ fun LobbyElementos(
             val jugador3 = uiState.lobby?.players?.getOrNull(3)
             JugadorItem(
                 vistaLider = vistaLider,
-                esLider = jugador3?.email == hostEmail,
-                esElUsuario = jugador3?.email == miEmail,
-                jugador = jugador3?.let { JugadorLobby(it.email, it.username, it.profileIcon, it.isReady, it.isBot, it.deckName) },
+                esLider = jugador3?.username == hostUsername,
+                esElUsuario = jugador3?.username == username,
+                jugador = jugador3,
                 onAnadirBot = onAnadirBot,
                 onExpulsar = { onExpulsar(3) }
             )
@@ -216,18 +220,19 @@ fun LobbyElementos(
 fun JugarCrearScreenPreview() {
     val mockLobby = Lobby(
         id = "123",
-        hostEmail = "host@test.com",
+        hostUsername = "host@test.com",
         players = listOf(
-            JugadorLobby("host@test.com", "HostUser", "p1", isReady = true, isBot = false),
-            JugadorLobby("user2@test.com", "GuestUser", "p2", isReady = false, isBot = false),
-            null,
+            JugadorLobby("host", "default", true, isBot = false),
+            JugadorLobby("user2", "default", false, isBot = false),
+            JugadorLobby("bot1", "default", true, isBot = false),
             null
-        )
+        ),
+        tableroSelect = "Estándar"
     )
     val mockUiState = JugarCrearUiState(
         lobby = mockLobby,
         vistaLider = true,
-        email = "host@test.com",
+        username = "host@test.com",
         seleccionMazo = "Fuego"
     )
 
@@ -239,6 +244,7 @@ fun JugarCrearScreenPreview() {
         onAbandonar = {},
         onCambiarListo = {},
         onEmpezarPartida = {},
-        onElegirTablero = { tablero -> }
+        onElegirTablero = {},
+        onElegirMazo = {}
     )
 }

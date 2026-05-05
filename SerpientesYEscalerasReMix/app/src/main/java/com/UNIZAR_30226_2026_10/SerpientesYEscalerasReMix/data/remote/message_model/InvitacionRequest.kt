@@ -4,8 +4,8 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_m
 import com.google.gson.annotations.SerializedName
 
 data class InvitacionRequest(
-    @SerializedName("inviteFor")
-    val inviteFor: String,
     @SerializedName("inviteFrom")
-    val inviteFrom: String
+    val inviteFrom: String,
+    @SerializedName("inviteFor")
+    val inviteFor: String
 )
