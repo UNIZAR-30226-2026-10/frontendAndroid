@@ -1,28 +1,40 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase
 
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.LogrosRepository
 import kotlinx.coroutines.flow.StateFlow
 
-data class LogroUsuario(
-    val id: String,
-    val nombre: String,
-    val descripcion: String,
-    val progresoActual: Int,
-    val progresoObjetivo: Int,
-    val tipoRecompensa: String,
-    val valorRecompensa: String,
-    val esCompletado: Boolean,
-    val recompensaReclamada: Boolean = false,
-    val imagen: Int = 0
-)
-
 class ObtenerLogrosCase(
-    private val email: StateFlow<String>
+    private val email: StateFlow<String>,
+    private val repository: LogrosRepository
 ) {
     suspend operator fun invoke(): List<LogroUsuario> {
-        // TODO: GET /api/achievements  → lista global de logros
-        // TODO: GET /api/users/${email.value}/stats  → logros completados del usuario
-        // Cruzar ambas respuestas: para cada logro global, comprobar si está
-        // en la lista de completados del usuario y asignar progreso/esCompletado
-        return emptyList()
+        try {
+            // 1. Obtenemos la lista global de logros desde el repositorio
+            val globalAchievements = repository.getAllAchievements()
+
+            // 2. Obtenemos las estadísticas del usuario para calcular el progreso
+            val statsResponse = repository.getUserStats(email.value)
+
+            // 3. Mapeamos los DTOs de la API a nuestro modelo de dominio LogroUsuario
+            return globalAchievements.map { dto ->
+                // Extraemos el valor de la estadística correspondiente al logro
+                val progreso = statsResponse.stats[dto.claveMetrica] ?: 0
+
+                LogroUsuario(
+                    id = dto.id,
+                    nombre = dto.nombre,
+                    descripcion = dto.descripcion,
+                    progresoActual = progreso,
+                    progresoObjetivo = dto.objetivo,
+                    tipoRecompensa = dto.tipoRecompensa,
+                    valorRecompensa = dto.valorRecompensa,
+                    esCompletado = progreso >= dto.objetivo,
+                    recompensaReclamada = false // Esto se actualizará según la lógica de la API
+                )
+            }
+        } catch (e: Exception) {
+            // En caso de error de red, devolvemos una lista vacía para evitar el crash
+            return emptyList()
+        }
     }
 }

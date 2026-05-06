@@ -21,6 +21,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.NavHost
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.ConexionRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.LogrosRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PartidaRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MenuTopBar
@@ -41,11 +42,10 @@ class MainActivity : ComponentActivity() {
 
         // Inicialización de los casos de uso
         val caseFacade = CaseFacade(
-            applicationContext, // TODO elminar e instanciarComo Retrofit
-
-            ConexionRepositoryImpl(apiService),
-
-            PartidaRepositoryImpl()
+            context = applicationContext,
+            pruebaConexionRepository = ConexionRepositoryImpl(apiService),
+            partidaRepository = PartidaRepositoryImpl(),
+            logrosRepo = LogrosRepositoryImpl(apiService)
         )
 
         setContent {

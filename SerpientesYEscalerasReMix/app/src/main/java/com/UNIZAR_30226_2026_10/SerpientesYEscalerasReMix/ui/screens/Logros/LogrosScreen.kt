@@ -104,7 +104,6 @@ fun TarjetaLogro(logro: LogroUsuario, onReclamar: (String) -> Unit) {
             }
 
             Spacer(modifier = Modifier.width(8.dp))
-
             Column(modifier = Modifier.width(80.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = "Recompensa", style = SETextTypes.seleccionable)
                 if (logro.tipoRecompensa == "Moneda") {

@@ -4,6 +4,9 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
+import retrofit2.http.Body
 
 interface ApiService {
 
@@ -28,10 +31,21 @@ interface ApiService {
 
     // FUNCIONES AUTH
     // ...
+    @GET("achievements/")
+    suspend fun getAllAchievements(): List<LogroDTO> // Obtener todos los logros
+
+    @GET("users/{email}/stats")
+    suspend fun getUserStats(@Path("email") email: String): StatsDTO // Obtener progreso
+
+    @POST("users/{email}/achievements")
+    suspend fun claimAchievement(
+        @Path("email") email: String,
+        @Body achievementId: Map<String, String>
+    ): Response<Unit> // Reclamar logro
 }
 
 object ApiClient { // object = Singleton
-    private val API_URL = "http://syeremix.switzerlandnorth.cloudapp.azure.com/api/"
+        private val API_URL = "http://10.0.2.2:3000/api/"
     val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(API_URL)
         .addConverterFactory(GsonConverterFactory.create())
