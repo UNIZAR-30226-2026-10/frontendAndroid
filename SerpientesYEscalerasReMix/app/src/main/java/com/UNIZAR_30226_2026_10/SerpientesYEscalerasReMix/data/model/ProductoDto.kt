@@ -20,3 +20,7 @@ fun ProductoDto.toDomain(): Producto {
         categoria = this.categoria
     )
 }
+
+data class ComprarProductoRequest(
+    @SerializedName("cosmetic_name") val cosmeticName: String
+)

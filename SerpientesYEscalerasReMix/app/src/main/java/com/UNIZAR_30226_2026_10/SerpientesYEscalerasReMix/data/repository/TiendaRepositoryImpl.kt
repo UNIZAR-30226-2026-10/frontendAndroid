@@ -5,6 +5,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Producto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.toDomain
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.TiendaRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.ComprarProductoRequest
 
 class TiendaRepositoryImpl(
     private val apiService: TiendaAPIService,
@@ -18,9 +19,10 @@ class TiendaRepositoryImpl(
         return response.map { it.toDomain() }
     }
 
+    // Necesita como param un JSON con el atributo cosmetic_name
     override suspend fun comprarProducto(producto: Producto): Boolean {
         // Llamada a la API para comprar el producto
-        val response = apiService.comprarProducto(local.getEmail(),producto.nombre)
+        val response = apiService.comprarProducto(local.getEmail(), ComprarProductoRequest(producto.nombre))
         // Devolver true si la compra fue exitosa, false en caso contrario
         if (response.isSuccessful) {
             // Actualizar el saldo del usuario después de una compra exitosa

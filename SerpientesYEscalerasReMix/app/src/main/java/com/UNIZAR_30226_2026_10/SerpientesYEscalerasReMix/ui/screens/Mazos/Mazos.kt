@@ -1,4 +1,4 @@
-package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens
+package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Mazos
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,10 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -40,11 +38,9 @@ import androidx.compose.runtime.setValue
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.fakes.mazoVacio
 import androidx.compose.foundation.lazy.grid.items
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonEditarMazo
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonGenerico
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonNuevoMazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonEliminarMazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_offline
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_online
 
 @Composable
 fun MazosScreen(SEState: SENavHostController){

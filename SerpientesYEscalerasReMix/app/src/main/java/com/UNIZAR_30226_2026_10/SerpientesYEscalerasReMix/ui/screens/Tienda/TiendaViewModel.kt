@@ -67,7 +67,6 @@ class TiendaViewModel (private val cf: CaseFacade) : ViewModel() {
             try{
                 val exito = cf.comprarProductoCase(producto)
                 if (exito) {
-                    val saldoActual = cf.getSaldoCase()
                     // Refrescar la lista de productos y el saldo después de una compra exitosa
                     // FIXME quizas se podria hacer q se marcara como comprado el producto en vez de volver a cargar todo
                     fetchProductos()

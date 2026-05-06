@@ -23,7 +23,6 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.ConexionRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PartidaRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.TiendaRepositoryImpl
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.UserRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.TiendaAPIService
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MenuTopBar
@@ -31,6 +30,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.navGraph
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.rememberSEAppState
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SerpientesYEscalerasReMixTheme
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
 import kotlinx.coroutines.runBlocking
 
 // MainActivity, muestra topBar y contenido de la pantalla en base a la navegación
@@ -38,18 +38,17 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val local = LocalStorage(applicationContext)
 
         // Inicialización de data.remote, Retrofit
         val apiService = ApiClient.apiService
         val tiendaApiService = ApiClient.retrofit.create(TiendaAPIService::class.java)
-        val tiendaRepository = TiendaRepositoryImpl(tiendaApiService, )
+        val tiendaRepository = TiendaRepositoryImpl(tiendaApiService, local)
 
         // Inicialización de los casos de uso
         val caseFacade = CaseFacade(
             applicationContext, // TODO elminar e instanciarComo Retrofit
-
             ConexionRepositoryImpl(apiService),
-
             PartidaRepositoryImpl(),
             tiendaRepository
         )
@@ -83,6 +82,17 @@ fun MainScreen(cF: CaseFacade) {
 
     // Prueba de Conectividad Logging/Debug
     LaunchedEffect(Unit) {
+        try {
+            val pingResponse = ApiClient.apiService.pingAuth()
+            if (pingResponse.isSuccessful) {
+                Log.d("RETROFIT_PING", "✅ /ping OK")
+            } else {
+                Log.e("RETROFIT_PING", "❌ /ping fallo: ${pingResponse.code()}")
+            }
+        } catch (e: Exception) {
+            Log.e("RETROFIT_PING", "❌ /ping error: ${e.message}")
+        }
+
         val isConnected = cF.pruebaConexionCase()
         if (isConnected) {
             Log.d("RETROFIT_TEST", "✅ Conexión exitosa y GSON configurado")

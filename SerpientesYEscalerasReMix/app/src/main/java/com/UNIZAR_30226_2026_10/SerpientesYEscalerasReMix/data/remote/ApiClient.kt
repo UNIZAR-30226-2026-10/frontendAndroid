@@ -8,6 +8,7 @@ import retrofit2.http.GET
 interface ApiService {
 
     // FUNCIONES PARA PRUEBAS Y LOGGING EN MAIN_ACTIVITY
+
     @GET("achievements/ping")
     suspend fun pingAchievements(): Response<Unit>
 
