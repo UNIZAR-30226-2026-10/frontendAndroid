@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
@@ -43,7 +42,6 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Usuario
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_secondary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selected
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_unselected
@@ -54,8 +52,7 @@ fun ListaAmigos(
     usuarios: List<Usuario>,
     onInvitar: (String) -> Unit,
     onUnirse: (String) -> Unit,
-    onBorrar: (String) -> Unit,
-    onAnadir: (String) -> Unit
+    onBorrar: (String) -> Unit
 ) {
     var usuarioExpandido by remember { mutableStateOf<String?>(null) }
 
@@ -73,8 +70,7 @@ fun ListaAmigos(
                 },
                 onInvitar = onInvitar,
                 onUnirse = onUnirse,
-                onBorrar = onBorrar,
-                onAnadir = onAnadir
+                onBorrar = onBorrar
             )
         }
     }
@@ -87,11 +83,9 @@ fun TarjetaAmigo(
     onClick: () -> Unit,
     onInvitar: (String) -> Unit,
     onUnirse: (String) -> Unit,
-    onBorrar: (String) -> Unit,
-    onAnadir: (String) -> Unit
+    onBorrar: (String) -> Unit
 ) {
     val fondo = if (amigo.haInvitado) color_selected
-    else if (amigo.estaOnline) color_secondary
     else color_unselected
 
     Surface(
@@ -110,8 +104,7 @@ fun TarjetaAmigo(
                     fondo = fondo,
                     onInvitar = onInvitar,
                     onUnirse = onUnirse,
-                    onBorrar = onBorrar,
-                    onAnadir = onAnadir
+                    onBorrar = onBorrar
                 )
             }
         }
@@ -180,7 +173,6 @@ fun DesplegableAmigo(
     onInvitar: (String) -> Unit,
     onUnirse: (String) -> Unit,
     onBorrar: (String) -> Unit,
-    onAnadir: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -191,21 +183,16 @@ fun DesplegableAmigo(
         val colorUnselectedAux = if (fondo == color_unselected) color_bg else color_unselected
         val colorUnirse = if (usuario.haInvitado) color_text else colorUnselectedAux
 
-        if (usuario.esAmigo) {
-            DesplegableItem(Icons.Default.AddCircle, "Invitar a la partida", color_text) {
-                onInvitar(usuario.nombre)
-            }
-            DesplegableItem(Icons.Default.PlayArrow, "Unirse a la partida", colorUnirse) {
-                if (usuario.haInvitado) onUnirse(usuario.nombre)
-            }
-            DesplegableItem(Icons.Default.Delete, "Borrar amigo", color_text) {
-                onBorrar(usuario.nombre)
-            }
-        } else {
-            DesplegableItem(Icons.Default.Add, "Añadir amigo", color_text) {
-                onAnadir(usuario.nombre)
-            }
+        DesplegableItem(Icons.Default.AddCircle, "Invitar a la partida", color_text) {
+            onInvitar(usuario.nombre)
         }
+        DesplegableItem(Icons.Default.PlayArrow, "Unirse a la partida", colorUnirse) {
+            if (usuario.haInvitado) onUnirse(usuario.nombre)
+        }
+        DesplegableItem(Icons.Default.Delete, "Borrar amigo", color_text) {
+            onBorrar(usuario.nombre)
+        }
+
     }
 }
 

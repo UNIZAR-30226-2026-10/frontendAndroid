@@ -6,10 +6,12 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_mo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AnadirBotRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AuthReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.CrearLobbyRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.InvitacionRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.GetAmigosReply
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.GetInvitacionesReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LeaveOrExpelRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LobbyReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LoginRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PostInvitacionRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.RegisterRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SeleccionMazoRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SetBoardRequest
@@ -77,12 +79,6 @@ interface ApiService {
     @POST("lobbies/{lobbyId}/bots")
     suspend fun addBot(@Path("lobbyId") lobbyId: String, @Body request: AnadirBotRequest): Response<ResponseBody>
 
-    @POST("lobbies/{lobbyId}/invitations")
-    suspend fun sendInvitation(@Path("lobbyId") lobbyId: String, @Body request: InvitacionRequest): Response<ResponseBody>
-
-    @PUT("lobbies/{lobbyId}/invitations")
-    suspend fun respondInvitation(@Path("lobbyId") lobbyId: String, @Body request: AceptarInvitacionRequest): Response<ResponseBody>
-
     @PUT("lobbies/{lobbyId}/board")
     suspend fun setBoard(@Path("lobbyId") lobbyId: String, @Body body: SetBoardRequest): Response<ResponseBody>
 
@@ -97,6 +93,27 @@ interface ApiService {
 
     @POST("lobbies/{lobbyId}/start")
     suspend fun startMatch(@Path("lobbyId") lobbyId: String): Response<Map<String, String>> // TODO cambiar
+
+    // FUNCIONES JUGAR-AMIGOS
+
+    @POST("lobbies/{lobbyId}/invitations")
+    suspend fun sendInvitation(@Path("lobbyId") lobbyId: String, @Body request: PostInvitacionRequest): Response<ResponseBody>
+
+    @PUT("lobbies/{lobbyId}/invitations")
+    suspend fun respondInvitation(@Path("lobbyId") lobbyId: String, @Body request: AceptarInvitacionRequest): Response<LobbyReply>
+
+    @GET("users/{username}/invites")
+    suspend fun getInvitations(@Path("username") username: String): Response<GetInvitacionesReply>
+
+    @POST("users/{email}/{friendUsername}/invites")
+    suspend fun addFriend(@Path("email") email: String, @Path("friendUsername") friendUsername: String): Response<ResponseBody>
+
+    @HTTP(method = "DELETE", path = "users/{email}/friends/{friendUsername}", hasBody = true)
+    suspend fun removeFriend(@Path("email") email: String, @Path("friendUsername") friendUsername: String, @Body body: Map<String, String>): Response<ResponseBody>
+
+    @GET("users/{email}/friends")
+    suspend fun getFriends(@Path("email") email: String): Response<GetAmigosReply>
+
 }
 
 object ApiClient {

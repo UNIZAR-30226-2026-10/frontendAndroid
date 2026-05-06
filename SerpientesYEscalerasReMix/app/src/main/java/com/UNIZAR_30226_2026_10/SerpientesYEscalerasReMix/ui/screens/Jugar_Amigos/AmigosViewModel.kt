@@ -19,32 +19,37 @@ class AmigosViewModel(private val cF: CaseFacade, private val snackHost: Snackba
     companion object {
         fun Factory(cF: CaseFacade, snackHost: SnackbarHostState): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                    AmigosViewModel(cF, snackHost) as T
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return AmigosViewModel(cF, snackHost) as T
+                }
             }
     }
 
     private val _uiState = MutableStateFlow(AmigosUiState())
     val uiState = _uiState.asStateFlow()
 
-    private var pollingJob: Job? = null
-    private var pollingMS: Long = 2000
-
-    private fun showErrorSnackbar(message: String) {
+    init {
+        // Conexión de Flows del Repository a UI State
         viewModelScope.launch {
-            snackHost.showSnackbar(message)
+            launch { cF.amigos.collect { data -> _uiState.update { it.copy(amigos = data) } } }
         }
     }
 
+    // Funciones POLLING
+
+    private var pollingMS: Long = 2000 // Consultar cada 2 segundos
+    private var pollingJob: Job? = null
+
     fun iniciarPolling() {
         if (pollingJob?.isActive == true) return
+
         pollingJob = viewModelScope.launch {
             while (isActive) {
                 try {
-                    val nuevosAmigos = cF.obtenerAmigosCase()
-                    _uiState.update { it.copy(listaAmigosPolling = nuevosAmigos) }
+                    cF.obtenerAmigosCase()
+                    cF.obtenerInvitacionesCase()
                 } catch (e: Exception) {
-                    // Manejo silencioso o error si es necesario
+                    // Manejo silencioso de errores de red en polling
                 }
                 delay(pollingMS)
             }
@@ -55,44 +60,67 @@ class AmigosViewModel(private val cF: CaseFacade, private val snackHost: Snackba
         pollingJob?.cancel()
     }
 
+    private fun showErrorSnackbar(message: String) {
+        viewModelScope.launch {
+            snackHost.showSnackbar(message)
+        }
+    }
+
+    // Métodos de interacción
+
     fun buscarAmigos(searchText: String) {
         _uiState.update { it.copy(searchText = searchText) }
     }
 
     fun invitarAmigo(nombre: String) {
         viewModelScope.launch {
-            cF.invitarAmigoLobbyCase(nombre)
+            val exito = cF.invitarAmigoLobbyCase(nombre)
+            if (!exito) {
+                showErrorSnackbar("No se pudo invitar a $nombre")
+            }
         }
     }
 
-    fun unirseAPartida(amigoNombre: String, onSuccess: () -> Unit) {
+    fun responderInvitacion(lobbyId: String, inviteFrom: String, aceptar: Boolean) {
         viewModelScope.launch {
-            // Lógica de unión pendiente de implementar
-            onSuccess() 
+            cF.responderInvitacionCase(lobbyId, inviteFrom, aceptar)
         }
     }
 
     fun borrarAmigo(nombre: String) {
         viewModelScope.launch {
-            cF.eliminarAmigoCase(nombre)
+            val exito = cF.eliminarAmigoCase(nombre)
+            if (!exito) {
+                showErrorSnackbar("No se pudo eliminar a $nombre")
+            }
         }
     }
 
     fun anadirAmigo(nombre: String) {
         viewModelScope.launch {
-            cF.anadirAmigoCase(nombre)
+            val exito = cF.anadirAmigoCase(nombre)
+            if (!exito) {
+                showErrorSnackbar("No se pudo añadir a $nombre")
+            }
+        }
+    }
+
+    fun unirseAPartida(amigoNombre: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            // Lógica de unión ya se gestiona en responderInvitacion si es por invitación
+            onSuccess()
         }
     }
 }
 
 data class AmigosUiState(
-    val listaAmigosPolling: List<Usuario> = emptyList(),
+    val amigos: List<Usuario> = emptyList(),
     val searchText: String = ""
 ) {
     val listaAmigosMostrada: List<Usuario>
         get() = if (searchText.isBlank()) {
-            listaAmigosPolling
+            amigos
         } else {
-            listaAmigosPolling.filter { it.nombre.contains(searchText, ignoreCase = true) }
+            amigos.filter { it.nombre.startsWith(searchText, ignoreCase = true) }
         }
 }

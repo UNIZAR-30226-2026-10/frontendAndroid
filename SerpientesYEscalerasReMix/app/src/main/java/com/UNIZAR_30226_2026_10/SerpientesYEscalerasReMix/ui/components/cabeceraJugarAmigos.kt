@@ -22,10 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -43,6 +39,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 @Composable
 fun CabeceraAmigos(
     navHost: SENavHostController,
+    searchText: String,
     onSearch: (String) -> Unit,
     onAdd: (String) -> Unit
 ) {
@@ -71,15 +68,12 @@ fun CabeceraAmigos(
 
         Spacer(Modifier.width(10.dp))
 
-        AmigosSearch(onSearch)
+        AmigosSearch(searchText, onSearch)
     }
 }
 
 @Composable
-fun AmigosSearch(onSearch: (String) -> Unit) {
-    // Búsqueda de amigos
-    var searchText by remember { mutableStateOf("") }
-
+fun AmigosSearch(searchText: String, onSearch: (String) -> Unit) {
     Surface(
         color = color_secondary,
         shape = RoundedCornerShape(16.dp),
@@ -90,7 +84,7 @@ fun AmigosSearch(onSearch: (String) -> Unit) {
     ) {
         BasicTextField(
             value = searchText,
-            onValueChange = { searchText = it },
+            onValueChange = { onSearch(it) },
             singleLine = true, // Subrayado
             textStyle = SETextTypes.plano.copy(color = color_text),
             modifier = Modifier

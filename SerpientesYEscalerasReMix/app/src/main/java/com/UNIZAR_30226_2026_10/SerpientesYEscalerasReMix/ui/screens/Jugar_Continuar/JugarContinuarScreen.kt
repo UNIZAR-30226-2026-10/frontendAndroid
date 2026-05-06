@@ -19,8 +19,6 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 
 @Composable
 fun JugarContinuarScreen(SEState: SENavHostController, viewModel: JugarContinuarViewModel) {
-    var opcionSeleccionada = "Continuar"
-
     Column(modifier = Modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.height(12.dp))
 

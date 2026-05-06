@@ -1,6 +1,5 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Amigos
 
-import android.content.pm.ActivityInfo
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -14,7 +13,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Usuario
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.CabeceraAmigos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ListaAmigos
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.fijarOrientacion
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.rememberSEAppState
@@ -25,9 +23,6 @@ fun AmigosScreen(
     viewModel: AmigosViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
-    // Mantener orientación horizontal para esta pantalla
-    fijarOrientacion(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
 
     LaunchedEffect(Unit) {
         viewModel.iniciarPolling()
@@ -42,6 +37,7 @@ fun AmigosScreen(
     AmigosContent(
         usuarios = uiState.listaAmigosMostrada,
         navHost = navController,
+        searchText = uiState.searchText,
         onSearch = { viewModel.buscarAmigos(it) },
         onInvitar = { viewModel.invitarAmigo(it) },
         onUnirse = { nombre ->
@@ -58,6 +54,7 @@ fun AmigosScreen(
 fun AmigosContent(
     usuarios: List<Usuario>,
     navHost: SENavHostController,
+    searchText: String,
     onSearch: (String) -> Unit,
     onInvitar: (String) -> Unit,
     onUnirse: (String) -> Unit,
@@ -68,14 +65,18 @@ fun AmigosContent(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        CabeceraAmigos(navHost, onSearch = onSearch, onAdd = { onAnadir(it) })
+        CabeceraAmigos(
+            navHost = navHost,
+            searchText = searchText,
+            onSearch = onSearch,
+            onAdd = onAnadir
+        )
 
         ListaAmigos(
             usuarios = usuarios,
             onInvitar = onInvitar,
             onUnirse = onUnirse,
-            onBorrar = onBorrar,
-            onAnadir = onAnadir
+            onBorrar = onBorrar
         )
     }
 }
@@ -84,13 +85,13 @@ fun AmigosContent(
 @Composable
 fun AmigosPreview() {
     val mockUsuarios = listOf(
-        Usuario("Juan", "En línea", true, true),
-        Usuario("Maria", "Te ha invitado", true, true, true),
-        Usuario("Pedro", "Desconectado", false, true)
+        Usuario("user1", "te ha invitado", true),
+        Usuario("user2", "", false),
     )
     AmigosContent(
         usuarios = mockUsuarios,
         navHost = rememberSEAppState(),
+        searchText = "",
         onSearch = {},
         onInvitar = {},
         onUnirse = {},

@@ -35,7 +35,7 @@ class CaseFacade(
 
     val email: StateFlow<String> = loginRegisterRepository.email
     val username: StateFlow<String> = loginRegisterRepository.username
-
+    val lobbyId: StateFlow<String> = jugarCrearRepository.lobbyId
     val matchId: StateFlow<String> = partidaRepository.matchId
 
     // --- USECASE ---
@@ -68,12 +68,18 @@ class CaseFacade(
     val empezarPartidaCase = EmpezarPartidaCase(jugarCrearRepository, partidaRepository)
 
     // AMIGOS
-    val obtenerAmigosCase = ObtenerAmigosCase(amigosRepository)
-    val buscarAmigosCase = BuscarAmigosCase(amigosRepository)
-    val anadirAmigoCase = AnadirAmigoCase(amigosRepository)
-    val eliminarAmigoCase = EliminarAmigoCase(amigosRepository)
-    val invitarAmigoLobbyCase = InvitarAmigoLobbyCase(amigosRepository)
-    val getAmigoLobbyCase = GetAmigoLobbyCase(amigosRepository)
+
+    // Exposición de flujos del repositorio de Amigos
+    val amigos = amigosRepository.amigos
+
+    // Casos de uso de Amigos
+    val obtenerAmigosCase = ObtenerAmigosCase(amigosRepository, email)
+    val anadirAmigoCase = AnadirAmigoCase(amigosRepository, email)
+    val eliminarAmigoCase = EliminarAmigoCase(amigosRepository, email)
+    val obtenerInvitacionesCase = ObtenerInvitacionesCase(amigosRepository, username)
+    val invitarAmigoLobbyCase = InvitarAmigoLobbyCase(amigosRepository, username, lobbyId)
+    val responderInvitacionCase = ResponderInvitacionCase(amigosRepository, jugarCrearRepository, username)
+    
 
     // PARTIDA
 
