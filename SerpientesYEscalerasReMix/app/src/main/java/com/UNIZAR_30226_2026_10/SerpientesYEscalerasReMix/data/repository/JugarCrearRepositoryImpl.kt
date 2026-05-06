@@ -1,7 +1,6 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository
 
 import android.util.Log
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiService
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AnadirBotRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.CrearLobbyRequest
@@ -145,7 +144,7 @@ class JugarCrearRepositoryImpl(private val api: ApiService) : JugarCrearReposito
 
     private fun JugadoresLobbyReply.toDomain() = JugadorLobby(
         username = nombre,
-        profileIcon = if(icono != null) icono else "default",
+        profileIcon = if (icono != null) icono else "default",
         isReady = estaListo,
         isBot = esIA,
         deckName = nombreMazo

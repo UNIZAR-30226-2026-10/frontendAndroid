@@ -7,7 +7,7 @@ data class InvitacionGetReply(
     @SerializedName("inviteFor")
     val inviteFor: String,
     @SerializedName("inviteFrom")
-    val inviteFrom: String,
-    @SerializedName("partidaID")
-    val partidaID: String
+    val inviteFrom: String?,
+    @SerializedName("lobbyID")
+    val lobbyID: String?
 )

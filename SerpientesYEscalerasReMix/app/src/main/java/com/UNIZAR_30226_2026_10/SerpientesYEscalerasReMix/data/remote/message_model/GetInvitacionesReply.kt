@@ -5,5 +5,5 @@ import com.google.gson.annotations.SerializedName
 
 data class GetInvitacionesReply(
     @SerializedName("invites")
-    val invites: List<InvitacionGetReply>
+    val invites: List<InvitacionGetReply>?
 )

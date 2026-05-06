@@ -25,7 +25,7 @@ class AmigosRepositoryImpl(private val api: ApiService) : AmigosRepository {
                 val nuevosAmigos = response.body()?.friends?.map { it.toDomain() } ?: emptyList()
                 val actuales = _amigos.value
                 val invitacionesActuales = actuales.filter { it.haInvitado }.associateBy { it.nombre }
-                
+
                 // Combinar amigos con sus invitaciones si existen
                 _amigos.value = nuevosAmigos.map { amigo ->
                     invitacionesActuales[amigo.nombre]?.let { inv ->
@@ -83,18 +83,22 @@ class AmigosRepositoryImpl(private val api: ApiService) : AmigosRepository {
         try {
             val response = api.getInvitations(username)
             if (response.isSuccessful) {
-                val nuevasInvitaciones = response.body()?.invites?.map { it.toDomain() } ?: emptyList()
+                val nuevasInvitaciones = response.body()?.invites?.mapNotNull { it.toDomain() } ?: emptyList()
+
                 val currentList = _amigos.value
                 val invitacionesMap = nuevasInvitaciones.associateBy { it.nombre }
-                
-                // Actualizar la lista de amigos con las invitaciones
+
                 val listaActualizada = currentList.map { user ->
                     invitacionesMap[user.nombre]?.let { inv ->
-                        user.copy(haInvitado = true, estadoTexto = inv.estadoTexto, lobbyInvitado = inv.lobbyInvitado)
+                        user.copy(
+                            haInvitado = true,
+                            estadoTexto = inv.estadoTexto,
+                            lobbyInvitado = inv.lobbyInvitado
+                        )
                     } ?: user.copy(haInvitado = false, estadoTexto = "", lobbyInvitado = "")
                 }.toMutableList()
 
-                // Añadir personas que han invitado pero no estaban en la lista (Evitar errores)
+                // Añadir personas nuevas (que no estaban en amigos pero sí han invitado)
                 val nombresExistentes = listaActualizada.map { it.nombre }.toSet()
                 nuevasInvitaciones.forEach { inv ->
                     if (inv.nombre !in nombresExistentes) {
@@ -104,7 +108,8 @@ class AmigosRepositoryImpl(private val api: ApiService) : AmigosRepository {
 
                 _amigos.value = listaActualizada
             } else {
-                Log.e("AmigosRepo", "Error al obtener invitaciones: ${response.errorBody()?.string()}")
+                val errorMsg = response.errorBody()?.string()
+                Log.e("AmigosRepo", "Error al obtener invitaciones: $errorMsg")
             }
         } catch (e: Exception) {
             Log.e("AmigosRepo", "Excepción al obtener invitaciones", e)
@@ -129,10 +134,14 @@ class AmigosRepositoryImpl(private val api: ApiService) : AmigosRepository {
         nombre = nombre
     )
 
-    private fun InvitacionGetReply.toDomain() = Usuario(
-        nombre = inviteFrom,
-        estadoTexto = "te ha invitado",
-        haInvitado = true,
-        lobbyInvitado = partidaID
-    )
+    private fun InvitacionGetReply.toDomain(): Usuario? {
+        val nombreFrom = inviteFrom ?: return null
+
+        return Usuario(
+            nombre = nombreFrom,
+            estadoTexto = "te ha invitado",
+            haInvitado = true,
+            lobbyInvitado = lobbyID ?: "" // Si no hay ID, ponemos cadena vacía en lugar de crash
+        )
+    }
 }

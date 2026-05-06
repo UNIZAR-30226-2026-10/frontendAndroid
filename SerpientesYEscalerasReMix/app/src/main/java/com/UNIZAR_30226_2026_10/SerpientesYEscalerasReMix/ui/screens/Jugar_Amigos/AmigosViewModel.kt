@@ -105,9 +105,9 @@ class AmigosViewModel(private val cF: CaseFacade, private val snackHost: Snackba
         }
     }
 
-    fun unirseAPartida(amigoNombre: String, onSuccess: () -> Unit) {
+    fun unirseAPartida(lobbyId: String, amigoNombre: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
-            // Lógica de unión ya se gestiona en responderInvitacion si es por invitación
+            cF.responderInvitacionCase.invoke(lobbyId, amigoNombre, true)
             onSuccess()
         }
     }

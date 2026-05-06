@@ -40,8 +40,8 @@ fun AmigosScreen(
         searchText = uiState.searchText,
         onSearch = { viewModel.buscarAmigos(it) },
         onInvitar = { viewModel.invitarAmigo(it) },
-        onUnirse = { nombre ->
-            viewModel.unirseAPartida(nombre) {
+        onUnirse = { lobbyId, nombre ->
+            viewModel.unirseAPartida(lobbyId, nombre) {
                 navController.goTo(Destinos.JUGAR_CREAR)
             }
         },
@@ -57,7 +57,7 @@ fun AmigosContent(
     searchText: String,
     onSearch: (String) -> Unit,
     onInvitar: (String) -> Unit,
-    onUnirse: (String) -> Unit,
+    onUnirse: (String, String) -> Unit,
     onBorrar: (String) -> Unit,
     onAnadir: (String) -> Unit
 ) {
@@ -94,7 +94,7 @@ fun AmigosPreview() {
         searchText = "",
         onSearch = {},
         onInvitar = {},
-        onUnirse = {},
+        onUnirse = { a, b -> },
         onBorrar = {},
         onAnadir = {}
     )

@@ -51,7 +51,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_unselec
 fun ListaAmigos(
     usuarios: List<Usuario>,
     onInvitar: (String) -> Unit,
-    onUnirse: (String) -> Unit,
+    onUnirse: (String, String) -> Unit,
     onBorrar: (String) -> Unit
 ) {
     var usuarioExpandido by remember { mutableStateOf<String?>(null) }
@@ -82,7 +82,7 @@ fun TarjetaAmigo(
     expandido: Boolean,
     onClick: () -> Unit,
     onInvitar: (String) -> Unit,
-    onUnirse: (String) -> Unit,
+    onUnirse: (String, String) -> Unit,
     onBorrar: (String) -> Unit
 ) {
     val fondo = if (amigo.haInvitado) color_selected
@@ -171,7 +171,7 @@ fun DesplegableAmigo(
     usuario: Usuario,
     fondo: Color,
     onInvitar: (String) -> Unit,
-    onUnirse: (String) -> Unit,
+    onUnirse: (String, String) -> Unit,
     onBorrar: (String) -> Unit,
 ) {
     Column(
@@ -187,7 +187,7 @@ fun DesplegableAmigo(
             onInvitar(usuario.nombre)
         }
         DesplegableItem(Icons.Default.PlayArrow, "Unirse a la partida", colorUnirse) {
-            if (usuario.haInvitado) onUnirse(usuario.nombre)
+            if (usuario.haInvitado) onUnirse(usuario.lobbyInvitado, usuario.nombre)
         }
         DesplegableItem(Icons.Default.Delete, "Borrar amigo", color_text) {
             onBorrar(usuario.nombre)
