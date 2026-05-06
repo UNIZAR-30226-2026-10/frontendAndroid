@@ -45,10 +45,14 @@ class CaseFacade(
     val jugarCrearCase = JugarCrearCase(email, username, _lobbyId)
 
     // Casos de uso de Perfil
-    public val obtenerPerfilCase     = ObtenerPerfilCase(email, username)
-    public val actualizarNombreCase  = ActualizarNombreCase(email)
-    public val actualizarSkinCase    = ActualizarSkinCase(email)
+    public val obtenerPerfilCase = ObtenerPerfilCase(email, username)
+    public val actualizarNombreCase = ActualizarNombreCase(email)
+    public val actualizarSkinCase = ActualizarSkinCase(email)
     public val obtenerCosmeticosCase = ObtenerCosmeticosCase()
+
+    //Casos de uso de Logros
+    public val reclamarLogroCase = ReclamarLogroCase(email)
+    public val obtenerLogrosCase = ObtenerLogrosCase(email)
 
     // PARTIDA
 
