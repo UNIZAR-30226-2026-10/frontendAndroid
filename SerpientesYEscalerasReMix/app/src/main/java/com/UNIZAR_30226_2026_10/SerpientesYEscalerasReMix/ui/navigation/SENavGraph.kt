@@ -22,6 +22,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Partida.Par
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Partida.PartidaViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Register.RegisterScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Tienda.TiendaScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Tienda.TiendaViewModel
 
 // clase objeto utilizada como un enum. Define los destinos usados en los grafos de navegación
 object Destinos {
@@ -94,7 +95,10 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
     }
 
     composable(Destinos.TIENDA) {
-        TiendaScreen(SEState)
+        val tiendaViewModel: TiendaViewModel = viewModel(
+            factory = TiendaViewModel.factory(cF)
+        )
+        TiendaScreen(SEState, tiendaViewModel)
     }
 
     composable(Destinos.PERFIL) {

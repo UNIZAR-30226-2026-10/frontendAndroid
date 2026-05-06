@@ -4,6 +4,7 @@ import android.content.Context
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.ConexionRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PartidaRepository
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.TiendaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +16,8 @@ class CaseFacade(
     // TODO ir añadiendo aqui las interfaces que se vayan creando, fuera seran instanciadas como toquen
     private val pruebaConexionRepository: ConexionRepository,
 
-    private val partidaRepository: PartidaRepository
+    private val partidaRepository: PartidaRepository,
+    private val tiendaRepository: TiendaRepository
 ) {
 
     // TODO Cambiar e iniciar esto en MainActivity junto con remote, luego cerceriorarse que todo se crea bien con su repo, etc
@@ -49,6 +51,11 @@ class CaseFacade(
     public val actualizarNombreCase  = ActualizarNombreCase(email)
     public val actualizarSkinCase    = ActualizarSkinCase(email)
     public val obtenerCosmeticosCase = ObtenerCosmeticosCase()
+
+    // TIENDA
+    val getProductosCase = GetProductosCase(tiendaRepository)
+    val comprarProductoCase = ComprarProductoCase(tiendaRepository)
+    val getSaldoCase = GetSaldoCase(tiendaRepository)
 
     // PARTIDA
 

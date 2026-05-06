@@ -29,6 +29,7 @@ class LoginRegisterCase(
             local.setEmail(_email)
             email.value = _email
             username.value = "Yo" // TODO Cambiar con lo que devuelva la API
+            local.setSaldo(1000) // TODO Cambiar con lo que devuelva la API
 
             return true
         } else {

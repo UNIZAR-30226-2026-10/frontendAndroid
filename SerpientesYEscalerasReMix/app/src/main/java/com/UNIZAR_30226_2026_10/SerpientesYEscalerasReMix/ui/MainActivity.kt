@@ -22,6 +22,9 @@ import androidx.navigation.compose.NavHost
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.ConexionRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PartidaRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.TiendaRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.UserRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.TiendaAPIService
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MenuTopBar
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
@@ -38,6 +41,8 @@ class MainActivity : ComponentActivity() {
 
         // Inicialización de data.remote, Retrofit
         val apiService = ApiClient.apiService
+        val tiendaApiService = ApiClient.retrofit.create(TiendaAPIService::class.java)
+        val tiendaRepository = TiendaRepositoryImpl(tiendaApiService, )
 
         // Inicialización de los casos de uso
         val caseFacade = CaseFacade(
@@ -45,7 +50,8 @@ class MainActivity : ComponentActivity() {
 
             ConexionRepositoryImpl(apiService),
 
-            PartidaRepositoryImpl()
+            PartidaRepositoryImpl(),
+            tiendaRepository
         )
 
         setContent {

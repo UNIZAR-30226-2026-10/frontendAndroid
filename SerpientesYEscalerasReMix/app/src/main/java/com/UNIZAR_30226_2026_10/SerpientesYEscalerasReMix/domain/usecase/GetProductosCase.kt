@@ -5,7 +5,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.Tien
 
 class GetProductosCase(private  val tiendaRepository: TiendaRepository) {
     suspend operator fun invoke(): List<Producto> {
-        val productos = return tiendaRepository.getProductos()
+        val productos = tiendaRepository.getProductos()
 
         //TODO añadir mas reglas antes de devolver los proucots
 
