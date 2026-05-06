@@ -27,42 +27,37 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun LogoutBoton(scope: CoroutineScope, SEState: SENavHostController, cF: CaseFacade) {
-
+fun LogoutBoton(
+    scope: CoroutineScope,
+    SEState: SENavHostController,
+    cF: CaseFacade,
+    texto: String = "Amigos"
+) {
     Surface(
         color = color_negative,
         shape = RoundedCornerShape(16.dp),
         onClick = { logoutBotonAccion(scope, SEState, cF) }
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(4.dp))
-        {
-
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(4.dp)) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.ExitToApp, // O uno similar
+                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                 contentDescription = null,
                 tint = color_text,
                 modifier = Modifier
                     .size(50.dp)
-                    .align(Alignment.CenterVertically) // Se alinea a la derecha del Box
+                    .align(Alignment.CenterVertically)
             )
-
             Spacer(modifier = Modifier.width(16.dp))
-
-            Text("Amigos", style = SETextTypes.plano)
-
+            Text(texto, style = SETextTypes.plano)
             Spacer(modifier = Modifier.width(8.dp))
         }
-
     }
 }
 
 fun logoutBotonAccion(scope: CoroutineScope, SEState: SENavHostController, cF: CaseFacade) {
     scope.launch {
         cF.loginRegisterCase.cerrarSesion()
-
-        // Preparar el cambio a vertical para el login
         prepararOrientacion(SEState, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-
         SEState.goTo(Destinos.LOGIN)
     }
 }
