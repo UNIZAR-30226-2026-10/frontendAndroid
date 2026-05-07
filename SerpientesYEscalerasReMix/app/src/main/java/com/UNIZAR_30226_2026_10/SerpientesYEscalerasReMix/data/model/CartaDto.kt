@@ -7,13 +7,11 @@ import com.google.gson.annotations.SerializedName
 
 data class CartaDto(
     @SerializedName("nombre") val nombre: String,
-    @SerializedName("descripcion") val descripcion: String,
-    @SerializedName("tipo") val tipo: String,
-    @SerializedName("calidad") val calidad: String,
-    // FIXME TEMP
-    @SerializedName("id") val id: Int = 0,
-    @SerializedName("efecto") val efecto: String = "Efecto $id",
-    @SerializedName("imagen") val imagen: Int = 0
+    @SerializedName("calidad") val calidad: Calidad,
+    @SerializedName("tipo") val tipo: Tipo,
+    @SerializedName("descripcion") val descripcion: String
+
+
 )
 
 // MAPPER
@@ -22,17 +20,14 @@ fun CartaDto.toDomain(): Carta {
         nombre = this.nombre,
         descripcion = this.descripcion,
         tipo = try {
-            Tipo.valueOf(this.tipo)
+            Tipo.valueOf(this.tipo.name)
         } catch (e: Exception) {
             Tipo.Entorno // Valor por defecto en caso de que el tipo no sea reconocido
         },
         calidad = try {
-            Calidad.valueOf(this.calidad)
+            Calidad.valueOf(this.calidad.name)
         } catch (e: Exception) {
             Calidad.Comun // Valor por defecto en caso de que la calidad no sea reconocida
-        },
-        id = this.id,
-        efecto = this.efecto,
-        imagen = this.imagen
+        }
     )
 }

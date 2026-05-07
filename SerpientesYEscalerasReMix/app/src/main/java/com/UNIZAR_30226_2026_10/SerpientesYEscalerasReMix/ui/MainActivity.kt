@@ -21,6 +21,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.NavHost
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.ConexionRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.MazosRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PartidaRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MenuTopBar
@@ -45,7 +46,8 @@ class MainActivity : ComponentActivity() {
 
             ConexionRepositoryImpl(apiService),
 
-            PartidaRepositoryImpl()
+            PartidaRepositoryImpl(),
+            MazosRepositoryImpl()
         )
 
         setContent {

@@ -3,6 +3,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase
 import android.content.Context
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.ConexionRepository
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.MazosRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PartidaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +16,8 @@ class CaseFacade(
     // TODO ir añadiendo aqui las interfaces que se vayan creando, fuera seran instanciadas como toquen
     private val pruebaConexionRepository: ConexionRepository,
 
-    private val partidaRepository: PartidaRepository
+    private val partidaRepository: PartidaRepository,
+    private val mazoRepository: MazosRepository
 ) {
 
     // TODO Cambiar e iniciar esto en MainActivity junto con remote, luego cerceriorarse que todo se crea bien con su repo, etc
@@ -49,6 +51,15 @@ class CaseFacade(
     public val actualizarNombreCase  = ActualizarNombreCase(email)
     public val actualizarSkinCase    = ActualizarSkinCase(email)
     public val obtenerCosmeticosCase = ObtenerCosmeticosCase()
+
+    // MAZOS
+    // Casos de uso de Mazos
+    val obtenerMazosCase = GetMazosCase(mazoRepository)
+    val obtenerMazoCase = GetMazoCase(mazoRepository)
+    val crearMazoCase = CrearMazoCase(mazoRepository)
+    val eliminarMazoCase = EliminarMazoCase(mazoRepository)
+    val editarMazoCase = EditarMazoCase(mazoRepository)
+    val obtenerCartasDisponiblesCase = GetCartasDisponiblesCase(mazoRepository)
 
     // PARTIDA
 

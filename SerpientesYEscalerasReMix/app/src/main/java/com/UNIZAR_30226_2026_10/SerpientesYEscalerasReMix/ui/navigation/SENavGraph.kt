@@ -17,11 +17,12 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Login.Login
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.LogrosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil.PerfilScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil.PerfilViewModel
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.MazosScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Mazos.MazosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Partida.PartidaScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Partida.PartidaViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Register.RegisterScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.TiendaScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Mazos.EditarMazosScreen
 
 // clase objeto utilizada como un enum. Define los destinos usados en los grafos de navegación
 object Destinos {
@@ -31,6 +32,7 @@ object Destinos {
     const val JUGAR_CONTINUAR = "continuarPartida"
     const val JUGAR_AMIGOS = "amigos"
     const val MAZOS = "mazos"
+    const val EDITAR_MAZOS = "editarMazos"
     const val LOGROS = "logros"
     const val TIENDA = "tienda"
 
@@ -87,6 +89,10 @@ fun NavGraphBuilder.navGraph(SEState: SENavHostController, snackHost: SnackbarHo
 
     composable(Destinos.MAZOS){
         MazosScreen(SEState)
+    }
+
+    composable(Destinos.EDITAR_MAZOS){
+        EditarMazosScreen(SEState, null)
     }
 
     composable(Destinos.LOGROS) {
