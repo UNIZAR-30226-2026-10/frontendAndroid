@@ -28,7 +28,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_negativ
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 
 @Composable
-fun AbandonarLobbyBoton(SEState: SENavHostController, onClick: () -> Unit) {
+fun AbandonarLobbyBoton(navControler: SENavHostController, onClick: () -> Unit) {
     // Estado para controlar si el diálogo se muestra
     var showDialog by remember { mutableStateOf(false) }
 
@@ -39,7 +39,7 @@ fun AbandonarLobbyBoton(SEState: SENavHostController, onClick: () -> Unit) {
             confirmButton = {
                 TextButton(onClick = {
                     showDialog = false
-                    SEState.goTo(Destinos.JUGAR_CREAR)
+                    navControler.goTo(Destinos.JUGAR_CREAR)
                     onClick()
                 }) {
                     Text("Abandonar", color = color_negative)

@@ -1,48 +1,89 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase
 
-import android.content.Context
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
+import CerrarSesionCase
+import IniciarSesionCase
+import RegistrarseCase
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.AmigosRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.ConexionRepository
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.JugarContinuarRepository
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.JugarCrearRepository
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.LoginRegisterRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PartidaRepository
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class CaseFacade(
-    context: Context, // TODO eliminar de aqui
-
     // Repositorios
     // TODO ir añadiendo aqui las interfaces que se vayan creando, fuera seran instanciadas como toquen
+
+    // Prueba Inicial Retrofit
     private val pruebaConexionRepository: ConexionRepository,
 
-    private val partidaRepository: PartidaRepository
+    // Login / Registro
+    private val loginRegisterRepository: LoginRegisterRepository,
+
+    // Lobby / Jugar_Crear
+    private val jugarCrearRepository: JugarCrearRepository,
+
+    // Partida
+    private val partidaRepository: PartidaRepository,
+
+    // Amigos
+    private val amigosRepository: AmigosRepository,
+
+    // Continuar Partida
+    private val jugarContinuarRepository: JugarContinuarRepository
 ) {
 
-    // TODO Cambiar e iniciar esto en MainActivity junto con remote, luego cerceriorarse que todo se crea bien con su repo, etc
-    // Creación del almacen local
-    private val local = LocalStorage(context)
+    // --- GENERAL STATE ---
+    // estado compartido entre muchos usecases
 
-    // estado compartido entre usecases TODO eliminar de aqui y recuperar del repository correspondiente
-    private val _email = MutableStateFlow("YO@gmail.com") // TODO cambiar y enlazar con repo o repos
-    val email: StateFlow<String> = _email.asStateFlow()
+    val email: StateFlow<String> = loginRegisterRepository.email
+    val username: StateFlow<String> = loginRegisterRepository.username
+    val lobbyId: StateFlow<String> = jugarCrearRepository.lobbyId
+    val matchId: StateFlow<String> = partidaRepository.matchId
 
-    private val _username = MutableStateFlow("")
-    val username: StateFlow<String> = _username.asStateFlow()
+    // --- USECASE ---
 
-    private val _lobbyId = MutableStateFlow("")
-    val lobbyId: StateFlow<String> = _lobbyId.asStateFlow()
+    // TEST/LOG
 
-    private val _matchId = MutableStateFlow("1") // TODO cambiar y enlazar con repo o repos
-    val matchId: StateFlow<String> = _matchId.asStateFlow()
+    // Caso de uso de prueba ping con API/Retrofit
+    val pruebaConexionCase = PruebaConexionCase(pruebaConexionRepository)
 
-    // Crear Todos los casos de uso, asignando local y remoteApi segun corresponda
-    val loginRegisterCase = LoginRegisterCase(local, _email, _username)
+    // LOGIN/REGISTER
+    val comprobarLoginCase = ComprobarLoginCase(loginRegisterRepository)
+    val inciarSesionCase = IniciarSesionCase(loginRegisterRepository)
+    val registrarseCase = RegistrarseCase(loginRegisterRepository)
+    val cerrarSesionCase = CerrarSesionCase(loginRegisterRepository)
 
-    val amigosCase = AmigosCase(email, username, _lobbyId)
+    // JUGAR CREAR
 
-    val jugarContinuarCase = JugarContinuarCase(email, username)
+    // Exposición de flujos del repositorio de Jugar Crear
+    val lobby = jugarCrearRepository.lobbyActual
 
-    val jugarCrearCase = JugarCrearCase(email, username, _lobbyId)
+    // Casos de uso de Jugar Crear
+    val anadirBotCase = AnadirBotCase(jugarCrearRepository, username)
+    val cambiarPreparadoCase = CambiarPreparadoCase(jugarCrearRepository, username)
+    val seleccionarMazoCase = SeleccionarMazoCase(jugarCrearRepository, username)
+    val seleccionarTableroCase = SeleccionarTableroCase(jugarCrearRepository, username)
+    val abandonarExpulsarCase = AbandonarExpulsarCase(jugarCrearRepository, username)
+    val syncLobbyCase = SyncLobbyCase(jugarCrearRepository, username)
+    val empezarPartidaCase = EmpezarPartidaCase(jugarCrearRepository, partidaRepository)
+
+    // AMIGOS
+
+    // Exposición de flujos del repositorio de Amigos
+    val amigos = amigosRepository.amigos
+
+    // Casos de uso de Amigos
+    val obtenerAmigosCase = ObtenerAmigosCase(amigosRepository, email)
+    val anadirAmigoCase = AnadirAmigoCase(amigosRepository, email)
+    val eliminarAmigoCase = EliminarAmigoCase(amigosRepository, email)
+    val obtenerInvitacionesCase = ObtenerInvitacionesCase(amigosRepository, username)
+    val invitarAmigoLobbyCase = InvitarAmigoLobbyCase(amigosRepository, username, lobbyId)
+    val responderInvitacionCase = ResponderInvitacionCase(amigosRepository, jugarCrearRepository, username)
+
+    // JUGAR CONTINUAR
+    val obtenerRegistroPartidasCase = ObtenerRegistroPartidasCase(jugarContinuarRepository, email)
 
     // Casos de uso de Perfil
     public val obtenerPerfilCase     = ObtenerPerfilCase(email, username)
@@ -65,9 +106,4 @@ class CaseFacade(
     val confirmarDestinoCase = ConfirmarDestinoCase(partidaRepository, email, matchId)
     val chatCase = ChatCase(partidaRepository, matchId)
     val jugarCartaCase = JugarCartaCase(partidaRepository, email, matchId)
-
-    // TEST/LOG
-
-    // Caso de uso de prueba ping con API/Retrofit
-    val pruebaConexionCase = PruebaConexionCase(pruebaConexionRepository)
 }
