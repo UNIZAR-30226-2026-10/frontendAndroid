@@ -19,8 +19,13 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.NavHost
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.AmigosRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.ConexionRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.JugarContinuarRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.JugarCrearRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.LoginRegisterRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PartidaRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.TiendaRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.TiendaAPIService
@@ -41,12 +46,22 @@ class MainActivity : ComponentActivity() {
         val local = LocalStorage(applicationContext)
 
         // Inicialización de data.remote, Retrofit
+        ApiClient.init(applicationContext)
         val apiService = ApiClient.apiService
         val tiendaApiService = ApiClient.retrofit.create(TiendaAPIService::class.java)
         val tiendaRepository = TiendaRepositoryImpl(tiendaApiService, local)
 
+        // Inicialización de data.local
+        val localStorage = LocalStorage(applicationContext)
+
         // Inicialización de los casos de uso
         val caseFacade = CaseFacade(
+            pruebaConexionRepository =  ConexionRepositoryImpl(apiService),
+            loginRegisterRepository = LoginRegisterRepositoryImpl(apiService, localStorage),
+            partidaRepository =  PartidaRepositoryImpl(),
+            jugarCrearRepository = JugarCrearRepositoryImpl(apiService),
+            amigosRepository = AmigosRepositoryImpl(apiService),
+            jugarContinuarRepository = JugarContinuarRepositoryImpl(apiService)
             applicationContext, // TODO elminar e instanciarComo Retrofit
             ConexionRepositoryImpl(apiService),
             PartidaRepositoryImpl(),
@@ -77,22 +92,11 @@ fun MainScreen(cF: CaseFacade) {
     val SEState = rememberSEAppState()
 
     val email = runBlocking {
-        cF.loginRegisterCase.comprobarLogin()
+        cF.comprobarLoginCase.invoke()
     }
 
     // Prueba de Conectividad Logging/Debug
     LaunchedEffect(Unit) {
-        try {
-            val pingResponse = ApiClient.apiService.pingAuth()
-            if (pingResponse.isSuccessful) {
-                Log.d("RETROFIT_PING", "✅ /ping OK")
-            } else {
-                Log.e("RETROFIT_PING", "❌ /ping fallo: ${pingResponse.code()}")
-            }
-        } catch (e: Exception) {
-            Log.e("RETROFIT_PING", "❌ /ping error: ${e.message}")
-        }
-
         val isConnected = cF.pruebaConexionCase()
         if (isConnected) {
             Log.d("RETROFIT_TEST", "✅ Conexión exitosa y GSON configurado")

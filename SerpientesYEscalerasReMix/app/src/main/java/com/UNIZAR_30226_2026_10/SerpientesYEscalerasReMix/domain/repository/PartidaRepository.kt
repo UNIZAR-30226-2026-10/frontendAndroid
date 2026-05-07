@@ -10,11 +10,15 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface PartidaRepository {
     // Flujos de datos (Single State of Truth) seran cambiados con fetchEstadoCompleto
+    val matchId: StateFlow<String>
     val tablero: StateFlow<TableroSnapshot>
     val fichas: StateFlow<List<FichaSnapshot>>
     val jugadores: StateFlow<JugadoresSnapshot>
     val mano: StateFlow<List<Carta?>>
     val chat: StateFlow<List<MsgChat>>
+
+    // Modificar Flujos desde el exterior
+    suspend fun setMatchId(matchId: String)
 
     // Acciones respecto a paquete data
     suspend fun fetchEstadoCompleto(matchId: String, email: String)
