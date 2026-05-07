@@ -66,8 +66,9 @@ class CaseFacade(
     val seleccionarMazoCase = SeleccionarMazoCase(jugarCrearRepository, username)
     val seleccionarTableroCase = SeleccionarTableroCase(jugarCrearRepository, username)
     val abandonarExpulsarCase = AbandonarExpulsarCase(jugarCrearRepository, username)
-    val syncLobbyCase = SyncLobbyCase(jugarCrearRepository, username)
+    val syncLobbyCase = SyncLobbyCase(jugarCrearRepository, partidaRepository, username, lobby)
     val empezarPartidaCase = EmpezarPartidaCase(jugarCrearRepository, partidaRepository)
+    val obtenerTablerosCase = ObtenerTablerosCase(jugarCrearRepository)
 
     // AMIGOS
 

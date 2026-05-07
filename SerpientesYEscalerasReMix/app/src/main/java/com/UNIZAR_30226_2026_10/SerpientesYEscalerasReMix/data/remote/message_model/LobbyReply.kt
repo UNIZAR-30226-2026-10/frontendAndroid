@@ -15,5 +15,7 @@ data class LobbyReply(
     @SerializedName("numJugadores")
     val numJugadores: Int,
     @SerializedName("tablero")
-    val tablero: String
+    val tablero: String,
+    @SerializedName("idPartida")
+    val idPartida: String?
 )

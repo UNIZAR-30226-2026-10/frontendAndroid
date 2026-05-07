@@ -4,10 +4,14 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_m
 import com.google.gson.annotations.SerializedName
 
 data class PartidaJugadore(
-    @SerializedName("email")
-    val email: String,
+    @SerializedName("escaleraActualField")
+    val escaleraActualField: String,
+    @SerializedName("fichaActualField")
+    val fichaActualField: String,
+    @SerializedName("iconoActualField")
+    val iconoActualField: String,
     @SerializedName("nombre")
     val nombre: String,
-    @SerializedName("...")
-    val x: String
+    @SerializedName("serpienteActualField")
+    val serpienteActualField: String
 )

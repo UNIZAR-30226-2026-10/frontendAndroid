@@ -3,29 +3,23 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_m
 
 import com.google.gson.annotations.SerializedName
 
-data class ParidaReply(
-    @SerializedName("barajas")
-    val barajas: List<Baraja>,
+data class PartidaReply(
+    @SerializedName("chat")
+    val chat: List<Chat>,
     @SerializedName("configuracion")
-    val configuracion: Configuracion,
-    @SerializedName("createdAt")
-    val createdAt: String,
+    val configuracion: ConfiguracionX,
     @SerializedName("estado")
     val estado: String,
     @SerializedName("ganador")
     val ganador: Any,
-    @SerializedName("ganadorEmail")
-    val ganadorEmail: Any,
-    @SerializedName("id")
-    val id: String,
+    @SerializedName("ID")
+    val iD: String,
     @SerializedName("partidaJugadores")
     val partidaJugadores: List<PartidaJugadore>,
     @SerializedName("snapshotJugadores")
-    val snapshotJugadores: SnapshotJugadores,
+    val snapshotJugadores: SnapshotJugadoresX,
     @SerializedName("snapshotTablero")
-    val snapshotTablero: SnapshotTablero,
-    @SerializedName("tableroInicial")
-    val tableroInicial: TableroInicial,
+    val snapshotTablero: SnapshotTableroX,
     @SerializedName("tableroInicialNombre")
     val tableroInicialNombre: String
 )

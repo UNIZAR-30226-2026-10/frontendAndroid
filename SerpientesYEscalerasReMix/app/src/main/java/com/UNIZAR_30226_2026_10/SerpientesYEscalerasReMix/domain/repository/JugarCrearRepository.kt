@@ -17,4 +17,5 @@ interface JugarCrearRepository {
     suspend fun seleccionarTablero(requestedBy: String, tablero: String)
     suspend fun abandonarExpulsar(requestedBy: String, targetUsername: String)
     suspend fun empezarPartida(): String // Devuelve matchId
+    suspend fun getBoards(): List<String>
 }

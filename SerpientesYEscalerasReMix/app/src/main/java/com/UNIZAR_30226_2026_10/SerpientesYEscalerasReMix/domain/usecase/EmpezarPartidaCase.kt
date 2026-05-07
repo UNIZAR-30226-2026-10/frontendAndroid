@@ -7,7 +7,7 @@ class EmpezarPartidaCase(
     private val JugarCrearRepository: JugarCrearRepository,
     private val partidaRepository: PartidaRepository
 ) {
-    suspend operator fun invoke(id: String) {
+    suspend operator fun invoke(id: String, onSucces: () -> Unit) {
         val matchId = JugarCrearRepository.empezarPartida()
         partidaRepository.setMatchId(matchId)
     }

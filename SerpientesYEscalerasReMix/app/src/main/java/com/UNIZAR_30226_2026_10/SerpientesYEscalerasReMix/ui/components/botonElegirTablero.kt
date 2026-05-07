@@ -33,10 +33,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarMiniaturaTablero
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
@@ -46,14 +45,12 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 private data class TableroOpcion(val nombre: String, val resId: Int)
 
 @Composable
-fun ElegirTableroBoton(tableroResId: Int, onClick: (String) -> Unit) {
+fun ElegirTableroBoton(tableroResId: Int, nombreTableros: List<String>, onClick: (String) -> Unit) {
     var showDialog by remember { mutableStateOf(false) }
 
-    val opciones = listOf(
-        TableroOpcion("Clásico", R.drawable.tablero_debug),
-        TableroOpcion("Pradera", R.drawable.tablero_debug),
-        TableroOpcion("Infierno", R.drawable.tablero_debug)
-    )
+    val opciones = nombreTableros.map { nombre ->
+        TableroOpcion(nombre, buscarMiniaturaTablero(nombre))
+    }
 
     if (showDialog) {
         Dialog(onDismissRequest = { showDialog = false }) {
@@ -160,13 +157,4 @@ fun ElegirTableroBoton(tableroResId: Int, onClick: (String) -> Unit) {
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ElegirTableroBotonPreview() {
-    ElegirTableroBoton(
-        tableroResId = R.drawable.tablero_debug,
-        onClick = {}
-    )
 }

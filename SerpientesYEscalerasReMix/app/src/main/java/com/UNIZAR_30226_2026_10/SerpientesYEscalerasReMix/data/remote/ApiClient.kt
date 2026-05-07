@@ -9,9 +9,11 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_mo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.GetAmigosReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.GetInvitacionesReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.GetPartidasReply
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.IniciarPartidaRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LeaveOrExpelRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LobbyReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LoginRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PartidaReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PostInvitacionRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.RegisterRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SeleccionMazoRequest
@@ -80,6 +82,9 @@ interface ApiService {
     @POST("lobbies/{lobbyId}/bots")
     suspend fun addBot(@Path("lobbyId") lobbyId: String, @Body request: AnadirBotRequest): Response<ResponseBody>
 
+    @GET("boards")
+    suspend fun getAllBoards(): Response<List<String>>
+
     @PUT("lobbies/{lobbyId}/board")
     suspend fun setBoard(@Path("lobbyId") lobbyId: String, @Body body: SetBoardRequest): Response<ResponseBody>
 
@@ -91,9 +96,6 @@ interface ApiService {
 
     @HTTP(method = "DELETE", path = "lobbies/{lobbyId}/players/{username}", hasBody = true)
     suspend fun leaveOrExpel(@Path("lobbyId") lobbyId: String, @Path("username") username: String, @Body body: LeaveOrExpelRequest): Response<ResponseBody>
-
-    @POST("lobbies/{lobbyId}/start")
-    suspend fun startMatch(@Path("lobbyId") lobbyId: String): Response<Map<String, String>> // TODO cambiar
 
     // FUNCIONES JUGAR-AMIGOS
 
@@ -119,6 +121,10 @@ interface ApiService {
 
     @GET("users/{email}/matches")
     suspend fun getMatches(@Path("email") email: String): Response<GetPartidasReply>
+
+    // FUNCIONES PARTIDA
+    @POST("matches")
+    suspend fun startMatch(@Body body: IniciarPartidaRequest): Response<PartidaReply>
 
 }
 

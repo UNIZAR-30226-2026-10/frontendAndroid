@@ -3,7 +3,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_m
 
 import com.google.gson.annotations.SerializedName
 
-data class GetPartidasReply(
-    @SerializedName("matches")
-    val matches: List<PartidaRegistroGetReply>
+data class IniciarPartidaRequest(
+    @SerializedName("lobby_id")
+    val lobbyId: String
 )

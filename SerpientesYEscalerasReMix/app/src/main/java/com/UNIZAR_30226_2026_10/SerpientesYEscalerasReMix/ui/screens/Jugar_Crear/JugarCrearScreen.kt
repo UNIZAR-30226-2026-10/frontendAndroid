@@ -19,9 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.JugadorLobby
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Lobby
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarMiniaturaTablero
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.AbandonarLobbyBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.AmigosBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ContinuarBoton
@@ -29,15 +29,19 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ElegirTa
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.EmpezarPartidaBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.JugadorItem
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MazoElegirBoton
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.rememberSEAppState
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun JugarCrearScreen(navController: SENavHostController, viewModel: JugarCrearViewModel) {
     // Activar polling al entrar en la pantalla
     LaunchedEffect(Unit) {
-        viewModel.iniciarPolling()
+        viewModel.iniciarPolling { navController.goTo(Destinos.PARTIDA) }
+        viewModel.obtenerTableros()
     }
 
     // Desactivar polling cuando la pantalla no sea visible
@@ -51,20 +55,23 @@ fun JugarCrearScreen(navController: SENavHostController, viewModel: JugarCrearVi
 
     JugarCrearContent(
         uiState = uiState,
+        seleccionMazo = viewModel.seleccionMazo,
         navController = navController,
         onAnadirBot = { viewModel.onAnadirBot() },
         onExpulsar = { idx -> viewModel.onExpulsar(idx) },
         onAbandonar = { viewModel.onAbandonar() },
         onCambiarListo = { listo -> viewModel.onCambiarListo(listo) },
-        onEmpezarPartida = { viewModel.onEmpezarPartida() },
+        onEmpezarPartida = { viewModel.onEmpezarPartida( { navController.goTo(Destinos.PARTIDA) } ) },
         onElegirTablero = { tablero -> viewModel.onSeleccionarTablero(tablero) },
-        onElegirMazo = { mazo -> viewModel.onSeleccionarMazo(mazo) }
+        onElegirMazo = { mazo -> viewModel.onSeleccionarMazo(mazo) },
+        tableroSeleccionado = uiState.seleccionTablero
     )
 }
 
 @Composable
 fun JugarCrearContent(
     uiState: JugarCrearUiState,
+    seleccionMazo: Flow<String>,
     navController: SENavHostController,
     onAnadirBot: () -> Unit,
     onExpulsar: (Int) -> Unit,
@@ -72,7 +79,8 @@ fun JugarCrearContent(
     onCambiarListo: (Boolean) -> Unit,
     onEmpezarPartida: () -> Unit,
     onElegirTablero: (String) -> Unit,
-    onElegirMazo: (String) -> Unit
+    onElegirMazo: (String) -> Unit,
+    tableroSeleccionado: String
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -98,6 +106,7 @@ fun JugarCrearContent(
         ) {
             LobbyElementos(
                 uiState = uiState,
+                seleccionMazo = seleccionMazo,
                 navController = navController,
                 onAnadirBot = onAnadirBot,
                 onExpulsar = onExpulsar,
@@ -105,7 +114,8 @@ fun JugarCrearContent(
                 onCambiarListo = onCambiarListo,
                 onEmpezarPartida = onEmpezarPartida,
                 onElegirTablero = onElegirTablero,
-                onElegirMazo = onElegirMazo
+                onElegirMazo = onElegirMazo,
+                tableroSeleccionado = tableroSeleccionado
             )
         }
     }
@@ -114,6 +124,7 @@ fun JugarCrearContent(
 @Composable
 fun LobbyElementos(
     uiState: JugarCrearUiState,
+    seleccionMazo: Flow<String>,
     navController: SENavHostController,
     onAnadirBot: () -> Unit,
     onExpulsar: (Int) -> Unit,
@@ -121,7 +132,8 @@ fun LobbyElementos(
     onCambiarListo: (Boolean) -> Unit,
     onEmpezarPartida: () -> Unit,
     onElegirTablero: (String) -> Unit,
-    onElegirMazo: (String) -> Unit
+    onElegirMazo: (String) -> Unit,
+    tableroSeleccionado: String
 ) {
     val vistaLider = uiState.vistaLider
     val hostUsername = uiState.lobby?.hostUsername ?: ""
@@ -129,7 +141,7 @@ fun LobbyElementos(
 
     val miJugador = uiState.lobby?.players?.find { it?.username == username }
     val estaListo = miJugador?.isReady ?: false
-    val todosListos = uiState.lobby?.players?.filterNotNull()?.all { it.isReady } ?: false
+    val todosListos = uiState.lobby?.players?.filterNotNull()?.all { it.isReady || it.username == username } ?: false
 
     val sepVerticalJugadores = 16.dp
     val sepVerticalBotones = 8.dp
@@ -165,11 +177,12 @@ fun LobbyElementos(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(sepVerticalBotones)
         ) {
-            MazoElegirBoton(uiState.seleccionMazo.ifEmpty { "Estándar" }, onClick = onElegirMazo)
+            MazoElegirBoton(seleccionMazo, onClick = onElegirMazo)
             
             if (vistaLider) {
                 ElegirTableroBoton(
-                    tableroResId = R.drawable.tablero_debug,
+                    tableroResId = buscarMiniaturaTablero(tableroSeleccionado),
+                    nombreTableros = uiState.nombreTableros,
                     onClick = { tablero -> onElegirTablero(tablero) })
             } else {
                 Spacer(modifier = Modifier.height(120.dp))
@@ -227,17 +240,18 @@ fun JugarCrearScreenPreview() {
             JugadorLobby("bot1", "default", true, isBot = false),
             null
         ),
-        tableroSelect = "Estándar"
+        tableroSelect = "Estándar",
+        null
     )
     val mockUiState = JugarCrearUiState(
         lobby = mockLobby,
         vistaLider = true,
-        username = "host@test.com",
-        seleccionMazo = "Fuego"
+        username = "host@test.com"
     )
 
     JugarCrearContent(
         uiState = mockUiState,
+        seleccionMazo = flowOf("Fuego"),
         navController = rememberSEAppState(),
         onAnadirBot = {},
         onExpulsar = {},
@@ -245,6 +259,7 @@ fun JugarCrearScreenPreview() {
         onCambiarListo = {},
         onEmpezarPartida = {},
         onElegirTablero = {},
-        onElegirMazo = {}
+        onElegirMazo = {},
+        tableroSeleccionado = "Estándar"
     )
 }

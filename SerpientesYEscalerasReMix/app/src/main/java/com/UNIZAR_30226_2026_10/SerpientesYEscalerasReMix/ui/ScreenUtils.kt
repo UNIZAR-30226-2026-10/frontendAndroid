@@ -68,3 +68,9 @@ fun buscarIconoCartaR(icono: String): Int {
         else -> R.drawable.carta_moises
     }
 }
+
+fun buscarMiniaturaTablero(tablero: String): Int {
+    return when (tablero) {
+        else -> R.drawable.tablero_debug
+    }
+}

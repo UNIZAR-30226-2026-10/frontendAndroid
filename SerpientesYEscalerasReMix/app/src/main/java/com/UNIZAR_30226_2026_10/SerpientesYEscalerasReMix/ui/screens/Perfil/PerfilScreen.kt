@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,6 +60,7 @@ fun PerfilScreen(navHost: SENavHostController, viewModel: PerfilViewModel) {
     val perfil = viewModel.perfil
     val cargando = viewModel.cargando
     val errorMessage = viewModel.errorMessage
+    val context = LocalContext.current
 
     val nombre = perfil?.nombre ?: ""
     val stats = if (perfil != null) "${perfil.victorias}W/${perfil.derrotas}L" else ""
@@ -92,7 +94,7 @@ fun PerfilScreen(navHost: SENavHostController, viewModel: PerfilViewModel) {
         onCosmeticoSeleccionado = { categoria, skinId ->
                 viewModel.actualizarCosmetico(categoria, skinId)
             },
-        onCerrarSesion = { viewModel.cerrarSesion { navHost.goTo(Destinos.LOGIN) } }
+        onCerrarSesion = { viewModel.cerrarSesion(context) { navHost.goTo(Destinos.LOGIN) } }
         )
 }
 

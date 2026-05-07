@@ -28,12 +28,23 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
 
     val uiState = _uiState.asStateFlow()
 
+    private val _seleccionMazo = MutableStateFlow("")
+    val seleccionMazo = _seleccionMazo.asStateFlow()
+
     init {
         // Conexión de Flows del Repository a UI State
         viewModelScope.launch {
-            launch { cF.lobby.collect { data -> _uiState.update { it.copy(lobby = data) } } }
+            launch {
+                cF.lobby.collect { data ->
+                    _uiState.update { it.copy(lobby = data) }
+                    data.players.find { it?.username == _uiState.value.username }?.deckName?.let { mazo ->
+                        _seleccionMazo.value = mazo
+                    }
+                }
+            }
             launch { cF.username.collect { data -> _uiState.update { it.copy(username = data) } } }
         }
+        obtenerTableros()
     }
 
     // Funciones POLLING
@@ -41,12 +52,12 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
     private var pollingMS: Long = 2000 // Consultar cada 2 segundos
     private var pollingJob: Job? = null
 
-    fun iniciarPolling() {
+    fun iniciarPolling(onPartidaIniciada: () -> Unit) {
         if (pollingJob?.isActive == true) return
 
         pollingJob = viewModelScope.launch {
             while (isActive) {
-                cF.syncLobbyCase()
+                cF.syncLobbyCase(onPartidaIniciada)
                 if (_uiState.value.lobby != null) {
                     _uiState.update { it.copy(vistaLider = _uiState.value.lobby!!.hostUsername == _uiState.value.username) }
                 }
@@ -59,6 +70,13 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
         pollingJob?.cancel()
     }
 
+    fun obtenerTableros() {
+        viewModelScope.launch {
+            val boards = cF.obtenerTablerosCase()
+            _uiState.update { it.copy(nombreTableros = boards) }
+        }
+    }
+
     // Métodos de interacción con el Lobby
     fun onCambiarListo(listo: Boolean) {
         viewModelScope.launch {
@@ -69,12 +87,14 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
     fun onSeleccionarMazo(nombreMazo: String) {
         viewModelScope.launch {
             cF.seleccionarMazoCase(nombreMazo)
+            _seleccionMazo.value = nombreMazo
         }
     }
 
     fun onSeleccionarTablero(nombreTablero: String) {
         viewModelScope.launch {
             cF.seleccionarTableroCase(nombreTablero)
+            _uiState.update { it.copy(seleccionTablero = nombreTablero) }
         }
     }
 
@@ -99,10 +119,11 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
         }
     }
 
-    fun onEmpezarPartida() {
+    fun onEmpezarPartida(onSucces: () -> Unit) {
         viewModelScope.launch {
             val lobbyId = _uiState.value.lobby?.id ?: ""
-            cF.empezarPartidaCase(lobbyId)
+            cF.cambiarPreparadoCase(true)
+            cF.empezarPartidaCase(lobbyId, onSucces)
         }
     }
 }
@@ -110,7 +131,8 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
 data class JugarCrearUiState(
     val lobby: Lobby? = null,
     val vistaLider: Boolean = false,
-    val seleccionMazo: String = "",
     val seleccionTablero: String = "",
-    val username: String = ""
+    val username: String = "",
+    val tableroSeleccionado: String = "",
+    val nombreTableros: List<String> = emptyList()
 )
