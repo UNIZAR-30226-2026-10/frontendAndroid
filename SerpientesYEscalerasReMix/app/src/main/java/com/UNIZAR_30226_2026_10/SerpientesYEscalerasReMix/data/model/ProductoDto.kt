@@ -31,5 +31,5 @@ fun ProductoDto.toDomain(): Producto {
 }
 
 data class ComprarProductoRequest(
-    @SerializedName("nomCosmetico") val nombreCosmetico: String
+    @SerializedName("cosmetic_name") val nombreCosmetico: String
 )

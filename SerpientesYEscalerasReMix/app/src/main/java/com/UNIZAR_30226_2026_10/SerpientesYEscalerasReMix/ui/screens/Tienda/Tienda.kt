@@ -36,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo_Producto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_SEPText
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
@@ -43,6 +44,9 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fondoTienda
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DetalleProductoTienda
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Tienda.TiendaViewModel
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonGenerico
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_online
+import androidx.compose.ui.graphics.Color
 
 
 @Composable
@@ -89,7 +93,26 @@ fun TiendaContent(
     val coroutineScope = rememberCoroutineScope()
 
     // Crea mapa "Cat 1" -> 0, "Cat 2" -> 8, ... (indice de inicio de cada categoria o numero de productos)
-    val categorias = remember(productos) { productos.map { it.tipo }.distinct() }
+    // Truquillo de ordenacion para que se 1.Escalera 2.Icono 3.Serpiente 4.Ficha
+    // TODO AÑADIR MAS FICHAS A LA BD PARA VER MEJOR EL EFECTO DE LA ORDENACION, YA QUE SI HAY MENOS DE 5 NO SE VE
+    val categorias = remember(productos) {
+        productos.map { it.tipo }
+            .distinct()
+            .sortedWith(compareBy { tipo ->
+                when (tipo) {
+                    Tipo_Producto.Ficha -> 4
+                    Tipo_Producto.Serpiente -> 3
+                    Tipo_Producto.Escalera -> 2
+                    Tipo_Producto.Icono -> 1
+                    else -> 0
+                }
+            })
+    }
+    val productosOrdenados = remember(productos, categorias) {
+        productos.sortedWith(compareBy { producto ->
+            categorias.indexOf(producto.tipo)
+        })
+    }
     var categoriaSeleccionada by remember { mutableStateOf(categorias.firstOrNull() ?: "") }
     // FIXME no necesario segun el diseño planteado pero se puede mirar
     //var productoSeleccionado by remember { mutableStateOf<Producto?>(null) }
@@ -97,7 +120,7 @@ fun TiendaContent(
     // Sincronizar scroll y botones de categoria
     LaunchedEffect(listState.firstVisibleItemIndex) {
         // Obtener el producto visible actualmente
-        val productoVisible = productos.getOrNull(listState.firstVisibleItemIndex)
+        val productoVisible = productosOrdenados.getOrNull(listState.firstVisibleItemIndex)
 
         // Si el producto visible pertenece a una categoria diferente a la seleccionada, actualizar la seleccion
         productoVisible?.let {
@@ -108,6 +131,7 @@ fun TiendaContent(
     }
 
     var productoSeleccionado by remember { mutableStateOf<Producto?>(null) }
+    var avisoProductoEnPosesion by remember { mutableStateOf(false) }
 
     productoSeleccionado?.let { producto ->
         // Mostrar detalle del producto en un Dialog
@@ -119,6 +143,36 @@ fun TiendaContent(
                 productoSeleccionado = null
             }
         )
+    }
+
+    if (avisoProductoEnPosesion) {
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = { avisoProductoEnPosesion = false }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .background(color_bg, RoundedCornerShape(12.dp))
+                    .border(2.dp, color_sf, RoundedCornerShape(12.dp))
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Cosmetico ya en posesion",
+                        style = SETextTypes.plano,
+                        color = color_text
+                    )
+                    BotonGenerico(
+                        texto = "Cerrar",
+                        onClick = { avisoProductoEnPosesion = false },
+                        modifier = Modifier.padding(top = 12.dp),
+                        colorPrincipal = color_online,
+                        habilitado = true
+                    )
+                }
+            }
+        }
     }
 
     Column(
@@ -164,19 +218,21 @@ fun TiendaContent(
                 .background(color_fondoTienda)
         ) {
             // BOTONES DE CATEGORIAS
+            // FIXME hacer que se muestren lo ultimo las fichas para que se vea que se ha seleccionado la categoria, ya que es la que mas ocupa
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color_fondoTienda)
             ) {
+
                 categorias.forEach { categoria ->
-                    Log.d("TiendaContent", "Hasta aqui llega con categoria: $categoria")
+                    //Log.d("TiendaContent", "Hasta aqui llega con categoria: $categoria")
                     BotonCategoriaCustom(
                         titulo = categoria.toString(),
                         estaSeleccionado = categoriaSeleccionada == categoria,
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            val index = productos.indexOfFirst { it.tipo == categoria }
+                            val index = productosOrdenados.indexOfFirst { it.tipo == categoria }
                             if (index != -1) {
                                 coroutineScope.launch {
                                     listState.animateScrollToItem(index)
@@ -184,7 +240,7 @@ fun TiendaContent(
                             }
                         }
                     )
-                    Log.d("TiendaContent", "Despues del boton con categoria: $categoria")
+                    //Log.d("TiendaContent", "Despues del boton con categoria: $categoria")
                 }
             }
 
@@ -201,11 +257,15 @@ fun TiendaContent(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    items(productos) { producto ->
+                    items(productosOrdenados) { producto ->
                         TarjetaProductoTienda(
                             producto = producto,
                             onClick = {
-                                productoSeleccionado = producto
+                                if (producto.enPosesion) {
+                                    avisoProductoEnPosesion = true
+                                } else {
+                                    productoSeleccionado = producto
+                                }
                             }
                         )
                     }

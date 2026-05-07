@@ -125,6 +125,7 @@ fun DetalleProductoTienda(
                             .padding(top = 16.dp)
                             .align(Alignment.CenterHorizontally),
                         colorPrincipal = color_online,
+                        habilitado = !producto.enPosesion
                     )
                 }
             }

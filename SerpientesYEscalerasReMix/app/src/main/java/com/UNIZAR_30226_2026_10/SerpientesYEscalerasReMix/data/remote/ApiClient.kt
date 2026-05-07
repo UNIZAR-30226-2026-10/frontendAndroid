@@ -133,7 +133,7 @@ interface ApiService {
     @POST("cosmetics/store/{email}") //FIXME
     suspend fun comprarProducto(
         @Path("email") email: String,
-        @Body nombreProducto: ComprarProductoRequest
+        @Body cosmetic_name: ComprarProductoRequest
     ): Response<Unit>
 
     @GET("users/{email}/SEP")
