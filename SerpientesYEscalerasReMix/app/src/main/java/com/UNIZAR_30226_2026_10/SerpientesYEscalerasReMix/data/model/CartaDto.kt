@@ -2,7 +2,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model
 
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Calidad
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo_Carta
 import com.google.gson.annotations.SerializedName
 
 data class CartaDto(
@@ -22,9 +22,9 @@ fun CartaDto.toDomain(): Carta {
         nombre = this.nombre,
         descripcion = this.descripcion,
         tipo = try {
-            Tipo.valueOf(this.tipo)
+            Tipo_Carta.valueOf(this.tipo)
         } catch (e: Exception) {
-            Tipo.Entorno // Valor por defecto en caso de que el tipo no sea reconocido
+            Tipo_Carta.Entorno // Valor por defecto en caso de que el tipo no sea reconocido
         },
         calidad = try {
             Calidad.valueOf(this.calidad)

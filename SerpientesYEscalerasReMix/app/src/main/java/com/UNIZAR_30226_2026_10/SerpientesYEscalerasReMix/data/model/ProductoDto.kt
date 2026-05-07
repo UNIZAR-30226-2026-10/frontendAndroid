@@ -2,25 +2,34 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model
 
 import com.google.gson.annotations.SerializedName
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Producto
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo_Producto
 
 data class ProductoDto (
-    @SerializedName("nombre") val nombre: String,
-    @SerializedName("descripcion") val descripcion: String,
-    @SerializedName("precio") val precio: Int,
-    @SerializedName("imagenUrl") val imagenUrl: String,
-    @SerializedName ("categoria") val categoria: String
+    @SerializedName("nomCosmetico") val nombre: String?,
+    @SerializedName("precio") val precio: Int?,
+    @SerializedName("desc") val descripcion: String?,
+    @SerializedName("tipo") val tipo: String?,
+    @SerializedName("loTiene") val enPosesion: Boolean?
 )
 
 fun ProductoDto.toDomain(): Producto {
     return Producto(
-        nombre = this.nombre,
-        descripcion = this.descripcion,
-        precio = this.precio,
-        imagenUrl = this.imagenUrl,
-        categoria = this.categoria
+        nombre = this.nombre ?: "",
+        precio = this.precio ?: 0,
+        descripcion = this.descripcion ?: "",
+        // Convertir el tipo de String a Tipo enum, manejando casos desconocidos
+        tipo = when (this.tipo) {
+            "Icono" -> Tipo_Producto.Icono
+            "Skin_Ficha" -> Tipo_Producto.Ficha
+            "Skin_Serpiente" -> Tipo_Producto.Serpiente
+            "Skin_Escalera" -> Tipo_Producto.Escalera
+            else -> Tipo_Producto.Desconocido
+        },
+        enPosesion = this.enPosesion ?: false
+
     )
 }
 
 data class ComprarProductoRequest(
-    @SerializedName("cosmetic_name") val cosmeticName: String
+    @SerializedName("nomCosmetico") val nombreCosmetico: String
 )

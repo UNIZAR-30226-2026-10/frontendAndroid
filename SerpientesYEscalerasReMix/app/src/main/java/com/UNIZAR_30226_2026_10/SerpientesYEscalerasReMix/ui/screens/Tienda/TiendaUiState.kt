@@ -2,9 +2,9 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Tienda
 
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Producto
 
-sealed class TiendaUiState{
-    // Al abrir la pantall y carga de la API
-    object Loading: TiendaUiState()
+sealed class TiendaUiState {
+    // Al abrir la pantalla y carga de la API
+    object Loading : TiendaUiState()
 
     // Cuando los datos llegan correctamente
     data class Success(

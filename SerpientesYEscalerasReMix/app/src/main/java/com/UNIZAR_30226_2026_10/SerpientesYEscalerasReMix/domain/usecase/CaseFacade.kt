@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class CaseFacade(
-    context: Context, // TODO eliminar de aqui
 
     // Repositorios
     // TODO ir añadiendo aqui las interfaces que se vayan creando, fuera seran instanciadas como toquen
@@ -23,8 +22,6 @@ class CaseFacade(
     // Prueba Inicial Retrofit
     private val pruebaConexionRepository: ConexionRepository,
 
-    private val partidaRepository: PartidaRepository,
-    private val tiendaRepository: TiendaRepository
     // Login / Registro
     private val loginRegisterRepository: LoginRegisterRepository,
 
@@ -38,7 +35,11 @@ class CaseFacade(
     private val amigosRepository: AmigosRepository,
 
     // Continuar Partida
-    private val jugarContinuarRepository: JugarContinuarRepository
+    private val jugarContinuarRepository: JugarContinuarRepository,
+
+    // Tienda
+    private val tiendaRepository: TiendaRepository
+
 ) {
 
     // --- GENERAL STATE ---
@@ -52,9 +53,6 @@ class CaseFacade(
     // --- USECASE ---
 
     // TEST/LOG
-
-    // Caso de uso de prueba ping con API/Retrofit
-    val pruebaConexionCase = PruebaConexionCase(pruebaConexionRepository)
 
     // LOGIN/REGISTER
     val comprobarLoginCase = ComprobarLoginCase(loginRegisterRepository)
@@ -99,9 +97,9 @@ class CaseFacade(
     public val obtenerCosmeticosCase = ObtenerCosmeticosCase()
 
     // TIENDA
-    val getProductosCase = GetProductosCase(tiendaRepository)
-    val comprarProductoCase = ComprarProductoCase(tiendaRepository)
-    val getSaldoCase = GetSaldoCase(tiendaRepository)
+    val getProductosCase = GetProductosCase(tiendaRepository, email)
+    val comprarProductoCase = ComprarProductoCase(tiendaRepository, email)
+    val getSaldoCase = GetSaldoCase(tiendaRepository, email)
 
     // PARTIDA
 

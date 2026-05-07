@@ -25,28 +25,24 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.tooling.preview.Preview
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.listaDePruebas
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonCategoriaCustom
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.TarjetaProductoTienda
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.rememberSEAppState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.TiendaRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_SEPText
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fondoTienda
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DetalleProductoTienda
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Tienda.TiendaViewModel
 
 
 @Composable
@@ -93,7 +89,7 @@ fun TiendaContent(
     val coroutineScope = rememberCoroutineScope()
 
     // Crea mapa "Cat 1" -> 0, "Cat 2" -> 8, ... (indice de inicio de cada categoria o numero de productos)
-    val categorias = remember(productos) { productos.map { it.categoria }.distinct() }
+    val categorias = remember(productos) { productos.map { it.tipo }.distinct() }
     var categoriaSeleccionada by remember { mutableStateOf(categorias.firstOrNull() ?: "") }
     // FIXME no necesario segun el diseño planteado pero se puede mirar
     //var productoSeleccionado by remember { mutableStateOf<Producto?>(null) }
@@ -105,8 +101,8 @@ fun TiendaContent(
 
         // Si el producto visible pertenece a una categoria diferente a la seleccionada, actualizar la seleccion
         productoVisible?.let {
-            if (categoriaSeleccionada != it.categoria) {
-                categoriaSeleccionada = it.categoria
+            if (categoriaSeleccionada != it.tipo) {
+                categoriaSeleccionada = it.tipo
             }
         }
     }
@@ -174,12 +170,13 @@ fun TiendaContent(
                     .background(color_fondoTienda)
             ) {
                 categorias.forEach { categoria ->
+                    Log.d("TiendaContent", "Hasta aqui llega con categoria: $categoria")
                     BotonCategoriaCustom(
-                        titulo = categoria,
+                        titulo = categoria.toString(),
                         estaSeleccionado = categoriaSeleccionada == categoria,
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            val index = productos.indexOfFirst { it.categoria == categoria }
+                            val index = productos.indexOfFirst { it.tipo == categoria }
                             if (index != -1) {
                                 coroutineScope.launch {
                                     listState.animateScrollToItem(index)
@@ -187,6 +184,7 @@ fun TiendaContent(
                             }
                         }
                     )
+                    Log.d("TiendaContent", "Despues del boton con categoria: $categoria")
                 }
             }
 
