@@ -34,7 +34,7 @@ class JugarContinuarViewModel(private val cF: CaseFacade) : ViewModel() {
         }
     }
 
-    fun continuar(idPartida: Int) {
+    fun continuar(idPartida: String) {
         viewModelScope.launch {
             // Implementación según la lógica de tu CaseFacade
             // cF.partidaCase.setId(idPartida)

@@ -37,7 +37,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 fun ListaPartidas(
     navHost: SENavHostController?,
     partidas: List<RegistroPartida>,
-    onTarjeta: (Int) -> Unit
+    onTarjeta: (String) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -54,7 +54,7 @@ fun ListaPartidas(
 fun TarjetaPartida(
     navHost: SENavHostController?,
     partida: RegistroPartida,
-    onTarjeta: (Int) -> Unit
+    onTarjeta: (String) -> Unit
 ) {
     Surface(
         color = color_secondary,
@@ -76,7 +76,7 @@ fun TarjetaPartida(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     // Fecha de inicio y Nombre del Mapa
-                    Text(text = "Partida del ${partida.fecha} | ${partida.nombre}", style = SETextTypes.plano, color = color_text)
+                    Text(text = "Partida del ${partida.fecha} | ${partida.mapa}", style = SETextTypes.plano, color = color_text)
                 }
 
                 // Participantes
@@ -101,8 +101,8 @@ fun TarjetaPartida(
 @Composable
 fun PreviewListaPartidas() {
     val partidasEjemplo = listOf(
-        RegistroPartida("Tablero Clásico", "07/05/2026", 5, "Usuario1, Bot1, Bot2", 1),
-        RegistroPartida("Jungla Peligrosa", "06/05/2026", 12, "Usuario1, Amigo2", 2)
+        RegistroPartida("2023-09-20", "Mapa1", "Jugador1, Jugador2", "1"),
+        RegistroPartida("2023-09-21", "Mapa2", "Jugador3, Jugador4", "2"),
     )
     ListaPartidas(navHost = null, partidas = partidasEjemplo, onTarjeta = {})
 }

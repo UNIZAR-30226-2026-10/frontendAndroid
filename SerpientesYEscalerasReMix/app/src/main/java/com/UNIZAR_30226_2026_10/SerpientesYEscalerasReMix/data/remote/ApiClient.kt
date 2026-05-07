@@ -8,6 +8,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_mo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.CrearLobbyRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.GetAmigosReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.GetInvitacionesReply
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.GetPartidasReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LeaveOrExpelRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LobbyReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LoginRequest
@@ -113,6 +114,11 @@ interface ApiService {
 
     @GET("users/{email}/friends")
     suspend fun getFriends(@Path("email") email: String): Response<GetAmigosReply>
+
+    // FUNCIONES JUGAR-CONTINUAR
+
+    @GET("users/{email}/matches")
+    suspend fun getMatches(@Path("email") email: String): Response<GetPartidasReply>
 
 }
 

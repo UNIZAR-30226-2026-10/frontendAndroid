@@ -1,19 +1,31 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository
 
+import android.util.Log
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiService
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PartidaGetReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.RegistroPartida
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.JugarContinuarRepository
-import kotlinx.coroutines.delay
 
-class JugarContinuarRepositoryImpl : JugarContinuarRepository {
+class JugarContinuarRepositoryImpl(private val api: ApiService) : JugarContinuarRepository {
     override suspend fun obtenerPartidas(email: String): List<RegistroPartida> {
-        // Simulación de retraso de red
-        delay(1000)
-        
-        // Mocks de ejemplo
-        return listOf(
-            RegistroPartida("Partida Épica", "2023-10-27 10:30", 5, "Jugador1, Jugador2", 1),
-            RegistroPartida("Duelo de Titanes", "2023-10-26 15:45", 12, "Jugador1, Bot1", 2),
-            RegistroPartida("Revancha", "2023-10-25 20:15", 2, "Jugador1, Jugador3, Jugador4", 3)
-        )
+        return try {
+            val response = api.getMatches(email)
+            if (response.isSuccessful) {
+                response.body()?.matches?.map { it.toDomain() } ?: emptyList()
+            } else {
+                Log.e("API_ERROR", "Error obteniendo partidas: ${response.errorBody()?.string()}")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("API_ERROR", "Excepción obteniendo partidas", e)
+            emptyList()
+        }
     }
+
+    private fun PartidaGetReply.toDomain() = RegistroPartida(
+        fecha = fecha,
+        jugadores = jugadores.joinToString(", "),
+        id = iD,
+        mapa = mapa
+    )
 }

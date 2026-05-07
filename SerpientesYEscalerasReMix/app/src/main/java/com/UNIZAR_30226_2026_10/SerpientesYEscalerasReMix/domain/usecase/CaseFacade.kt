@@ -81,7 +81,9 @@ class CaseFacade(
     val obtenerInvitacionesCase = ObtenerInvitacionesCase(amigosRepository, username)
     val invitarAmigoLobbyCase = InvitarAmigoLobbyCase(amigosRepository, username, lobbyId)
     val responderInvitacionCase = ResponderInvitacionCase(amigosRepository, jugarCrearRepository, username)
-    
+
+    // JUGAR CONTINUAR
+    val obtenerRegistroPartidasCase = ObtenerRegistroPartidasCase(jugarContinuarRepository, email)
 
     // PARTIDA
 
@@ -98,7 +100,4 @@ class CaseFacade(
     val confirmarDestinoCase = ConfirmarDestinoCase(partidaRepository, email, matchId)
     val chatCase = ChatCase(partidaRepository, matchId)
     val jugarCartaCase = JugarCartaCase(partidaRepository, email, matchId)
-
-    // JUGAR CONTINUAR
-    val obtenerRegistroPartidasCase = ObtenerRegistroPartidasCase(jugarContinuarRepository, email)
 }
