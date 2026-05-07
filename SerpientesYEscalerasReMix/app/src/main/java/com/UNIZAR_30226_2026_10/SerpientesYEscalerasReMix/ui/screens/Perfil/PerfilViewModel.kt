@@ -102,4 +102,11 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
             }
         }
     }
+
+    fun cerrarSesion(onSucces: () -> Unit) {
+        viewModelScope.launch {
+            cF.cerrarSesionCase()
+            onSucces()
+        }
+    }
 }
