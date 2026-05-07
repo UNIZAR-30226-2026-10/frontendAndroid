@@ -2,37 +2,15 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlendMode
@@ -41,6 +19,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
@@ -48,20 +28,13 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.Categor
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.LogoutBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_secondary
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.*
 
 @Composable
 fun PerfilScreen(navHost: SENavHostController, viewModel: PerfilViewModel) {
     val perfil = viewModel.perfil
     val cargando = viewModel.cargando
     val errorMessage = viewModel.errorMessage
-
-    val nombre = perfil?.nombre ?: ""
-    val stats = if (perfil != null) "${perfil.victorias}W/${perfil.derrotas}L" else ""
 
     if (cargando) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -78,22 +51,18 @@ fun PerfilScreen(navHost: SENavHostController, viewModel: PerfilViewModel) {
     }
 
     PerfilContent(
-        nombre = nombre,
-        stats = stats,
+        nombre = perfil?.nombre ?: "",
+        stats = if (perfil != null) "${perfil.victorias}W / ${perfil.derrotas}L" else "",
         skinsEscalera = viewModel.skinsEscalera,
         skinsSerpiente = viewModel.skinsSerpiente,
         skinsFicha = viewModel.skinsFicha,
-        iconos = viewModel.iconos,
-        skinEscaleraActual = perfil?.skinEscaleraActual ?: "",
-        skinSerpienteActual = perfil?.skinSerpienteActual ?: "",
-        skinFichaActual = perfil?.skinFichaActual ?: "",
-        iconoActual = perfil?.iconoActual ?: "",
+        skinEscaleraActual = perfil?.skinEscaleraActual ?: "Estándar",
+        skinSerpienteActual = perfil?.skinSerpienteActual ?: "Estándar",
+        skinFichaActual = perfil?.skinFichaActual ?: "Estándar",
         onNombreConfirmado = { nuevo -> viewModel.actualizarNombre(nuevo) },
-        onCosmeticoSeleccionado = { categoria, skinId ->
-                viewModel.actualizarCosmetico(categoria, skinId)
-            },
+        onCosmeticoSeleccionado = { cat, id -> viewModel.actualizarCosmetico(cat, id) },
         onCerrarSesion = { viewModel.cerrarSesion { navHost.goTo(Destinos.LOGIN) } }
-        )
+    )
 }
 
 @Composable
@@ -103,41 +72,44 @@ fun PerfilContent(
     skinsEscalera: List<String>,
     skinsSerpiente: List<String>,
     skinsFicha: List<String>,
-    iconos: List<String>,
     skinEscaleraActual: String,
     skinSerpienteActual: String,
     skinFichaActual: String,
-    iconoActual: String,
     onNombreConfirmado: (String) -> Unit,
     onCosmeticoSeleccionado: (CategoriaCosmetico, String) -> Unit,
     onCerrarSesion: () -> Unit
 ) {
-
     Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        color = color_secondary,
-        border = BorderStroke(2.dp, color_primary),
-        shape = RoundedCornerShape(28.dp)
+        modifier = Modifier.fillMaxSize(),
+        color = color_bg // Fondo azul oscuro general
     ) {
-        Column {
-            TarjetaUsuario(
-                nombre = nombre,
-                stats = stats,
-                onNombreConfirmado = onNombreConfirmado,
-                onCerrarSesion = onCerrarSesion
+        Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
+            // CABECERA: Perfil con borde amarillo
+            TarjetaUsuario(nombre, stats, onNombreConfirmado, onCerrarSesion)
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // SECCIÓN COSMÉTICOS
+            Text(
+                text = "Cosméticos:",
+                style = SETextTypes.grande.copy(fontSize = 25.sp, color = color_text),
+                modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)
             )
-            Spacer(modifier = Modifier.height(15.dp))
-            SeccionCosmeticos(
-                skinsEscalera = skinsEscalera,
-                skinsSerpiente = skinsSerpiente,
-                skinsFicha = skinsFicha,
-                skinEscaleraActual = skinEscaleraActual,
-                skinSerpienteActual = skinSerpienteActual,
-                skinFichaActual = skinFichaActual,
-                onCosmeticoSeleccionado = onCosmeticoSeleccionado
-            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                CosmeticoItem("Escaleras", R.drawable.tablero_debug, skinEscaleraActual, skinsEscalera) {
+                    onCosmeticoSeleccionado(CategoriaCosmetico.ESCALERA, it)
+                }
+                CosmeticoItem("Serpientes", R.drawable.tablero_debug, skinSerpienteActual, skinsSerpiente) {
+                    onCosmeticoSeleccionado(CategoriaCosmetico.SERPIENTE, it)
+                }
+                CosmeticoItem("Fichas", R.drawable.tablero_debug, skinFichaActual, skinsFicha) {
+                    onCosmeticoSeleccionado(CategoriaCosmetico.FICHA, it)
+                }
+            }
         }
     }
 }
@@ -155,31 +127,29 @@ fun TarjetaUsuario(
         border = BorderStroke(2.dp, color_primary),
         shape = RoundedCornerShape(24.dp)
     ) {
-        Box(modifier = Modifier.padding(8.dp)) {
-
-            // Esquina superior derecha: stats encima, botón logout debajo
-            Column(
-                modifier = Modifier.align(Alignment.TopEnd),
-                horizontalAlignment = Alignment.End
-            ) {
-                Text(
-                    text = stats,
-                    style = SETextTypes.grande,
-                    color = color_text
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                LogoutBoton(onCerrarSesion)
-            }
-
-            // Fila con avatar + etiqueta + caja nombre
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
-            ) {
+        Row(
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                 AvatarUsuario()
                 Spacer(modifier = Modifier.width(16.dp))
-                EtiquetaNombre()
-                CajaNombreUsuario(nombre, onNombreConfirmado)
+                Column {
+                    Text(
+                        text = "Nombre de usuario:",
+                        style = SETextTypes.seleccionable.copy(fontSize = 14.sp),
+                        color = color_text.copy(alpha = 0.7f)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    CajaNombreUsuario(nombre, onNombreConfirmado)
+                }
+            }
+
+            Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(start = 12.dp)) {
+                Text(text = stats, style = SETextTypes.grande.copy(fontSize = 18.sp), color = color_text)
+                Spacer(modifier = Modifier.height(8.dp))
+                LogoutBoton(onCerrarSesion)
             }
         }
     }
@@ -191,18 +161,12 @@ fun CajaNombreUsuario(nombreActual: String, onConfirmar: (String) -> Unit) {
     var textoTemporal by remember(nombreActual) { mutableStateOf(nombreActual) }
 
     Surface(
-        modifier = Modifier
-            .padding(start = 20.dp)
-            .width(420.dp)
-            .height(40.dp),
-        color = color_bg,
-        border = BorderStroke(1.dp, if (editando) color_primary else color_text),
-        shape = RoundedCornerShape(4.dp)
+        modifier = Modifier.widthIn(max = 350.dp).height(42.dp),
+        color = Color(0xFF1A1C2E), // Fondo oscuro para la caja
+        border = BorderStroke(2.dp, if (editando) color_primary else color_text),
+        shape = RoundedCornerShape(8.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(modifier = Modifier.padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             if (editando) {
                 BasicTextField(
                     value = textoTemporal,
@@ -212,37 +176,18 @@ fun CajaNombreUsuario(nombreActual: String, onConfirmar: (String) -> Unit) {
                     singleLine = true,
                     cursorBrush = SolidColor(color_primary)
                 )
-                IconButton(
-                    onClick = {
-                        editando = false
-                        onConfirmar(textoTemporal)
-                    },
-                    modifier = Modifier.size(24.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "Confirmar guardado",
-                        tint = Color(0xFF4CAF50),
-                        modifier = Modifier.size(20.dp)
-                    )
+                IconButton(onClick = { editando = false; onConfirmar(textoTemporal) }) {
+                    Icon(Icons.Default.Check, "Guardar", tint = Color(0xFF4CAF50))
                 }
             } else {
                 Text(
                     text = nombreActual,
-                    style = SETextTypes.plano.copy(fontSize = 18.sp),
+                    style = SETextTypes.seleccionable.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                     color = color_text,
                     modifier = Modifier.weight(1f)
                 )
-                IconButton(
-                    onClick = { editando = true },
-                    modifier = Modifier.size(24.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Editar nombre",
-                        tint = color_text,
-                        modifier = Modifier.size(18.dp)
-                    )
+                IconButton(onClick = { editando = true }, modifier = Modifier.size(24.dp)) {
+                    Icon(Icons.Default.Edit, "Editar", tint = color_text.copy(alpha = 0.6f), modifier = Modifier.size(18.dp))
                 }
             }
         }
@@ -255,157 +200,46 @@ fun AvatarUsuario() {
         Surface(
             modifier = Modifier.size(85.dp),
             shape = CircleShape,
-            color = color_text,
-            border = BorderStroke(2.dp, Color.Black)
+            color = Color.White,
+            border = BorderStroke(2.dp, color_primary)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.icono_default),
-                contentDescription = null,
-                modifier = Modifier.padding(4.dp)
-            )
+            Image(painter = painterResource(id = R.drawable.icono_default), contentDescription = null, modifier = Modifier.padding(4.dp))
         }
-        Icon(
-            imageVector = Icons.Default.Edit,
-            contentDescription = "Cambiar avatar",
-            tint = color_text,
-            modifier = Modifier
-                .size(24.dp)
-                .offset(x = 2.dp, y = 2.dp)
-                .padding(4.dp)
-        )
-    }
-}
-
-@Composable
-fun EtiquetaNombre() {
-    Text(
-        text = "Nombre de usuario:",
-        style = SETextTypes.seleccionable.copy(fontSize = 18.sp),
-        color = color_text
-    )
-}
-
-@Composable
-fun SeccionCosmeticos(
-    skinsEscalera: List<String>,
-    skinsSerpiente: List<String>,
-    skinsFicha: List<String>,
-    skinEscaleraActual: String,
-    skinSerpienteActual: String,
-    skinFichaActual: String,
-    onCosmeticoSeleccionado: (CategoriaCosmetico, String) -> Unit
-) {
-    Column {
-        Text(
-            text = "Cosmeticos:",
-            style = SETextTypes.grande.copy(fontSize = 25.sp),
-            color = color_text,
-            modifier = Modifier.padding(start = 50.dp)
-        )
-        Spacer(modifier = Modifier.height(20.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            CosmeticoItem(
-                label = "Escaleras",
-                imagenRes = R.drawable.tablero_debug,
-                skinActual = skinEscaleraActual,
-                opciones = skinsEscalera,
-                onSeleccion = { skinId ->
-                    onCosmeticoSeleccionado(
-                        CategoriaCosmetico.ESCALERA,
-                        skinId
-                    )
-                }
-            )
-            CosmeticoItem(
-                label = "Serpientes",
-                imagenRes = R.drawable.tablero_debug,
-                skinActual = skinSerpienteActual,
-                opciones = skinsSerpiente,
-                onSeleccion = { skinId ->
-                    onCosmeticoSeleccionado(
-                        CategoriaCosmetico.SERPIENTE,
-                        skinId
-                    )
-                }
-            )
-            CosmeticoItem(
-                label = "Fichas",
-                imagenRes = R.drawable.tablero_debug,
-                skinActual = skinFichaActual,
-                opciones = skinsFicha,
-                onSeleccion = { skinId ->
-                    onCosmeticoSeleccionado(
-                        CategoriaCosmetico.FICHA,
-                        skinId
-                    )
-                }
-            )
+        Surface(modifier = Modifier.size(26.dp), color = color_primary, shape = CircleShape, border = BorderStroke(2.dp, Color.White)) {
+            Icon(Icons.Default.Edit, null, tint = Color.White, modifier = Modifier.padding(5.dp))
         }
     }
 }
 
 @Composable
-fun CosmeticoItem(
-    label: String,
-    imagenRes: Int,
-    skinActual: String,
-    opciones: List<String>,
-    onSeleccion: (String) -> Unit
-) {
+fun CosmeticoItem(label: String, imagenRes: Int, skinActual: String, opciones: List<String>, onSeleccion: (String) -> Unit) {
     var mostrarMenu by remember { mutableStateOf(false) }
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = label, style = SETextTypes.grande, color = color_text)
-        Spacer(modifier = Modifier.height(4.dp))
-        Box(contentAlignment = Alignment.Center) {
-            Surface(
-                modifier = Modifier
-                    .size(200.dp, 115.dp)
-                    .border(2.dp, color_text, RoundedCornerShape(4.dp)),
-                color = color_bg,
-                shape = RoundedCornerShape(4.dp)
-            ) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(180.dp)) {
+        Text(text = label, style = SETextTypes.grande.copy(fontSize = 18.sp, color = color_text))
+        Spacer(modifier = Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.height(115.dp).fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            color = color_bg,
+            border = BorderStroke(2.dp, color_primary),
+            onClick = { mostrarMenu = true }
+        ) {
+            Box(contentAlignment = Alignment.Center) {
                 Image(
                     painter = painterResource(id = imagenRes),
-                    contentDescription = label,
-                    modifier = Modifier.padding(8.dp),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
-                    colorFilter = ColorFilter.tint(Color.Black.copy(alpha = 0.4f), BlendMode.Darken)
+                    colorFilter = ColorFilter.tint(Color.Black.copy(alpha = 0.7f), BlendMode.Darken)
                 )
-                IconButton(
-                    onClick = { mostrarMenu = true },
-                    modifier = Modifier.size(60.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Editar $label",
-                        tint = color_text,
-                        modifier = Modifier.size(60.dp)
-                    )
+                Icon(Icons.Default.Edit, null, tint = Color.White, modifier = Modifier.size(40.dp))
+                Surface(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(), color = color_primary.copy(alpha = 0.8f)) {
+                    Text(text = skinActual, style = SETextTypes.plano.copy(fontSize = 12.sp, color = Color.White), modifier = Modifier.padding(vertical = 2.dp), textAlign = TextAlign.Center)
                 }
             }
-            DropdownMenu(
-                expanded = mostrarMenu,
-                onDismissRequest = { mostrarMenu = false }
-            ) {
-                opciones.forEach { skinId ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = skinId,
-                                color = if (skinId == skinActual) color_primary else color_text
-                            )
-                        },
-                        onClick = {
-                            mostrarMenu = false
-                            onSeleccion(skinId)
-                        }
-                    )
-                }
-            }
+        }
+        DropdownMenu(expanded = mostrarMenu, onDismissRequest = { mostrarMenu = false }) {
+            opciones.forEach { DropdownMenuItem(text = { Text(it) }, onClick = { onSeleccion(it); mostrarMenu = false }) }
         }
     }
 }
