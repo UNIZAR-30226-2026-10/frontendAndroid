@@ -19,7 +19,8 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.LogrosScree
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.MazosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Partida.PartidaScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Partida.PartidaViewModel
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil.PerfilScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil.PerfilViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Register.RegisterScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Register.RegisterViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.TiendaScreen
@@ -105,7 +106,10 @@ fun NavGraphBuilder.navGraph(navController: SENavHostController, snackHost: Snac
     }
 
     composable(Destinos.PERFIL) {
-        Perfil(navController)
+        val perfilViewModel: PerfilViewModel = viewModel(
+            factory = PerfilViewModel.Factory(cF)
+        )
+        PerfilScreen(navController, perfilViewModel)
     }
 
     composable(Destinos.PARTIDA) {

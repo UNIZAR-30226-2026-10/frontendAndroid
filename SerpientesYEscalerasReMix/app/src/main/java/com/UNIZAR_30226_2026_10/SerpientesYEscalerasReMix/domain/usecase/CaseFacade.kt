@@ -85,6 +85,12 @@ class CaseFacade(
     // JUGAR CONTINUAR
     val obtenerRegistroPartidasCase = ObtenerRegistroPartidasCase(jugarContinuarRepository, email)
 
+    // Casos de uso de Perfil
+    public val obtenerPerfilCase     = ObtenerPerfilCase(email, username)
+    public val actualizarNombreCase  = ActualizarNombreCase(email)
+    public val actualizarSkinCase    = ActualizarSkinCase(email)
+    public val obtenerCosmeticosCase = ObtenerCosmeticosCase()
+
     // PARTIDA
 
     // Exposición de flujos del repositorio de Partida
