@@ -3,8 +3,11 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Cont
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.RegistroPartida
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.Partida
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class JugarContinuarViewModel(private val cF: CaseFacade) : ViewModel() {
@@ -17,16 +20,28 @@ class JugarContinuarViewModel(private val cF: CaseFacade) : ViewModel() {
         }
     }
 
-    // Estado de la lista de partidas
-    var listaPartidas = emptyList<Partida>()
+    private val _uiState = MutableStateFlow(JugarContinuarUiState())
+    val uiState = _uiState.asStateFlow()
 
     init {
+        obtenerListaPartidas()
+    }
+
+    private fun obtenerListaPartidas() {
         viewModelScope.launch {
-           listaPartidas = cF.jugarContinuarCase.obtenerPartidas()
+            val partidas = cF.obtenerRegistroPartidasCase.obtenerPartidas()
+            _uiState.update { it.copy(listaPartidas = partidas) }
         }
     }
 
-    fun continuar(idPartida: Int) { // TODO
-        // cF.partidaCase.setId(idPartida)
+    fun continuar(idPartida: Int) {
+        viewModelScope.launch {
+            // Implementación según la lógica de tu CaseFacade
+            // cF.partidaCase.setId(idPartida)
+        }
     }
 }
+
+data class JugarContinuarUiState(
+    val listaPartidas: List<RegistroPartida> = emptyList()
+)

@@ -23,83 +23,86 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.Partida
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.RegistroPartida
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_secondary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
+
 @Composable
-fun ListaPartidas(SEState: SENavHostController, partidas: List<Partida>, onTarjeta: (Int) -> Unit) {
+fun ListaPartidas(
+    navHost: SENavHostController?,
+    partidas: List<RegistroPartida>,
+    onTarjeta: (Int) -> Unit
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp), // Espacio en los bordes de la lista
-        verticalArrangement = Arrangement.spacedBy(12.dp) // Espacio entre tarjetas
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(partidas) { partida ->
-            TarjetaPartida(SEState, partida, onTarjeta)
+            TarjetaPartida(navHost, partida, onTarjeta)
         }
     }
 }
 
 @Composable
-fun TarjetaPartida(SEState: SENavHostController, partida: Partida, onTarjeta: (Int) -> Unit) {
+fun TarjetaPartida(
+    navHost: SENavHostController?,
+    partida: RegistroPartida,
+    onTarjeta: (Int) -> Unit
+) {
     Surface(
         color = color_secondary,
         shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(2.dp, color_primary), // Borde amarillo/dorado
+        border = BorderStroke(2.dp, color_primary),
         modifier = Modifier.fillMaxWidth(),
         onClick = {
             onTarjeta(partida.id)
-            SEState.goTo(Destinos.PARTIDA)
+            navHost?.goTo(Destinos.PARTIDA)
         }
     ) {
         Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Columna de información (Izquierda)
             Column(modifier = Modifier.weight(1f)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = partida.nombre, style = SETextTypes.plano, color = color_text)
-                    Text(text = partida.fecha, style = SETextTypes.plano, color = color_text)
+                    // Fecha de inicio y Nombre del Mapa
+                    Text(text = "Partida del ${partida.fecha} | ${partida.nombre}", style = SETextTypes.plano, color = color_text)
                 }
 
+                // Participantes
                 Text(
-                    text = "Turno ${partida.turno}",
-                    style = SETextTypes.plano,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-
-                Text(
-                    text = partida.jugadores,
+                    text = "Participantes: ${partida.jugadores}",
                     style = SETextTypes.sombreado,
+                    modifier = Modifier.padding(top = 4.dp)
                 )
             }
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Botón Continuar (Derecha)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Continuar",
-                    style = SETextTypes.plano,
-                    textDecoration = TextDecoration.Underline
-                )
-                Icon(
-                    imageVector = Icons.Default.PlayArrow,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = color_text
-                )
+                Text(text = "Continuar", style = SETextTypes.plano, textDecoration = TextDecoration.Underline)
+                Icon(Icons.Default.PlayArrow, null, modifier = Modifier.size(16.dp), tint = color_text)
             }
         }
     }
+}
+
+@Preview(showBackground = true, widthDp = 800, heightDp = 400)
+@Composable
+fun PreviewListaPartidas() {
+    val partidasEjemplo = listOf(
+        RegistroPartida("Tablero Clásico", "07/05/2026", 5, "Usuario1, Bot1, Bot2", 1),
+        RegistroPartida("Jungla Peligrosa", "06/05/2026", 12, "Usuario1, Amigo2", 2)
+    )
+    ListaPartidas(navHost = null, partidas = partidasEjemplo, onTarjeta = {})
 }

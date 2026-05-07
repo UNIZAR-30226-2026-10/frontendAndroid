@@ -23,6 +23,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorag
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.AmigosRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.ConexionRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.JugarContinuarRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.JugarCrearRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.LoginRegisterRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PartidaRepositoryImpl
@@ -53,7 +54,8 @@ class MainActivity : ComponentActivity() {
             loginRegisterRepository = LoginRegisterRepositoryImpl(apiService, localStorage),
             partidaRepository =  PartidaRepositoryImpl(),
             jugarCrearRepository = JugarCrearRepositoryImpl(apiService),
-            amigosRepository = AmigosRepositoryImpl(apiService)
+            amigosRepository = AmigosRepositoryImpl(apiService),
+            jugarContinuarRepository = JugarContinuarRepositoryImpl()
         )
 
         setContent {

@@ -28,13 +28,13 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 
 
 @Composable
-fun CrearBoton(SEState: SENavHostController, orientacion: String) {
+fun CrearBoton(navHost: SENavHostController, orientacion: String) {
 
     Surface(
         color = color_secondary,
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(2.dp, color_primary),
-        onClick = { SEState.goTo(Destinos.JUGAR_CREAR) },
+        onClick = { navHost.goTo(Destinos.JUGAR_CREAR) },
         modifier = Modifier
             .width(110.dp)
             .height(40.dp)

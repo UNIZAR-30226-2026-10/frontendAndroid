@@ -5,6 +5,7 @@ import IniciarSesionCase
 import RegistrarseCase
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.AmigosRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.ConexionRepository
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.JugarContinuarRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.JugarCrearRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.LoginRegisterRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PartidaRepository
@@ -27,7 +28,10 @@ class CaseFacade(
     private val partidaRepository: PartidaRepository,
 
     // Amigos
-    private val amigosRepository: AmigosRepository
+    private val amigosRepository: AmigosRepository,
+
+    // Continuar Partida
+    private val jugarContinuarRepository: JugarContinuarRepository
 ) {
 
     // --- GENERAL STATE ---
@@ -39,8 +43,6 @@ class CaseFacade(
     val matchId: StateFlow<String> = partidaRepository.matchId
 
     // --- USECASE ---
-
-    val jugarContinuarCase = JugarContinuarCase(email, username) // TODO eleminar
 
     // TEST/LOG
 
@@ -96,4 +98,7 @@ class CaseFacade(
     val confirmarDestinoCase = ConfirmarDestinoCase(partidaRepository, email, matchId)
     val chatCase = ChatCase(partidaRepository, matchId)
     val jugarCartaCase = JugarCartaCase(partidaRepository, email, matchId)
+
+    // JUGAR CONTINUAR
+    val obtenerRegistroPartidasCase = ObtenerRegistroPartidasCase(jugarContinuarRepository, email)
 }
