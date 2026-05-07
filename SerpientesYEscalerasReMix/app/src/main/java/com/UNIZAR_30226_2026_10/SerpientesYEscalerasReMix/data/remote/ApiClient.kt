@@ -120,7 +120,7 @@ interface ApiService {
     // FUNCIONES JUGAR-CONTINUAR
 
     @GET("users/{email}/matches")
-    suspend fun getMatches(@Path("email") email: String): Response<GetPartidasReply>
+    suspend fun getMatches(@Path("email", encoded = true) email: String): Response<GetPartidasReply>
 
     // FUNCIONES PARTIDA
     @POST("matches")
@@ -162,8 +162,10 @@ object ApiClient {
                 val modifiedResponse = response.newBuilder()
                 modifiedResponse.removeHeader("Set-Cookie")
                 for (header in cookieHeaders) {
-                    // Quitamos 'secure' para que el BridgeInterceptor la acepte sobre HTTP
-                    val insecureHeader = header.replace(Regex("(?i);\\s*secure"), "")
+                    val insecureHeader = header
+                        .replace(Regex("(?i);\\s*secure"), "")
+                        .replace(Regex("(?i);\\s*SameSite=[a-z]+"), "")
+
                     modifiedResponse.addHeader("Set-Cookie", insecureHeader)
                 }
                 modifiedResponse.build()
@@ -175,7 +177,7 @@ object ApiClient {
         // Cliente OKHttp
         val okHttpClient = OkHttpClient.Builder()
             .protocols(listOf(okhttp3.Protocol.HTTP_1_1)) // TODO ELIMINAR ESTA LINEA CUANDO NO SE TRABAJE EN LOCAL 192.168.1.36
-            .addNetworkInterceptor(forceInsecureInterceptor)
+            .addInterceptor(forceInsecureInterceptor)
             .addNetworkInterceptor(loggingInterceptor)
             .cookieJar(cookieJar)
             .build()

@@ -3,4 +3,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_m
 
 import com.google.gson.annotations.SerializedName
 
-class SnapshotTablero
+data class SnapshotTablero(
+    @SerializedName("casillas")
+    val casillas: List<Casilla>
+)

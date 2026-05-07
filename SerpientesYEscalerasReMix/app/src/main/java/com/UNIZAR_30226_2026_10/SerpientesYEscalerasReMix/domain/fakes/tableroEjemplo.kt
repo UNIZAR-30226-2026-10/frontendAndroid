@@ -13,10 +13,11 @@ val fakeTableroSnapshot = TableroSnapshot(
                 val salto: Int?,
                 val siguientes: List<Int>,
                 val rotacion: Int = 90, // Valor por defecto
-                val esCurva: Boolean = false // Valor por defecto
+                val esCurva: Boolean = false, // Valor por defecto
+                val efecto: String? = null
             )
 
-            val (tipo, salto, siguientes, rotacion, esCurva) = when (n) {
+            val (tipo, salto, siguientes, rotacion, esCurva, efecto) = when (n) {
                 // Inicial
                 1 -> CasillaInfo(TipoCasilla.Normal, null, listOf(2))
 
@@ -101,9 +102,9 @@ val fakeTableroSnapshot = TableroSnapshot(
                 38 -> CasillaInfo(TipoCasilla.Normal, null, listOf(37))
                 39 -> CasillaInfo(TipoCasilla.Normal, null, listOf(38))
 
-                42 -> CasillaInfo(TipoCasilla.Normal, null, listOf(43))
-                43 -> CasillaInfo(TipoCasilla.Normal, null, listOf(44))
-                44 -> CasillaInfo(TipoCasilla.Normal, null, listOf(45))
+                42 -> CasillaInfo(TipoCasilla.Normal, null, listOf(43), efecto="+4")
+                43 -> CasillaInfo(TipoCasilla.Normal, null, listOf(44), efecto="-4")
+                44 -> CasillaInfo(TipoCasilla.Normal, null, listOf(45), efecto="Agujero de serpiente")
                 45 -> CasillaInfo(TipoCasilla.Normal, null, listOf(46))
 
                 52 -> CasillaInfo(TipoCasilla.Normal, null, listOf(51))
@@ -149,6 +150,7 @@ val fakeTableroSnapshot = TableroSnapshot(
                 tipo = tipo,
                 siguientes = siguientes,
                 saltoA = salto,
+                efecto = efecto
             )
         }
 )

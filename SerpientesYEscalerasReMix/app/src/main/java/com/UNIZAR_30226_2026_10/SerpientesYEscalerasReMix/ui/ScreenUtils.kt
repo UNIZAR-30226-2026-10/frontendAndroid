@@ -74,3 +74,12 @@ fun buscarMiniaturaTablero(tablero: String): Int {
         else -> R.drawable.tablero_debug
     }
 }
+
+fun buscarIconoEfecto(efecto: String): Int {
+    return when (efecto) {
+        "+4" -> R.drawable.efecto_mas_cuatro
+        "-4" -> R.drawable.efecto_menos_cuatro
+        "Agujero de serpiente" -> R.drawable.efecto_agujero_de_serpiente
+        else -> R.drawable.debug_error
+    }
+}
