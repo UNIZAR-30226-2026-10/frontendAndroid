@@ -11,9 +11,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.Logi
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.MazosRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PartidaRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.TiendaRepository
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class CaseFacade(
 
@@ -106,12 +104,12 @@ class CaseFacade(
 
     // MAZOS
     // Casos de uso de Mazos
-    val obtenerMazosCase = GetMazosCase(mazoRepository)
-    val obtenerMazoCase = GetMazoCase(mazoRepository)
-    val crearMazoCase = CrearMazoCase(mazoRepository)
-    val eliminarMazoCase = EliminarMazoCase(mazoRepository)
-    val editarMazoCase = EditarMazoCase(mazoRepository)
-    val obtenerCartasDisponiblesCase = GetCartasDisponiblesCase(mazoRepository)
+    val obtenerMazosCase = GetMazosCase(mazoRepository, email)
+    val obternerCartasMazo = GetCartasMazoCase(mazoRepository, email)
+    val crearMazoCase = CrearMazoCase(mazoRepository, email)
+    val eliminarMazoCase = EliminarMazoCase(mazoRepository, email)
+    val editarMazoCase = EditarMazoCase(mazoRepository, email)
+    val obtenerCartasDisponiblesCase = GetCartasDisponiblesCase(mazoRepository, email)
 
     // PARTIDA
 
@@ -128,5 +126,8 @@ class CaseFacade(
     val confirmarDestinoCase = ConfirmarDestinoCase(partidaRepository, email, matchId)
     val chatCase = ChatCase(partidaRepository, matchId)
     val jugarCartaCase = JugarCartaCase(partidaRepository, email, matchId)
+
+    // Pruebas conexion
+    val pruebaConexionCase = PruebaConexionCase(pruebaConexionRepository)
 
    }

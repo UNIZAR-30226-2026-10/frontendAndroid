@@ -58,8 +58,8 @@ class MainActivity : ComponentActivity() {
             jugarCrearRepository = JugarCrearRepositoryImpl(apiService),
             amigosRepository = AmigosRepositoryImpl(apiService),
             jugarContinuarRepository = JugarContinuarRepositoryImpl(apiService),
-            tiendaRepository = TiendaRepositoryImpl(apiService)
-            mazoRepository = MazosRepositoryImpl()
+            tiendaRepository = TiendaRepositoryImpl(apiService),
+            mazoRepository = MazosRepositoryImpl(apiService)
         )
 
         setContent {

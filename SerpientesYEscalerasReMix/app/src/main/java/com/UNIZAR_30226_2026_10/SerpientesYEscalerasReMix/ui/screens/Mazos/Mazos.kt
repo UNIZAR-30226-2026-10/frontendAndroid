@@ -36,10 +36,11 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonNue
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonEliminarMazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_offline
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 
 @Composable
-fun MazosScreen(SEState: SENavHostController){
-    val viewModel: MazosViewModel = viewModel()
+fun MazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
+
     val mazos = viewModel.mazos
     val mazoSeleccionado = viewModel.mazoSeleccionado
 
@@ -136,6 +137,7 @@ fun MazosScreen(SEState: SENavHostController){
                     viewModel.crearNuevoMazo()
                     // TODO si hay menos de 8 mazos cambio a pantalla de edicion de mazo con uno vacio
                     // TODO si hay 8 mazos muestro mensaje de error
+                    navController.navController.navigate(Destinos.EDITAR_MAZOS)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -146,6 +148,8 @@ fun MazosScreen(SEState: SENavHostController){
             BotonEditarMazo(
                 onClick = {
                     // TODO cambio a pantalla de edicion de mazo con el mazo seleccionado
+                    navController.navController.navigate(Destinos.EDITAR_MAZOS)
+
                 },
                 modifier = Modifier
                     .fillMaxWidth()

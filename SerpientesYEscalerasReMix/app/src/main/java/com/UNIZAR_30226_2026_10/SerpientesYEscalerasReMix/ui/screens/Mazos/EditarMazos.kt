@@ -58,12 +58,11 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 import androidx.compose.foundation.text.BasicTextField
 
 @Composable
-fun EditarMazosScreen(SEState: SENavHostController, mazoId: Int?) {
-    val viewModel: MazosViewModel = viewModel()
+fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
 
-    LaunchedEffect(mazoId) {
-        viewModel.seleccionarMazoPorNumero(mazoId)
-    }
+    /*LaunchedEffect(viewModel.mazoSeleccionado) {
+        viewModel.seleccionarMazoPorNumero()
+    }*/
 
     val mazo = viewModel.mazoSeleccionado
     val cartasDisponibles = viewModel.cartasDisponibles

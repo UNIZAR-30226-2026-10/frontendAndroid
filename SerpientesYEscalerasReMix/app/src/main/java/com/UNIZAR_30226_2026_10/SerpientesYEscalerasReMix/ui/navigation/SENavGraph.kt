@@ -3,6 +3,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -16,23 +17,23 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Crear
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Login.LoginScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Login.LoginViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.LogrosScreen
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.MazosScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Mazos.MazosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil.PerfilScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil.PerfilViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Mazos.MazosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Partida.PartidaScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Partida.PartidaViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil.PerfilScreen
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil.PerfilViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Mazos.MazosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Partida.PartidaScreen
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Partida.PartidaViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Register.RegisterScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Register.RegisterViewModel
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.TiendaScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Tienda.TiendaScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Mazos.EditarMazosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Tienda.TiendaScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Tienda.TiendaViewModel
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Mazos.EditarMazosScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Mazos.MazosViewModel
 
 // clase objeto utilizada como un enum. Define los destinos usados en los grafos de navegación
 object Destinos {
@@ -103,12 +104,23 @@ fun NavGraphBuilder.navGraph(navController: SENavHostController, snackHost: Snac
         AmigosScreen(navController, amigosViewModel)
     }
 
-    composable(Destinos.MAZOS){
-        MazosScreen(navController)
+    composable(Destinos.MAZOS){ backStackEntry ->
+        val mazosViewModel: MazosViewModel = viewModel(
+            backStackEntry,
+            factory = MazosViewModel.Factory(cF)
+        )
+        MazosScreen(navController, mazosViewModel)
     }
 
-    composable(Destinos.EDITAR_MAZOS){
-        EditarMazosScreen(navController, )
+    composable(Destinos.EDITAR_MAZOS){ backStackEntry ->
+        val parentEntry = remember(backStackEntry) {
+            navController.navController.getBackStackEntry(Destinos.MAZOS)
+        }
+        val mazosViewModel: MazosViewModel = viewModel(
+            parentEntry,
+            factory = MazosViewModel.Factory(cF)
+        )
+        EditarMazosScreen(navController, mazosViewModel)
     }
 
     composable(Destinos.LOGROS) {

@@ -2,7 +2,9 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote
 
 import android.content.Context
 import android.util.Log
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.CartaDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.ComprarProductoRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.MazoDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.ProductoDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.SaldoDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AceptarInvitacionRequest
@@ -31,6 +33,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.HTTP
 import retrofit2.http.POST
@@ -140,6 +143,44 @@ interface ApiService {
     suspend fun getSaldo(
         @Path("email") email: String
     ): Response<SaldoDto>
+
+    // FUNCIONES MAZOS
+    @GET("/{email}/decks")
+    suspend fun getMazos(
+        @Path("email") email: String
+    ) : Response<List<MazoDto>>
+
+    @GET("/{email}/decks/{id}/cards")
+    suspend fun getCartasMazo(
+        @Path("email") email: String,
+        @Path("id") id: String
+    ) : Response<List<CartaDto>>
+
+    @POST("/{email}/decks")
+    suspend fun crearMazo(
+        @Path("email") email: String,
+        @Body nuevoMazo: MazoDto
+    ) : Response<Unit>
+
+    @DELETE("/{email}/decks/{id}")
+    suspend fun eliminarMazo(
+        @Path("email") email: String,
+        @Path("id") id: String
+    ) : Response<Unit>
+
+    @POST("/{email}/decks/{id}")
+    suspend fun editarMazo(
+        @Path("email") email: String,
+        @Path("id") id: String,
+        @Body nuevoNombre: String?,
+        @Body nuevasCartas: List<CartaDto>?,
+        @Body eliminarCartas: List<CartaDto>?
+    ) : Response<Unit>
+
+    @GET("/{email}/cards")
+    suspend fun getCartasDisponibles(
+        @Path("email") email: String
+    ) : Response<List<CartaDto>>
 
 }
 

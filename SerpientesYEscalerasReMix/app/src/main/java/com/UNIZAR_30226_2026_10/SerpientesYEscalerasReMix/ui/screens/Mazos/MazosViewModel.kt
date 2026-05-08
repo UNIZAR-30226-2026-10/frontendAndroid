@@ -16,7 +16,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Mazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 
-class MazosViewModel(val cF: CaseFacade) : ViewModel() {
+class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
 
     companion object {
         fun Factory(cF: CaseFacade): ViewModelProvider.Factory =
@@ -38,7 +38,8 @@ class MazosViewModel(val cF: CaseFacade) : ViewModel() {
         private set
 
     // Como ya tenemos la lista de mazos no necesitamos pedirselo a la API, podemos seleccionar por
-    // indice en la lista que tenemos
+    // indice en la lista que tenemos, aunque de hecho cuando trabajamos con una mazo ya estamos en el
+    // asi que no es necesario ni siquiera el indice, se puede seleccionar directamente por el mazo
     fun seleccionarMazoPorNumero(mazo: Int?) {
         if (mazo == null) {
             mazoSeleccionado = mazos.firstOrNull() ?: mazoVacio
