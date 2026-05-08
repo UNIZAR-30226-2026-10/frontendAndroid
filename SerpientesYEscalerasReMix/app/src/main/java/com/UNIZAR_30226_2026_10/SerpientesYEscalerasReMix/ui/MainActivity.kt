@@ -27,6 +27,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.JugarC
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.JugarCrearRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.LoginRegisterRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PartidaRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.TiendaRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MenuTopBar
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
@@ -55,7 +56,10 @@ class MainActivity : ComponentActivity() {
             partidaRepository =  PartidaRepositoryImpl(),
             jugarCrearRepository = JugarCrearRepositoryImpl(apiService),
             amigosRepository = AmigosRepositoryImpl(apiService),
-            jugarContinuarRepository = JugarContinuarRepositoryImpl(apiService)
+            jugarContinuarRepository = JugarContinuarRepositoryImpl(apiService),
+            tiendaRepository = TiendaRepositoryImpl(apiService)
+            //applicationContext // TODO elminar e instanciarComo Retrofit
+
         )
 
         setContent {
@@ -87,6 +91,7 @@ fun MainScreen(cF: CaseFacade) {
 
     // Prueba de Conectividad Logging/Debug
     LaunchedEffect(Unit) {
+
         val isConnected = cF.pruebaConexionCase()
         if (isConnected) {
             Log.d("RETROFIT_TEST", "✅ Conexión exitosa y GSON configurado")

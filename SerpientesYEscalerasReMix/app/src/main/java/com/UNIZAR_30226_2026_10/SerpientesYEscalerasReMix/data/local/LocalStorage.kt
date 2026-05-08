@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.first
 
 // Se declara en el contexto global de Android un nuevo campo "dataLocal" que contendrá todos
 // aquellos valores que queramos guardar entre ejecuciones diferentes de la app.
@@ -15,6 +16,7 @@ class LocalStorage(private val context: Context) {
 
     private val logKey = booleanPreferencesKey("logStatus")
     private val emailKey = stringPreferencesKey("email")
+    private val passwdKey = stringPreferencesKey("passwd")
 
     suspend fun setLogin(loggedIn: Boolean) {
         context.dataLocal.edit { preferences ->

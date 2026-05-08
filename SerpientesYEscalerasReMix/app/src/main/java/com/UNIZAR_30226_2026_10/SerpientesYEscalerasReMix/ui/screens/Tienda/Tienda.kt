@@ -1,4 +1,4 @@
-package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens
+package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Tienda
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -25,55 +25,113 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.tooling.preview.Preview
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.listaDePruebas
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonCategoriaCustom
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.TarjetaProductoTienda
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.rememberSEAppState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo_Producto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_SEPText
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fondoTienda
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DetalleProductoTienda
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Tienda.TiendaViewModel
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonGenerico
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_online
+import androidx.compose.ui.graphics.Color
 
 
 @Composable
-fun TiendaScreen(SEState: SENavHostController, sep: Int = 1000) {
+fun TiendaScreen(SEState: SENavHostController, viewModel: TiendaViewModel) {
+
+    val state by viewModel.uiState.collectAsState()
+
+    when (val s = state) {
+        is TiendaUiState.Loading -> {
+            // TODO Mostrar pantalla de carga
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Cargando tienda...")
+            }
+        }
+        is TiendaUiState.Success -> {
+            // TODO Mostrar la tienda con los productos reales
+            TiendaContent(
+                sep = s.saldo,
+                productos = s.productos,
+                onComprarProducto = { producto ->
+                    viewModel.comprarProducto(producto)
+                }
+            )
+        }
+        is TiendaUiState.Error -> {
+            // TODO Mostrar mensaje de error
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Error al cargar la tienda: ${s.message}")
+            }
+        }
+    }
+
+
+}
+
+@Composable
+fun TiendaContent(
+    sep: Int,
+    productos: List<Producto>,
+    onComprarProducto: (Producto) -> Unit
+) {
 
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    val productos: List<Producto> = listaDePruebas // TODO Reemplazar con datos reales del ViewModel
-
     // Crea mapa "Cat 1" -> 0, "Cat 2" -> 8, ... (indice de inicio de cada categoria o numero de productos)
-    val categorias = productos.map { it.categoria }.distinct()
-
+    // Truquillo de ordenacion para que se 1.Escalera 2.Icono 3.Serpiente 4.Ficha
+    // TODO AÑADIR MAS FICHAS A LA BD PARA VER MEJOR EL EFECTO DE LA ORDENACION, YA QUE SI HAY MENOS DE 5 NO SE VE
+    val categorias = remember(productos) {
+        productos.map { it.tipo }
+            .distinct()
+            .sortedWith(compareBy { tipo ->
+                when (tipo) {
+                    Tipo_Producto.Ficha -> 4
+                    Tipo_Producto.Serpiente -> 3
+                    Tipo_Producto.Escalera -> 2
+                    Tipo_Producto.Icono -> 1
+                    else -> 0
+                }
+            })
+    }
+    val productosOrdenados = remember(productos, categorias) {
+        productos.sortedWith(compareBy { producto ->
+            categorias.indexOf(producto.tipo)
+        })
+    }
     var categoriaSeleccionada by remember { mutableStateOf(categorias.firstOrNull() ?: "") }
+    // FIXME no necesario segun el diseño planteado pero se puede mirar
+    //var productoSeleccionado by remember { mutableStateOf<Producto?>(null) }
 
     // Sincronizar scroll y botones de categoria
     LaunchedEffect(listState.firstVisibleItemIndex) {
         // Obtener el producto visible actualmente
-        val productoVisible = productos.getOrNull(listState.firstVisibleItemIndex)
+        val productoVisible = productosOrdenados.getOrNull(listState.firstVisibleItemIndex)
 
         // Si el producto visible pertenece a una categoria diferente a la seleccionada, actualizar la seleccion
         productoVisible?.let {
-            if (categoriaSeleccionada != it.categoria) {
-                categoriaSeleccionada = it.categoria
+            if (categoriaSeleccionada != it.tipo) {
+                categoriaSeleccionada = it.tipo
             }
         }
     }
 
     var productoSeleccionado by remember { mutableStateOf<Producto?>(null) }
+    var avisoProductoEnPosesion by remember { mutableStateOf(false) }
 
     productoSeleccionado?.let { producto ->
         // Mostrar detalle del producto en un Dialog
@@ -81,11 +139,40 @@ fun TiendaScreen(SEState: SENavHostController, sep: Int = 1000) {
             producto = producto,
             onDismiss = { productoSeleccionado = null },
             onComprar = { prod ->
-                // TODO Lógica de compra
-                Log.d("TiendaScreen", "Comprar producto: ${prod.nombre}")
+                onComprarProducto(producto)
                 productoSeleccionado = null
             }
         )
+    }
+
+    if (avisoProductoEnPosesion) {
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = { avisoProductoEnPosesion = false }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .background(color_bg, RoundedCornerShape(12.dp))
+                    .border(2.dp, color_sf, RoundedCornerShape(12.dp))
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Cosmetico ya en posesión",
+                        style = SETextTypes.plano,
+                        color = color_text
+                    )
+                    BotonGenerico(
+                        texto = "Cerrar",
+                        onClick = { avisoProductoEnPosesion = false },
+                        modifier = Modifier.padding(top = 12.dp),
+                        colorPrincipal = color_online,
+                        habilitado = true
+                    )
+                }
+            }
+        }
     }
 
     Column(
@@ -109,7 +196,7 @@ fun TiendaScreen(SEState: SENavHostController, sep: Int = 1000) {
             )
 
             Text(
-                text = "Sep $sep", // TODO Reemplazar con el saldo real del usuario
+                text = "Sep $sep",
                 style = SETextTypes.SEPStyle,
                 color = color_SEPText,
                 modifier = Modifier
@@ -131,18 +218,21 @@ fun TiendaScreen(SEState: SENavHostController, sep: Int = 1000) {
                 .background(color_fondoTienda)
         ) {
             // BOTONES DE CATEGORIAS
+            // FIXME hacer que se muestren lo ultimo las fichas para que se vea que se ha seleccionado la categoria, ya que es la que mas ocupa
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color_fondoTienda)
             ) {
+
                 categorias.forEach { categoria ->
+                    //Log.d("TiendaContent", "Hasta aqui llega con categoria: $categoria")
                     BotonCategoriaCustom(
-                        titulo = categoria,
+                        titulo = categoria.toString(),
                         estaSeleccionado = categoriaSeleccionada == categoria,
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            val index = productos.indexOfFirst { it.categoria == categoria }
+                            val index = productosOrdenados.indexOfFirst { it.tipo == categoria }
                             if (index != -1) {
                                 coroutineScope.launch {
                                     listState.animateScrollToItem(index)
@@ -150,6 +240,7 @@ fun TiendaScreen(SEState: SENavHostController, sep: Int = 1000) {
                             }
                         }
                     )
+                    //Log.d("TiendaContent", "Despues del boton con categoria: $categoria")
                 }
             }
 
@@ -166,11 +257,15 @@ fun TiendaScreen(SEState: SENavHostController, sep: Int = 1000) {
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    items(productos) { producto ->
+                    items(productosOrdenados) { producto ->
                         TarjetaProductoTienda(
                             producto = producto,
                             onClick = {
-                                productoSeleccionado = producto
+                                if (producto.enPosesion) {
+                                    avisoProductoEnPosesion = true
+                                } else {
+                                    productoSeleccionado = producto
+                                }
                             }
                         )
                     }
@@ -179,16 +274,5 @@ fun TiendaScreen(SEState: SENavHostController, sep: Int = 1000) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-    }
-}
-
-@Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
-@Composable
-fun TiendaScreenPreview() {
-    val SEState = rememberSEAppState()
-    // Usamos el tema de tu proyecto
-    MaterialTheme {
-        // PASAMOS LOS DATOS MOCK AQUÍ
-        TiendaScreen(SEState)
     }
 }

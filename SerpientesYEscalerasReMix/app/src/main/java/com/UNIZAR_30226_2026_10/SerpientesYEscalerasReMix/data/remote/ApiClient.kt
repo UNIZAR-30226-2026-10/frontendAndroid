@@ -2,6 +2,9 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote
 
 import android.content.Context
 import android.util.Log
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.ComprarProductoRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.ProductoDto
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.SaldoDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AceptarInvitacionRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AnadirBotRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AuthReply
@@ -37,6 +40,7 @@ import retrofit2.http.Path
 interface ApiService {
 
     // FUNCIONES PARA PRUEBAS Y LOGGING EN MAIN_ACTIVITY
+
     @GET("achievements/ping")
     suspend fun pingAchievements(): Response<Unit>
 
@@ -120,11 +124,28 @@ interface ApiService {
     @GET("users/{email}/matches")
     suspend fun getMatches(@Path("email") email: String): Response<GetPartidasReply>
 
+    // FUNCIONES TIENDA FIXME MIRAR LO DE LAS REPLYS
+    @GET("cosmetics/store/{email}") //FIXME
+    suspend fun getProductos(
+        @Path("email") email: String
+    ): Response<List<ProductoDto>>
+
+    @POST("cosmetics/store/{email}") //FIXME
+    suspend fun comprarProducto(
+        @Path("email") email: String,
+        @Body cosmetic_name: ComprarProductoRequest
+    ): Response<Unit>
+
+    @GET("users/{email}/SEP")
+    suspend fun getSaldo(
+        @Path("email") email: String
+    ): Response<SaldoDto>
+
 }
 
 object ApiClient {
-    // private const val API_URL = "http://syeremix.switzerlandnorth.cloudapp.azure.com/api/"
-    private const val API_URL = "http://192.168.1.36:3000/api/"
+    private const val API_URL = "http://syeremix.switzerlandnorth.cloudapp.azure.com/api/"
+    //private const val API_URL = "http://192.168.1.36:3000/api/"
 
     private var _apiService: ApiService? = null
     private var _cookieJar: PersistentCookieJar? = null

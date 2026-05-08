@@ -9,9 +9,13 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.Juga
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.JugarCrearRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.LoginRegisterRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PartidaRepository
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.TiendaRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class CaseFacade(
+
     // Repositorios
     // TODO ir añadiendo aqui las interfaces que se vayan creando, fuera seran instanciadas como toquen
 
@@ -31,7 +35,11 @@ class CaseFacade(
     private val amigosRepository: AmigosRepository,
 
     // Continuar Partida
-    private val jugarContinuarRepository: JugarContinuarRepository
+    private val jugarContinuarRepository: JugarContinuarRepository,
+
+    // Tienda
+    private val tiendaRepository: TiendaRepository
+
 ) {
 
     // --- GENERAL STATE ---
@@ -45,9 +53,6 @@ class CaseFacade(
     // --- USECASE ---
 
     // TEST/LOG
-
-    // Caso de uso de prueba ping con API/Retrofit
-    val pruebaConexionCase = PruebaConexionCase(pruebaConexionRepository)
 
     // LOGIN/REGISTER
     val comprobarLoginCase = ComprobarLoginCase(loginRegisterRepository)
@@ -91,6 +96,11 @@ class CaseFacade(
     public val actualizarSkinCase    = ActualizarSkinCase(email)
     public val obtenerCosmeticosCase = ObtenerCosmeticosCase()
 
+    // TIENDA
+    val getProductosCase = GetProductosCase(tiendaRepository, email)
+    val comprarProductoCase = ComprarProductoCase(tiendaRepository, email)
+    val getSaldoCase = GetSaldoCase(tiendaRepository, email)
+
     // PARTIDA
 
     // Exposición de flujos del repositorio de Partida
@@ -106,4 +116,9 @@ class CaseFacade(
     val confirmarDestinoCase = ConfirmarDestinoCase(partidaRepository, email, matchId)
     val chatCase = ChatCase(partidaRepository, matchId)
     val jugarCartaCase = JugarCartaCase(partidaRepository, email, matchId)
+
+    // TEST/LOG
+
+    // Caso de uso de prueba ping con API/Retrofit
+    val pruebaConexionCase = PruebaConexionCase(pruebaConexionRepository)
 }

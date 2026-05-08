@@ -1,6 +1,6 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model
 
-enum class Tipo {
+enum class Tipo_Carta {
     Ofensiva,
     Defensiva,
     Entorno
@@ -16,7 +16,7 @@ enum class Calidad {
 data class Carta (
     val nombre: String,
     val descripcion: String,
-    val tipo: Tipo,
+    val tipo: Tipo_Carta,
     val calidad: Calidad,
     val id: Int? = null,
     val efecto: String? = null,
