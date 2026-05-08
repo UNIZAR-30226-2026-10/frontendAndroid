@@ -142,6 +142,7 @@ fun LobbyElementos(
     val miJugador = uiState.lobby?.players?.find { it?.username == username }
     val estaListo = miJugador?.isReady ?: false
     val todosListos = uiState.lobby?.players?.filterNotNull()?.all { it.isReady || it.username == username } ?: false
+    val mazoActual by seleccionMazo.collectAsState(initial = "")
 
     val sepVerticalJugadores = 16.dp
     val sepVerticalBotones = 8.dp
@@ -195,6 +196,7 @@ fun LobbyElementos(
                     esLider = vistaLider,
                     estaListo = estaListo,
                     todosListos = todosListos,
+                    mazoSeleccionado = mazoActual.isNotEmpty(),
                     onEmpezar = onEmpezarPartida,
                     onCambiarListo = { nuevoEstado -> onCambiarListo(!nuevoEstado) }
                 )

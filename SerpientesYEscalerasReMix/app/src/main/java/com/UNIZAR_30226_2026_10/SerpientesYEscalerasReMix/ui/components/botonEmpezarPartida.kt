@@ -27,14 +27,16 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_unselec
 fun EmpezarPartidaBoton(
     esLider: Boolean,
     estaListo: Boolean,
-    todosListos: Boolean, // Nueva condición para el líder
+    todosListos: Boolean,
+    mazoSeleccionado: Boolean,
     onEmpezar: () -> Unit,
     onCambiarListo: (Boolean) -> Unit
 ) {
     // Estado interno para el pop-up de error
     var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
-    // Diálogo de error (solo para el líder)
+    // Diálogo de error
     if (showErrorDialog) {
         AlertDialog(
             onDismissRequest = { showErrorDialog = false },
@@ -43,8 +45,8 @@ fun EmpezarPartidaBoton(
                     Text("Entendido")
                 }
             },
-            title = { Text("No se puede empezar") },
-            text = { Text("Todos los jugadores deben estar en estado 'Listo' para poder comenzar la partida.") }
+            title = { Text("No se puede continuar") },
+            text = { Text(errorMessage) }
         )
     }
 
@@ -56,10 +58,14 @@ fun EmpezarPartidaBoton(
         shape = RoundedCornerShape(10.dp),
         shadowElevation = 8.dp,
         onClick = {
-            if (esLider) {
+            if (!mazoSeleccionado) {
+                errorMessage = "Debes seleccionar un mazo antes de continuar."
+                showErrorDialog = true
+            } else if (esLider) {
                 if (todosListos) {
                     onEmpezar()
                 } else {
+                    errorMessage = "Todos los jugadores deben estar en estado 'Listo' para poder comenzar la partida."
                     showErrorDialog = true
                 }
             } else {
