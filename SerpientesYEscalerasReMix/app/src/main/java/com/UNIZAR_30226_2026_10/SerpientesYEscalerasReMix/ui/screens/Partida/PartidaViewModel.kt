@@ -37,6 +37,7 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
     init {
         // Conexión de Flows del Repository a UI State
         viewModelScope.launch {
+            launch { cF.username.collect { data -> _uiState.update { it.copy(username = data) } } }
             launch { cF.tablero.collect { data -> _uiState.update { it.copy(tablero = data) } } }
             launch { cF.fichas.collect { data -> _uiState.update { it.copy(fichas = data) } } }
             launch { cF.jugadores.collect { data -> _uiState.update { it.copy( jugadores = data) } } }
@@ -64,7 +65,7 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
                         // Comprobamos si el índice es válido para la lista actual
                         val esRealmenteMiTurno = if (lista.isNotEmpty() && indiceTurno in lista.indices) {
-                            lista[indiceTurno].email == cF.email.value
+                            lista[indiceTurno].username == uiState.value.username
 
                         } else {
                             false
@@ -363,8 +364,8 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
     }
 
-    fun onSeleccionJugadorCarta(emailObjetivo: String) {
-        ejecutarUsoCarta(target = emailObjetivo)
+    fun onSeleccionJugadorCarta(usernameObjetivo: String) {
+        ejecutarUsoCarta(target = usernameObjetivo)
         _uiState.update {
             it.copy(
                 seleccionJugadorCarta = false,
@@ -433,9 +434,11 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 }
 
 data class PartidaUiState(
-    // Todo cambiar por lineas comentadas (esta asi para poder usar preview)
+    // Datos user
+    val username: String = "",
+
     // Contenido dinamico
-    val tablero: TableroSnapshot = TableroSnapshot(emptyList()),
+    val tablero: TableroSnapshot = TableroSnapshot(emptyList(), "default", "default"),
     val fichas: List<FichaSnapshot> = emptyList(),
     val jugadores: JugadoresSnapshot = JugadoresSnapshot(0, 0, emptyList()),
     val mano: MutableList<Carta?> = mutableListOf(),

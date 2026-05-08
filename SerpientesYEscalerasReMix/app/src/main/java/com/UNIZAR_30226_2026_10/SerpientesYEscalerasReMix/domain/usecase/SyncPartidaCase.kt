@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 class SyncPartidaCase(
     private val repository: PartidaRepository,
-    private val email: StateFlow<String>,
+    private val username: StateFlow<String>,
     private val matchId: StateFlow<String>
 ) {
 
@@ -15,17 +15,17 @@ class SyncPartidaCase(
 
         if (repository.jugadores.value.jugadores.isEmpty()) {
             if (matchId.value.isNotEmpty()) {
-                repository.fetchEstadoCompleto(matchId.value, email.value)
+                repository.fetchEstadoCompleto(matchId.value, username.value)
                 init = true
             }
         } else {
 
             val turno = repository.jugadores.value.turno
-            val jugadorTurno = repository.jugadores.value.jugadores[turno].email
-            val esMiTurno = jugadorTurno == email.value
+            val jugadorTurno = repository.jugadores.value.jugadores[turno].username
+            val esMiTurno = jugadorTurno == username.value
 
             if (!init || esMiTurno) {
-                repository.fetchEstadoCompleto(matchId.value, email.value)
+                repository.fetchEstadoCompleto(matchId.value, username.value)
                 init = true
             }
         }

@@ -85,6 +85,7 @@ class CaseFacade(
 
     // JUGAR CONTINUAR
     val obtenerRegistroPartidasCase = ObtenerRegistroPartidasCase(jugarContinuarRepository, email)
+    val continuarPartidaCase = ContinuarPartidaCase(partidaRepository)
 
     // Casos de uso de Perfil
     public val obtenerPerfilCase     = ObtenerPerfilCase(email, username)
@@ -102,9 +103,9 @@ class CaseFacade(
     val chat = partidaRepository.chat
 
     // Casos de uso de Partida
-    val syncPartidaCase = SyncPartidaCase(partidaRepository, email, matchId)
-    val lanzarDadoCase = LanzarDadoCase(partidaRepository, email, matchId)
-    val confirmarDestinoCase = ConfirmarDestinoCase(partidaRepository, email, matchId)
-    val chatCase = ChatCase(partidaRepository, matchId)
-    val jugarCartaCase = JugarCartaCase(partidaRepository, email, matchId)
+    val syncPartidaCase = SyncPartidaCase(partidaRepository, username, matchId)
+    val lanzarDadoCase = LanzarDadoCase(partidaRepository, username, matchId)
+    val confirmarDestinoCase = ConfirmarDestinoCase(partidaRepository, username, matchId)
+    val chatCase = ChatCase(partidaRepository, matchId, username)
+    val jugarCartaCase = JugarCartaCase(partidaRepository, username, matchId)
 }

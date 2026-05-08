@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
         val caseFacade = CaseFacade(
             pruebaConexionRepository =  ConexionRepositoryImpl(apiService),
             loginRegisterRepository = LoginRegisterRepositoryImpl(apiService, localStorage),
-            partidaRepository =  PartidaRepositoryImpl(),
+            partidaRepository =  PartidaRepositoryImpl(apiService),
             jugarCrearRepository = JugarCrearRepositoryImpl(apiService),
             amigosRepository = AmigosRepositoryImpl(apiService),
             jugarContinuarRepository = JugarContinuarRepositoryImpl(apiService)

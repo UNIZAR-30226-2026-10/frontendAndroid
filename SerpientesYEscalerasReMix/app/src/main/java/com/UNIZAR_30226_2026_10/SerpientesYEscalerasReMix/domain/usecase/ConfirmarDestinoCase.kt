@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 class ConfirmarDestinoCase(
     private val repository: PartidaRepository,
-    private val email: StateFlow<String>,
+    private val username: StateFlow<String>,
     private val matchId: StateFlow<String>
 ) {
 
@@ -14,7 +14,7 @@ class ConfirmarDestinoCase(
         // Confirmar movimiento
         return repository.confirmarMovimiento(
             matchId = matchId.value,
-            email = email.value,
+            username = username.value,
             fichaId = movimiento.fichaId,
             destinoId = movimiento.casillaId,
             pasosRestantes = if (movimiento.pasosRestantes == 0) null
@@ -26,7 +26,7 @@ class ConfirmarDestinoCase(
         // Confirmar movimiento
         return repository.confirmarMovimiento(
             matchId = matchId.value,
-            email = email.value,
+            username = username.value,
             fichaId = movimiento.fichaId,
             destinoId = movimiento.fichaId,
             pasosRestantes = movimiento.pasosRestantes

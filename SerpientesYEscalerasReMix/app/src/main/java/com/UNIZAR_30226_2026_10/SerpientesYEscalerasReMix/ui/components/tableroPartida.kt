@@ -47,7 +47,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.FichaSnap
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Movimiento
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TableroSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TipoCasilla
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarIconoEfecto
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarIconoEfectoR
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SerpientesYEscalerasReMixTheme
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
@@ -153,7 +153,7 @@ fun Tablero(
                                         val efecto = casilla.efecto
 
                                         Image(
-                                            painter = painterResource(id = buscarIconoEfecto(efecto)),
+                                            painter = painterResource(id = buscarIconoEfectoR(efecto)),
                                             contentDescription = "imagen de ${efecto}",
                                             modifier = Modifier.fillMaxSize(1f)
                                         )

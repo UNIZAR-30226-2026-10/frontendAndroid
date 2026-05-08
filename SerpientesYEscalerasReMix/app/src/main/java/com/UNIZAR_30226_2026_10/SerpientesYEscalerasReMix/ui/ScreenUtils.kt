@@ -33,7 +33,6 @@ fun prepararOrientacion(SEState: SENavHostController, Orientation: Int) {
 
 // Busca Icono de jugador en R
 fun buscarIconoJugadorR(icono: String): Int {
-    // TODO ajustar debidamente a los iconos de R (una vez sean creados, etc)
     val iconoR = when (icono) {
         "default" -> R.drawable.icono_default
         "bot"     -> R.drawable.icono_bots
@@ -69,13 +68,15 @@ fun buscarIconoCartaR(icono: String): Int {
     }
 }
 
-fun buscarMiniaturaTablero(tablero: String): Int {
+// Busca Miniatura de tablero en R
+fun buscarMiniaturaTableroR(tablero: String): Int {
     return when (tablero) {
         else -> R.drawable.tablero_debug
     }
 }
 
-fun buscarIconoEfecto(efecto: String): Int {
+// Busca Icono de efecto en R
+fun buscarIconoEfectoR(efecto: String): Int {
     return when (efecto) {
         "+4" -> R.drawable.efecto_mas_cuatro
         "-4" -> R.drawable.efecto_menos_cuatro

@@ -35,7 +35,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarMiniaturaTablero
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarMiniaturaTableroR
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
@@ -49,7 +49,7 @@ fun ElegirTableroBoton(tableroResId: Int, nombreTableros: List<String>, onClick:
     var showDialog by remember { mutableStateOf(false) }
 
     val opciones = nombreTableros.map { nombre ->
-        TableroOpcion(nombre, buscarMiniaturaTablero(nombre))
+        TableroOpcion(nombre, buscarMiniaturaTableroR(nombre))
     }
 
     if (showDialog) {

@@ -6,13 +6,13 @@ import kotlinx.coroutines.flow.StateFlow
 
 class LanzarDadoCase(
     private val repository: PartidaRepository,
-    private val email: StateFlow<String>,
+    private val username: StateFlow<String>,
     private val matchId: StateFlow<String>
 ) {
 
     suspend operator fun invoke(): Pair<Int, List<Movimiento>> {
         // Realizar tirada
-        return repository.lanzarDado(matchId.value, email.value)
+        return repository.lanzarDado(matchId.value, username.value)
     }
 
     suspend operator fun invoke(movimientos: List<Movimiento>, fichaId: Int): List<Movimiento> {

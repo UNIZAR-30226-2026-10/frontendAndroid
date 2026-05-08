@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeJugadoresSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.JugadoresSnapshot
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarIconoJugadorR
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fg
@@ -102,7 +103,7 @@ fun ListaJugadores(
                         .then( // seleccionar jugador para accion de una carta
                             if (seleccionCarta) {
                                 Modifier
-                                    .clickable { onSeleccionCarta(jugador.email) }
+                                    .clickable { onSeleccionCarta(jugador.username) }
                             } else Modifier
                         ),
                     verticalAlignment = Alignment.CenterVertically,
@@ -117,7 +118,7 @@ fun ListaJugadores(
                             border = BorderStroke(1.dp, color_bg)
                         ) {
                             Image(
-                                painter = painterResource(id = jugador.icono),
+                                painter = painterResource(id = buscarIconoJugadorR(jugador.icono)),
                                 contentDescription = "Perfil Snake",
                                 modifier = Modifier.padding(4.dp),
                                 contentScale = ContentScale.Fit
@@ -149,7 +150,7 @@ fun ListaJugadores(
                     )
 
                     Text(
-                        text = jugador.nombre,
+                        text = jugador.username,
                         style = SETextTypes.plano.copy(fontSize = 13.sp),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,

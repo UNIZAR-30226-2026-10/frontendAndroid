@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.JugadorLobby
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Lobby
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarMiniaturaTablero
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarMiniaturaTableroR
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.AbandonarLobbyBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.AmigosBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ContinuarBoton
@@ -182,7 +182,7 @@ fun LobbyElementos(
             
             if (vistaLider) {
                 ElegirTableroBoton(
-                    tableroResId = buscarMiniaturaTablero(tableroSeleccionado),
+                    tableroResId = buscarMiniaturaTableroR(tableroSeleccionado),
                     nombreTableros = uiState.nombreTableros,
                     onClick = { tablero -> onElegirTablero(tablero) })
             } else {

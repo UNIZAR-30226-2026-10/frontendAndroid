@@ -7,6 +7,10 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TipoCasil
 
 val fakeTableroSnapshot = TableroSnapshot(
 
+    skinEscalera = "default",
+
+    skinSerpiente = "default",
+
     casillas = (1..100).map { n ->
             data class CasillaInfo( // Clase auxiliar para devolver el tipo de casilla
                 val tipo: TipoCasilla,

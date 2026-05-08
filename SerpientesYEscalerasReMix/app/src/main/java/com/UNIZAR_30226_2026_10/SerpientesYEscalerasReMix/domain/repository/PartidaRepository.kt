@@ -21,13 +21,13 @@ interface PartidaRepository {
     suspend fun setMatchId(matchId: String)
 
     // Acciones respecto a paquete data
-    suspend fun fetchEstadoCompleto(matchId: String, email: String)
+    suspend fun fetchEstadoCompleto(matchId: String, username: String)
 
     // Devuelve las casillas posibles y la puntuacion del dado
-    suspend fun lanzarDado(matchId: String, email: String): Pair<Int, List<Movimiento>>
+    suspend fun lanzarDado(matchId: String, username: String): Pair<Int, List<Movimiento>>
 
-    suspend fun confirmarMovimiento(matchId: String, email: String, fichaId: Int, destinoId: Int, pasosRestantes: Int?): List<Movimiento>
-    suspend fun jugarCarta(matchId: String, email: String, cartaId: String, target: String?, inicio: Int?, fin: Int?)
-    suspend fun recibirChat(matchId: String)
+    suspend fun confirmarMovimiento(matchId: String, username: String, fichaId: Int, destinoId: Int, pasosRestantes: Int?): List<Movimiento>
+    suspend fun jugarCarta(matchId: String, username: String, cartaId: String, target: String?, inicio: Int?, fin: Int?)
+    suspend fun recibirChat(matchId: String, username: String)
     suspend fun enviarMensaje(matchId: String, mensaje: MsgChat)
 }
