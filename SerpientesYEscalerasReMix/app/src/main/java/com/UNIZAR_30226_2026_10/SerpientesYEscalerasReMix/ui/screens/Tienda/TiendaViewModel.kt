@@ -23,8 +23,12 @@ class TiendaViewModel (private val cf: CaseFacade) : ViewModel() {
     companion object {
         fun factory(cf: CaseFacade): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return TiendaViewModel(cf) as T
+                    if (modelClass.isAssignableFrom(TiendaViewModel::class.java)) {
+                        return TiendaViewModel(cf) as T
+                    }
+                    throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
         }
     }
@@ -39,30 +43,28 @@ class TiendaViewModel (private val cf: CaseFacade) : ViewModel() {
         }
     }
 
-    fun fetchProductos() {
-        viewModelScope.launch {
-            if (cf.email.value.isBlank()) {
-                return@launch
-            }
-            _uiState.value = TiendaUiState.Loading
-            try {
-                val lista = try {
-                    cf.getProductosCase()
-                } catch (e: Exception) {
-                    Log.e("TiendaViewModel", "Error al obtener productos, usando lista vacía: ${e.message}")
-                    emptyList<Producto>()
-                }
-                val saldo = try {
-                    cf.getSaldoCase()
-                } catch (e: Exception) {
-                    val fallback = obtenerSaldoActual() ?: 0
-                    Log.e("TiendaViewModel", "Error al obtener el saldo, usando saldo actual: $fallback")
-                    fallback
-                }
-                _uiState.value = TiendaUiState.Success(lista, saldo)
+    suspend fun fetchProductos() {
+        if (cf.email.value.isBlank()) {
+            return
+        }
+        _uiState.value = TiendaUiState.Loading
+        try {
+            val lista = try {
+                cf.getProductosCase()
             } catch (e: Exception) {
-                _uiState.value = TiendaUiState.Error("No se pudo conectar con el servidor")
+                Log.e("TiendaViewModel", "Error al obtener productos, usando lista vacía: ${e.message}")
+                emptyList<Producto>()
             }
+            val saldo = try {
+                cf.getSaldoCase()
+            } catch (e: Exception) {
+                val fallback = obtenerSaldoActual() ?: 0
+                Log.e("TiendaViewModel", "Error al obtener el saldo, usando saldo actual: $fallback")
+                fallback
+            }
+            _uiState.value = TiendaUiState.Success(lista, saldo)
+        } catch (e: Exception) {
+            _uiState.value = TiendaUiState.Error("No se pudo conectar con el servidor")
         }
     }
 
