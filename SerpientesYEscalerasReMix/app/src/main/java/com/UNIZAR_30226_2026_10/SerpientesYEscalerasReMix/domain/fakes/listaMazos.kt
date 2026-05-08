@@ -2,13 +2,13 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.fakes
 
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Calidad
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo_Carta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Mazo
 
 val carta1: Carta = Carta(
     nombre = "Carta 1",
     descripcion = "Descripción de la carta 1",
-    tipo = Tipo.Ofensiva,
+    tipo = Tipo_Carta.Ofensiva,
     calidad = Calidad.Comun,
     id = 1,
     efecto = "Efecto de la carta 1",
@@ -18,7 +18,7 @@ val carta1: Carta = Carta(
 val carta2: Carta = Carta(
     nombre = "Carta 2",
     descripcion = "Descripción de la carta 2",
-    tipo = Tipo.Defensiva,
+    tipo = Tipo_Carta.Defensiva,
     calidad = Calidad.Rara,
     id = 2,
     efecto = "Efecto de la carta 2",
@@ -28,7 +28,7 @@ val carta2: Carta = Carta(
 val carta3: Carta = Carta(
     nombre = "Carta 3",
     descripcion = "Descripción de la carta 3",
-    tipo = Tipo.Entorno,
+    tipo = Tipo_Carta.Entorno,
     calidad = Calidad.Epica,
     id = 3,
     efecto = "Efecto de la carta 3",
@@ -38,7 +38,7 @@ val carta3: Carta = Carta(
 val carta4: Carta = Carta(
     nombre = "Carta 4",
     descripcion = "Descripción de la carta 4",
-    tipo = Tipo.Ofensiva,
+    tipo = Tipo_Carta.Ofensiva,
     calidad = Calidad.Legendaria,
     id = 4,
     efecto = "Efecto de la carta 4",
@@ -48,7 +48,7 @@ val carta4: Carta = Carta(
 val carta5: Carta = Carta(
     nombre = "Carta 5",
     descripcion = "Descripción de la carta 5",
-    tipo = Tipo.Defensiva,
+    tipo = Tipo_Carta.Defensiva,
     calidad = Calidad.Comun,
     id = 5,
     efecto = "Efecto de la carta 5",
