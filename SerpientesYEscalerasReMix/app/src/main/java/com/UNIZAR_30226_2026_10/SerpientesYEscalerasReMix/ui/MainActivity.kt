@@ -19,9 +19,14 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.NavHost
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.AmigosRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.ConexionRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.MazosRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.JugarContinuarRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.JugarCrearRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.LoginRegisterRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PartidaRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MenuTopBar
@@ -38,10 +43,20 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Inicialización de data.remote, Retrofit
+        ApiClient.init(applicationContext)
         val apiService = ApiClient.apiService
+
+        // Inicialización de data.local
+        val localStorage = LocalStorage(applicationContext)
 
         // Inicialización de los casos de uso
         val caseFacade = CaseFacade(
+            pruebaConexionRepository =  ConexionRepositoryImpl(apiService),
+            loginRegisterRepository = LoginRegisterRepositoryImpl(apiService, localStorage),
+            partidaRepository =  PartidaRepositoryImpl(),
+            jugarCrearRepository = JugarCrearRepositoryImpl(apiService),
+            amigosRepository = AmigosRepositoryImpl(apiService),
+            jugarContinuarRepository = JugarContinuarRepositoryImpl(apiService)
             applicationContext, // TODO elminar e instanciarComo Retrofit
 
             ConexionRepositoryImpl(apiService),
@@ -74,7 +89,7 @@ fun MainScreen(cF: CaseFacade) {
     val SEState = rememberSEAppState()
 
     val email = runBlocking {
-        cF.loginRegisterCase.comprobarLogin()
+        cF.comprobarLoginCase.invoke()
     }
 
     // Prueba de Conectividad Logging/Debug
