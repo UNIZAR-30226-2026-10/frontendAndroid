@@ -11,5 +11,9 @@ data class Casilla(
     @SerializedName("siguientes")
     val siguientes: List<Int>,
     @SerializedName("tipo")
-    val tipo: String?
+    val tipo: String?,
+    @SerializedName("rotacion")
+    val rotacion: Int,
+    @SerializedName("esCurva")
+    val esCurva: Boolean
 )

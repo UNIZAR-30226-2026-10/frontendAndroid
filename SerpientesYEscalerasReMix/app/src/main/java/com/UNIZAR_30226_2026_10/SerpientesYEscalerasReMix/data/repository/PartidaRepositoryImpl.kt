@@ -83,20 +83,16 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
         fichaId: Int,
         destinoId: Int,
         pasosRestantes: Int?
-    ): List<Movimiento> {
+    ) {
         val response = api.updatePawn(matchId, username, UpdatePawnRequest(destinoId, fichaId, pasosRestantes))
         if (response.isSuccessful && response.body() != null) {
             val reply = response.body()!!
             updateState(reply, username)
-            // Extraer movimientos permitidos para el usuario actual de la nueva snapshot
+
+            // En caso de que sea un bifurcacion, devolvermos los movimientos posibles
             val localPlayer = reply.snapshotJugadores.jugadores.find { it.username == username }
-            return localPlayer?.movimientosPermitidos?.mapNotNull { 
-                // Asumiendo que movimientosPermitidos viene como un objeto que podemos mapear o similar
-                // Por ahora devolvemos vacío si no tenemos el DTO claro para 'Any'
-                null 
-            } ?: emptyList()
+
         }
-        return emptyList()
     }
 
     override suspend fun jugarCarta(matchId: String, username: String, cartaId: String, target: String?, inicio: Int?, fin: Int?) {
@@ -126,6 +122,8 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
         val snapshotJugadores = reply.snapshotJugadores.jugadores
         val partidaJugadores = reply.partidaJugadores
 
+        val skinMap = mutableMapOf<String, Pair<String, Color>>()
+
         val jugadoresMapeados = snapshotJugadores.mapIndexed { index, jug ->
             val infoExtra = partidaJugadores.find { it.nombre == jug.username }
 
@@ -133,6 +131,12 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
                 _tablero.value.skinEscalera = infoExtra?.escaleraActualField ?: "default"
                 _tablero.value.skinSerpiente = infoExtra?.serpienteActualField ?: "default"
             }
+
+            skinMap[jug.username] = Pair(
+                infoExtra?.iconoActualField ?: "default",
+                playerColors.getOrElse(index) { Color.Gray }
+            )
+
 
             JugadorEstado(
                 username = jug.username,
@@ -159,7 +163,9 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
                     id = f.id,
                     casilla = f.casilla,
                     meta = f.meta,
-                    esUsuario = jug.username == myUsername
+                    esUsuario = jug.username == myUsername,
+                    idImg = skinMap[jug.username]?.first!!,
+                    color = skinMap[jug.username]?.second!!
                 ))
             }
         }
@@ -193,8 +199,8 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
 
     private fun Casilla.toDomain(): CasillaSnapshot {
         return CasillaSnapshot(
-            esCurva = false,
-            rotacion = 0,
+            esCurva = this.esCurva,
+            rotacion = this.rotacion,
             efecto = this.efecto,
             tipo = mapTipoCasilla(this.tipo),
             siguientes = this.siguientes,
@@ -209,6 +215,7 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
             "Serpiente" -> TipoCasilla.Serpiente
             "Bifurcacion" -> TipoCasilla.Bifurcacion
             "Meta" -> TipoCasilla.Meta
+            "Vacía" -> TipoCasilla.Vacio
             else -> TipoCasilla.Normal
         }
     }
@@ -226,7 +233,7 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
             fichaId = this.fichaId.toIntOrNull() ?: 0,
             casillaId = this.casillaDestino.toIntOrNull() ?: 0,
             esBifurcacion = this.esBifurcacion.toBoolean(),
-            pasosRestantes = this.pasosRestantes.toIntOrNull() ?: 0
+            pasosRestantes = this.pasosRestantes?.toIntOrNull() ?: 0
         )
     }
 }

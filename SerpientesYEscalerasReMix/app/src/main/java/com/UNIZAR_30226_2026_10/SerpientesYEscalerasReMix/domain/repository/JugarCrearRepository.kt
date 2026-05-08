@@ -8,6 +8,7 @@ interface JugarCrearRepository {
     val lobbyActual: StateFlow<Lobby>
 
     suspend fun setLobbyId(lobbyId: String)
+    suspend fun clearMatchId()
     suspend fun fetchLobby()
     suspend fun fetchLobbyByPlayer(username: String)
     suspend fun crearLobby(username: String) // Actualiza lobbyId

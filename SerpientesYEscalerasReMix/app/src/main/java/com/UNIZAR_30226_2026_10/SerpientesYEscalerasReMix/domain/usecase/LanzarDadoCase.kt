@@ -17,6 +17,7 @@ class LanzarDadoCase(
 
     suspend operator fun invoke(movimientos: List<Movimiento>, fichaId: Int): List<Movimiento> {
         // Filtrado de casillas por ficha
-        return movimientos.filter { it.fichaId == fichaId }
+        val movimientosFilter = movimientos.filter { it.fichaId == fichaId }
+        return movimientosFilter
     }
 }

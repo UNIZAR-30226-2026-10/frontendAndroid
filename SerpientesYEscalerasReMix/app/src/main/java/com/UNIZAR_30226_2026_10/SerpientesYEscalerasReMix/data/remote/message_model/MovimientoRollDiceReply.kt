@@ -11,5 +11,5 @@ data class MovimientoRollDiceReply(
     @SerializedName("fichaId")
     val fichaId: String,
     @SerializedName("pasosRestantes")
-    val pasosRestantes: String
+    val pasosRestantes: String?
 )

@@ -30,6 +30,11 @@ class JugarCrearRepositoryImpl(private val api: ApiService) : JugarCrearReposito
         _lobbyId.value = lobbyId
     }
 
+    override suspend fun clearMatchId() {
+        _lobbyId.value = ""
+        _lobbyActual.value = Lobby("", "", emptyList(), "", null)
+    }
+
     override suspend fun fetchLobby() {
         if (_lobbyId.value.isEmpty()) return
         try {

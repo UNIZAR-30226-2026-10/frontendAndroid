@@ -24,6 +24,7 @@ class SyncLobbyCase(
 
         if (lobby.value.matchId != null) {
             partidaRepository.setMatchId(lobby.value.matchId!!)
+            repository.clearMatchId()
             onPartidaEmpezada()
         }
     }

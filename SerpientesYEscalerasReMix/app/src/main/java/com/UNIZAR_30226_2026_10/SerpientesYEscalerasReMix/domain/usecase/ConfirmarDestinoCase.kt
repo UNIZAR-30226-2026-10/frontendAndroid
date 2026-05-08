@@ -10,9 +10,9 @@ class ConfirmarDestinoCase(
     private val matchId: StateFlow<String>
 ) {
 
-    suspend operator fun invoke(movimiento: Movimiento): List<Movimiento> {
+    suspend operator fun invoke(movimiento: Movimiento) {
         // Confirmar movimiento
-        return repository.confirmarMovimiento(
+        repository.confirmarMovimiento(
             matchId = matchId.value,
             username = username.value,
             fichaId = movimiento.fichaId,
@@ -22,14 +22,15 @@ class ConfirmarDestinoCase(
         )
     }
 
-    suspend operator fun invoke(movimiento: Movimiento, casillaDir: Int): List<Movimiento> {
+    suspend operator fun invoke(movimiento: Movimiento, casillaDir: Int) {
         // Confirmar movimiento
-        return repository.confirmarMovimiento(
+        repository.confirmarMovimiento(
             matchId = matchId.value,
             username = username.value,
             fichaId = movimiento.fichaId,
-            destinoId = movimiento.fichaId,
-            pasosRestantes = movimiento.pasosRestantes
-        ) // TODO añadir decision mediante casillaDir
+            destinoId = casillaDir,
+            pasosRestantes = if (movimiento.pasosRestantes == 0) null
+                             else movimiento.pasosRestantes
+        )
     }
 }

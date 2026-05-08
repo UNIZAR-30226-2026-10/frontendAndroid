@@ -131,8 +131,7 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
 data class JugarCrearUiState(
     val lobby: Lobby? = null,
     val vistaLider: Boolean = false,
-    val seleccionTablero: String = "",
     val username: String = "",
-    val tableroSeleccionado: String = "",
+    val seleccionTablero: String = "",
     val nombreTableros: List<String> = emptyList()
 )
