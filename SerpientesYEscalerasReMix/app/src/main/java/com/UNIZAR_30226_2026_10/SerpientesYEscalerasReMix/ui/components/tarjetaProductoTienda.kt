@@ -64,9 +64,8 @@ fun TarjetaProductoTienda(
 
                     error = painterResource(R.drawable.ic_launcher_foreground), // Reemplaza con tu recurso de error
                 )*/
-
                 Image(
-                    painter = painterResource(R.drawable.corona),
+                    painter = painterResource(producto.imageResId ?: R.drawable.corona),
                     contentDescription = producto.nombre,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -75,8 +74,11 @@ fun TarjetaProductoTienda(
 
                 Text(
                     text = "${producto.precio} Sep",
-                    style = SETextTypes.SEPStyle, //TODO
-                    modifier = Modifier.padding(8.dp)
+                    style = SETextTypes.SEPStyle,
+                    // Centrar el texto horizontalmente dentro de la columna
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .align(Alignment.CenterHorizontally)
                 )
             }
         }
@@ -91,4 +93,3 @@ fun TarjetaProductoTienda(
     }
 
 }
-

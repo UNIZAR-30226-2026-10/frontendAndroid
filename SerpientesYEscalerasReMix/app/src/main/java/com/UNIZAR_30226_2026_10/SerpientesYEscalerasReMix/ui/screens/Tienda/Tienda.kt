@@ -196,7 +196,7 @@ fun TiendaContent(
             )
 
             Text(
-                text = "Sep $sep", // TODO Reemplazar con el saldo real del usuario
+                text = "Sep $sep",
                 style = SETextTypes.SEPStyle,
                 color = color_SEPText,
                 modifier = Modifier
