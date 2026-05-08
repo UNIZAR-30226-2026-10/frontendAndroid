@@ -3,8 +3,8 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Producto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo_Producto
 
-val listaDePruebas = listOf(
-    Producto("Escaleras nobles", 200,"La escalera de un ilustre señor", Tipo_Producto.valueOf("Escalera"), true),
+/*val listaDePruebas = listOf(
+    Producto("Escaleras nobles",  200,"La escalera de un ilustre señor", Tipo_Producto.valueOf("Escalera"), true),
 
     Producto("Escaleras reales", 500,"La escalera de un rey de bravo corazón", Tipo_Producto.valueOf("Escalera"), false),
     Producto("Escaleras de oro", 1000,"", Tipo_Producto.valueOf("Escalera"), false),
@@ -18,3 +18,4 @@ val listaDePruebas = listOf(
     Producto("Ficha de oro", 700, "Una ficha hecha de oro macizo", Tipo_Producto.valueOf("Ficha"), false),
     Producto("Ficha de diamante", 1500, "Una ficha incrustada con diamantes", Tipo_Producto.valueOf("Ficha"), false)
 )
+*/

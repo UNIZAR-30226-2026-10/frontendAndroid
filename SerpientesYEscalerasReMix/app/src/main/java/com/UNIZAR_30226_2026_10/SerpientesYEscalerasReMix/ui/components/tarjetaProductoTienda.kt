@@ -46,7 +46,7 @@ fun TarjetaProductoTienda(
         ) {
             Column {
                 Text(
-                    text = producto.nombre,
+                    text = producto.nombreAMostrar,
                     style = SETextTypes.plano, //TODO
                     modifier = Modifier
                         .padding(8.dp)
@@ -66,7 +66,7 @@ fun TarjetaProductoTienda(
                 )*/
                 Image(
                     painter = painterResource(producto.imageResId ?: R.drawable.corona),
-                    contentDescription = producto.nombre,
+                    contentDescription = producto.nombreAMostrar,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp)

@@ -76,9 +76,11 @@ fun DetalleProductoTienda(
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
-                            painter = painterResource(R.drawable.corona), //TODO
-                            contentDescription = producto.nombre,
-                            modifier = Modifier.size(100.dp)
+                            painter = painterResource(producto.imageResId ?: R.drawable.corona),
+                            contentDescription = producto.nombreAMostrar,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(150.dp)
                         )
                     }
                 }
@@ -92,9 +94,12 @@ fun DetalleProductoTienda(
                     verticalArrangement = Arrangement.Top
                 ) {
                     Text(
-                        text = producto.nombre,
-                        style = SETextTypes.titulo, //TODO
+                        text = producto.nombreAMostrar,
+                        style = SETextTypes.nombreObjetoTienda, //TODO
                         color = color_sf,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        // Si el titulo es muy largo salta a la siguiente linea, pero no queremos que ocupe mas de 2 lineas,
                         modifier = Modifier.padding(end = 24.dp)
                     )
 

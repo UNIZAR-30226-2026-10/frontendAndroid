@@ -22,7 +22,7 @@ class TiendaRepositoryImpl(
     // Necesita como param un JSON con el atributo cosmetic_name
     override suspend fun comprarProducto(email: String, producto: Producto): Boolean {
         // Llamada a la API para comprar el producto
-        val response = apiService.comprarProducto(email, ComprarProductoRequest(producto.nombre))
+        val response = apiService.comprarProducto(email, ComprarProductoRequest(producto.nombreId))
         // Devolver true si la compra fue exitosa, false en caso contrario
         if (response.isSuccessful) {
             // TODO MIRAR DE CAMBIAR EN PANTALLA LA CURRENCY

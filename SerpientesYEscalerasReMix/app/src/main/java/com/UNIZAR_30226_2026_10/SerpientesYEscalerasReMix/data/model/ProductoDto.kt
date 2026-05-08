@@ -20,8 +20,15 @@ fun ProductoDto.toDomain(): Producto {
         .replace("-", "_")
     val imageResId = PRODUCTO_IMAGE_MAP[normalizedName]
 
+    // Pasar de serpiente_calcetin a "Serpiente Calcetin"
+    val nombreAMostrar = (this.nombre ?: "")
+        .split("_", " ")
+        .joinToString(" ") { it.replaceFirstChar { char -> char.uppercase() } }
+
+
     return Producto(
-        nombre = this.nombre ?: "",
+        nombreId = this.nombre ?: "",
+        nombreAMostrar = nombreAMostrar,
         precio = this.precio ?: 0,
         descripcion = this.descripcion ?: "",
         // Convertir el tipo de String a Tipo enum, manejando casos desconocidos
