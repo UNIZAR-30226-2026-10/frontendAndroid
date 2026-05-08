@@ -34,6 +34,10 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
     private val _uiState = MutableStateFlow(PartidaUiState())
     val uiState = _uiState.asStateFlow()
 
+    public fun cleanUiState() {
+        _uiState.update { PartidaUiState() }
+    }
+
     init {
         // Conexión de Flows del Repository a UI State
         viewModelScope.launch {
@@ -71,7 +75,7 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                             false
                         }
 
-                        estadoActual.copy(esMiTurno = esRealmenteMiTurno)
+                        estadoActual.copy(esMiTurno = esRealmenteMiTurno, bloquearDado = !esRealmenteMiTurno)
                     }
                 } catch (e: Exception) {
                     // Evita que el polling se rompa por un error de red

@@ -84,14 +84,10 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
         destinoId: Int,
         pasosRestantes: Int?
     ) {
-        val response = api.updatePawn(matchId, username, UpdatePawnRequest(destinoId, fichaId, pasosRestantes))
+        val response = api.updatePawn(matchId, username, UpdatePawnRequest(destinoId - 1, fichaId, pasosRestantes))
         if (response.isSuccessful && response.body() != null) {
             val reply = response.body()!!
             updateState(reply, username)
-
-            // En caso de que sea un bifurcacion, devolvermos los movimientos posibles
-            val localPlayer = reply.snapshotJugadores.jugadores.find { it.username == username }
-
         }
     }
 
@@ -231,7 +227,7 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
     private fun MovimientoRollDiceReply.toDomain(): Movimiento {
         return Movimiento(
             fichaId = this.fichaId.toIntOrNull() ?: 0,
-            casillaId = this.casillaDestino.toIntOrNull() ?: 0,
+            casillaId = (this.casillaDestino.toIntOrNull() ?: 0) + 1,
             esBifurcacion = this.esBifurcacion.toBoolean(),
             pasosRestantes = this.pasosRestantes?.toIntOrNull() ?: 0
         )

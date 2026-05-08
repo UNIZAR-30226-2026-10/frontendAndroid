@@ -29,6 +29,7 @@ fun EmpezarPartidaBoton(
     estaListo: Boolean,
     todosListos: Boolean,
     mazoSeleccionado: Boolean,
+    conCompanieros: Boolean,
     onEmpezar: () -> Unit,
     onCambiarListo: (Boolean) -> Unit
 ) {
@@ -58,7 +59,10 @@ fun EmpezarPartidaBoton(
         shape = RoundedCornerShape(10.dp),
         shadowElevation = 8.dp,
         onClick = {
-            if (!mazoSeleccionado) {
+            if (!conCompanieros) {
+                errorMessage = "No puedes empezar una partida sin compañeros."
+                showErrorDialog = true
+            } else if (!mazoSeleccionado) {
                 errorMessage = "Debes seleccionar un mazo antes de continuar."
                 showErrorDialog = true
             } else if (esLider) {

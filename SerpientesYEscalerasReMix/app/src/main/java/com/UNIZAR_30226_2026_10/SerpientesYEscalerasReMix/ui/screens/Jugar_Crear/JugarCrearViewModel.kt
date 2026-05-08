@@ -31,6 +31,10 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
     private val _seleccionMazo = MutableStateFlow("")
     val seleccionMazo = _seleccionMazo.asStateFlow()
 
+    private val _conCompaneros = MutableStateFlow(false)
+    val conCompaneros = _conCompaneros.asStateFlow()
+
+
     init {
         // Conexión de Flows del Repository a UI State
         viewModelScope.launch {
@@ -57,7 +61,11 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
 
         pollingJob = viewModelScope.launch {
             while (isActive) {
-                cF.syncLobbyCase(onPartidaIniciada)
+                cF.syncLobbyCase {
+                    onPartidaIniciada()
+                    _uiState.update { JugarCrearUiState() }
+                }
+                _conCompaneros.value = (_uiState.value.lobby?.players?.filterNotNull()?.size ?: 0) > 1
                 if (_uiState.value.lobby != null) {
                     _uiState.update { it.copy(vistaLider = _uiState.value.lobby!!.hostUsername == _uiState.value.username) }
                 }
@@ -107,6 +115,7 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
     fun onAbandonar() {
         viewModelScope.launch {
             cF.abandonarExpulsarCase(cF.username.value)
+            _uiState.update { JugarCrearUiState() }
         }
     }
 
@@ -120,11 +129,22 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
     }
 
     fun onEmpezarPartida(onSucces: () -> Unit) {
+        val playersCount = _uiState.value.lobby?.players?.filterNotNull()?.size ?: 0
+        if (playersCount <= 1) {
+            _uiState.update { it.copy(mensajeError = "No se puede iniciar una partida solo, porfavor añada a alguien") }
+            return
+        }
+
         viewModelScope.launch {
             val lobbyId = _uiState.value.lobby?.id ?: ""
             cF.cambiarPreparadoCase(true)
             cF.empezarPartidaCase(lobbyId, onSucces)
+            _uiState.update { JugarCrearUiState() }
         }
+    }
+
+    fun dismissedError() {
+        _uiState.update { it.copy(mensajeError = null) }
     }
 }
 
@@ -133,5 +153,6 @@ data class JugarCrearUiState(
     val vistaLider: Boolean = false,
     val username: String = "",
     val seleccionTablero: String = "",
-    val nombreTableros: List<String> = emptyList()
+    val nombreTableros: List<String> = emptyList(),
+    val mensajeError: String? = null
 )

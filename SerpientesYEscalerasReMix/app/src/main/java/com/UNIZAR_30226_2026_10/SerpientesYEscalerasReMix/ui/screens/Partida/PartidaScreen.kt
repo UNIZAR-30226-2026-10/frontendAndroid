@@ -86,7 +86,7 @@ fun PartidaScreen(
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.Start
                 ) {
-                    SalirPartidaBoton(SEState = navController)
+                    SalirPartidaBoton(navController = navController, onClose = { viewModel.cleanUiState() })
 
 
                     Box(modifier = Modifier.width(200.dp)) {

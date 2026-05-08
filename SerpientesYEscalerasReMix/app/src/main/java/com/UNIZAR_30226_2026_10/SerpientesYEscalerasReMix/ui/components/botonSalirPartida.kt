@@ -27,13 +27,17 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 
 
 @Composable
-fun SalirPartidaBoton(SEState: SENavHostController) {
+fun SalirPartidaBoton(navController: SENavHostController, onClose: () -> Unit) {
 
     Surface(
         color = color_secondary,
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(2.dp, color_primary),
-        onClick = { SEState.goTo(Destinos.JUGAR_CREAR) },
+        onClick =
+            {
+                navController.goTo(Destinos.JUGAR_CREAR)
+                onClose()
+            },
         modifier = Modifier
             .width(110.dp)
             .height(40.dp)

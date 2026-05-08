@@ -53,15 +53,17 @@ fun JugarCrearScreen(navController: SENavHostController, viewModel: JugarCrearVi
 
     val uiState by viewModel.uiState.collectAsState()
 
+
     JugarCrearContent(
         uiState = uiState,
         seleccionMazo = viewModel.seleccionMazo,
+        conCompanieros = viewModel.conCompaneros,
         navController = navController,
         onAnadirBot = { viewModel.onAnadirBot() },
         onExpulsar = { idx -> viewModel.onExpulsar(idx) },
         onAbandonar = { viewModel.onAbandonar() },
         onCambiarListo = { listo -> viewModel.onCambiarListo(listo) },
-        onEmpezarPartida = { viewModel.onEmpezarPartida( { navController.goTo(Destinos.PARTIDA) } ) },
+        onEmpezarPartida = { viewModel.onEmpezarPartida { navController.goTo(Destinos.PARTIDA) } },
         onElegirTablero = { tablero -> viewModel.onSeleccionarTablero(tablero) },
         onElegirMazo = { mazo -> viewModel.onSeleccionarMazo(mazo) },
         tableroSeleccionado = uiState.seleccionTablero
@@ -72,6 +74,7 @@ fun JugarCrearScreen(navController: SENavHostController, viewModel: JugarCrearVi
 fun JugarCrearContent(
     uiState: JugarCrearUiState,
     seleccionMazo: Flow<String>,
+    conCompanieros: Flow<Boolean>,
     navController: SENavHostController,
     onAnadirBot: () -> Unit,
     onExpulsar: (Int) -> Unit,
@@ -107,6 +110,7 @@ fun JugarCrearContent(
             LobbyElementos(
                 uiState = uiState,
                 seleccionMazo = seleccionMazo,
+                conCompanieros = conCompanieros,
                 navController = navController,
                 onAnadirBot = onAnadirBot,
                 onExpulsar = onExpulsar,
@@ -125,6 +129,7 @@ fun JugarCrearContent(
 fun LobbyElementos(
     uiState: JugarCrearUiState,
     seleccionMazo: Flow<String>,
+    conCompanieros: Flow<Boolean>,
     navController: SENavHostController,
     onAnadirBot: () -> Unit,
     onExpulsar: (Int) -> Unit,
@@ -197,6 +202,7 @@ fun LobbyElementos(
                     estaListo = estaListo,
                     todosListos = todosListos,
                     mazoSeleccionado = mazoActual.isNotEmpty(),
+                    conCompanieros = conCompanieros.collectAsState(initial = false).value,
                     onEmpezar = onEmpezarPartida,
                     onCambiarListo = { nuevoEstado -> onCambiarListo(!nuevoEstado) }
                 )
@@ -254,6 +260,7 @@ fun JugarCrearScreenPreview() {
     JugarCrearContent(
         uiState = mockUiState,
         seleccionMazo = flowOf("Fuego"),
+        conCompanieros = flowOf(true),
         navController = rememberSEAppState(),
         onAnadirBot = {},
         onExpulsar = {},
