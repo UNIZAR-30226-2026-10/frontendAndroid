@@ -5,20 +5,25 @@ import android.util.Log
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AceptarInvitacionRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AnadirBotRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AuthReply
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ChatRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.CrearLobbyRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.GetAmigosReply
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.GetChatReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.GetInvitacionesReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.GetPartidasReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.IniciarPartidaRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.JugarCartaRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LeaveOrExpelRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LobbyReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LoginRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PartidaReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PostInvitacionRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.RegisterRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.RollDiceReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SeleccionMazoRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SetBoardRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SetReadyRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.UpdatePawnRequest
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
@@ -125,6 +130,24 @@ interface ApiService {
     // FUNCIONES PARTIDA
     @POST("matches")
     suspend fun startMatch(@Body body: IniciarPartidaRequest): Response<PartidaReply>
+
+    @POST("matches/{matchId}/chat/{username}")
+    suspend fun sendChatMessage(@Path("matchId") matchId: String, @Path("username") username: String, @Body request: ChatRequest): Response<GetChatReply>
+
+    @GET("matches/{matchId}/chat/{username}")
+    suspend fun getChat(@Path("matchId") matchId: String, @Path("username") username: String): Response<GetChatReply>
+
+    @GET("matches/{matchId}/{username}")
+    suspend fun getMatchStatus(@Path("matchId") matchId: String, @Path("username") username: String): Response<PartidaReply>
+
+    @POST("matches/{matchId}/cards/{username}")
+    suspend fun playCard(@Path("matchId") matchId: String, @Path("username") username: String, @Body request: JugarCartaRequest): Response<PartidaReply>
+
+    @POST("matches/{matchId}/dice/{username}")
+    suspend fun rollDice(@Path("matchId") matchId: String, @Path("username") username: String): Response<RollDiceReply>
+
+    @POST("matches/{matchId}/pawn/{username}")
+    suspend fun updatePawn(@Path("matchId") matchId: String, @Path("username") username: String, @Body request: UpdatePawnRequest): Response<PartidaReply>
 
 }
 

@@ -21,7 +21,7 @@ data class PartidaReply(
     @SerializedName("partidaJugadores")
     val partidaJugadores: List<PartidaJugadore>,
     @SerializedName("chat")
-    val chat: List<Chat>,
+    val chat: List<ChatMsg>,
     @SerializedName("snapshotTablero")
     val snapshotTablero: SnapshotTablero,
     @SerializedName("snapshotJugadores")
