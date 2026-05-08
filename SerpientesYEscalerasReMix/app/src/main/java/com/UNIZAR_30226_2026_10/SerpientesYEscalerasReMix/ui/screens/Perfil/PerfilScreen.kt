@@ -41,7 +41,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
@@ -54,24 +53,6 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_secondary
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
-
-@Preview(showBackground = true, widthDp = 800, heightDp = 400, device = "spec:width=800dp,height=400dp,orientation=landscape")
-@Composable
-fun PerfilPreview() {
-    PerfilContent(
-        nombre = "Usuario Pro 2026",
-        stats = "15W / 5L",
-        skinsEscalera = listOf("Básica", "Neon"),
-        skinsSerpiente = listOf("Básica", "Cobra"),
-        skinsFicha = listOf("Dorada"),
-        skinEscaleraActual = "Neon",
-        skinSerpienteActual = "Básica",
-        skinFichaActual = "Dorada",
-        onNombreConfirmado = {},
-        onCosmeticoSeleccionado = { _, _ -> },
-        onCerrarSesion = {}
-    )
-}
 
 @Composable
 fun PerfilScreen(navHost: SENavHostController, viewModel: PerfilViewModel) {

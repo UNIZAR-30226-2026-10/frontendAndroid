@@ -12,6 +12,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_mo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LeaveOrExpelRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LobbyReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LoginRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PerfilUsuarioResponse
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PostInvitacionRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.RegisterRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SeleccionMazoRequest
@@ -119,6 +120,17 @@ interface ApiService {
 
     @GET("users/{email}/matches")
     suspend fun getMatches(@Path("email") email: String): Response<GetPartidasReply>
+
+    // FUNCIONES PERFIL
+
+    @GET("users/{email}")
+    suspend fun getUserProfile(@Path("email") email: String): Response<PerfilUsuarioResponse>
+
+    @PUT("users/{email}/username")
+    suspend fun updateUsername(@Path("email") email: String, @Body body: Map<String, String>): Response<ResponseBody>
+
+    @PUT("users/{email}/cosmetics")
+    suspend fun updateCosmetic(@Path("email") email: String, @Body body: Map<String, String>): Response<ResponseBody>
 
 }
 
