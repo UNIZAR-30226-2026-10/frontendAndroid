@@ -99,7 +99,7 @@ fun DetalleProductoTienda(
                         color = color_sf,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        // Si el titulo es muy largo salta a la siguiente linea, pero no queremos que ocupe mas de 2 lineas,
+                        // Si el titulo es muy largo salta a la siguiente linea, pero no queremos que ocupe mas de 1 linea
                         modifier = Modifier.padding(end = 24.dp)
                     )
 

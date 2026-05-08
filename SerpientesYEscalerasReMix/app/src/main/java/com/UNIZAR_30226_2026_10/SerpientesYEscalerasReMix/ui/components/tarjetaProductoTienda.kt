@@ -23,6 +23,8 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Producto
 
@@ -36,6 +38,13 @@ fun TarjetaProductoTienda(
         modifier = modifier
             .width(160.dp)
             .clickable { onClick() }
+            .semantics {
+                if (producto.enPosesion) {
+                    contentDescription = "${producto.nombreAMostrar}. Comprado"
+                } else {
+                    contentDescription = producto.nombreAMostrar
+                }
+            }
     ) {
         Card(
             modifier = Modifier
@@ -87,8 +96,15 @@ fun TarjetaProductoTienda(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0x99000000))
-            )
+                    .background(Color(0x99000000)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "EN POSESIÓN",
+                    style = SETextTypes.avisoObjetoEnPosesion,
+                    color = Color.Red
+                )
+            }
         }
     }
 

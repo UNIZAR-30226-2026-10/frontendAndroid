@@ -5,8 +5,8 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Producto
 import kotlinx.coroutines.flow.StateFlow
 
 class ComprarProductoCase(
-    private final val tiendaRepository: TiendaRepository,
-    private final val email: StateFlow<String>
+    private val tiendaRepository: TiendaRepository,
+    private val email: StateFlow<String>
 ) {
     suspend operator fun invoke(producto: Producto): Boolean {
         //TODO añadir reglas de negocio antes de comprar el producto

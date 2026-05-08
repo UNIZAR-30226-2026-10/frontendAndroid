@@ -159,7 +159,7 @@ fun TiendaContent(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "Cosmetico ya en posesion",
+                        text = "Cosmetico ya en posesión",
                         style = SETextTypes.plano,
                         color = color_text
                     )

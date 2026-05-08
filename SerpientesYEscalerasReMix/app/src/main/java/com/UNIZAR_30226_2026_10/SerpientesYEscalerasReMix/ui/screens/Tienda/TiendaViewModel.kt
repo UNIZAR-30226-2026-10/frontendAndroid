@@ -39,13 +39,6 @@ class TiendaViewModel (private val cf: CaseFacade) : ViewModel() {
         }
     }
 
-    private fun actualizarEstadoConSaldo(nuevoSaldo: Int) {
-        val estadoActual = _uiState.value
-        if (estadoActual is TiendaUiState.Success) {
-            _uiState.value = estadoActual.copy(saldo = nuevoSaldo)
-        }
-    }
-
     fun fetchProductos() {
         viewModelScope.launch {
             if (cf.email.value.isBlank()) {
@@ -62,8 +55,9 @@ class TiendaViewModel (private val cf: CaseFacade) : ViewModel() {
                 val saldo = try {
                     cf.getSaldoCase()
                 } catch (e: Exception) {
-                    obtenerSaldoActual() ?: 0
-                    Log.e("TiendaViewModel", "Error al obtener el saldo, usando saldo actual: ${obtenerSaldoActual()}")
+                    val fallback = obtenerSaldoActual() ?: 0
+                    Log.e("TiendaViewModel", "Error al obtener el saldo, usando saldo actual: $fallback")
+                    fallback
                 }
                 _uiState.value = TiendaUiState.Success(lista, saldo)
             } catch (e: Exception) {
@@ -76,7 +70,7 @@ class TiendaViewModel (private val cf: CaseFacade) : ViewModel() {
         viewModelScope.launch {
             try{
                 if (cf.email.value.isBlank()) {
-                    _uiState.value = TiendaUiState.Error("Usuario no logeado")
+                    _uiState.value = TiendaUiState.Error("Usuario no ha iniciado sesión")
                     return@launch
                 }
                 val exito = cf.comprarProductoCase(producto)

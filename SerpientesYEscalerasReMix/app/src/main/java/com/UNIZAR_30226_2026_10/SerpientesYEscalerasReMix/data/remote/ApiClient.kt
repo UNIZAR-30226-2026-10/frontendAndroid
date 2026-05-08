@@ -128,7 +128,7 @@ interface ApiService {
     @GET("cosmetics/store/{email}") //FIXME
     suspend fun getProductos(
         @Path("email") email: String
-    ): List<ProductoDto>
+    ): Response<List<ProductoDto>>
 
     @POST("cosmetics/store/{email}") //FIXME
     suspend fun comprarProducto(
@@ -139,7 +139,7 @@ interface ApiService {
     @GET("users/{email}/SEP")
     suspend fun getSaldo(
         @Path("email") email: String
-    ): SaldoDto
+    ): Response<SaldoDto>
 
 }
 

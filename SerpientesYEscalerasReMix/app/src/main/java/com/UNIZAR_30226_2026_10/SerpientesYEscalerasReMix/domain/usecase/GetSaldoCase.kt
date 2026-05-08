@@ -4,8 +4,8 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.Tien
 import kotlinx.coroutines.flow.StateFlow
 
 class GetSaldoCase(
-    private  final val tiendaRepository: TiendaRepository,
-    private final val email: StateFlow<String>
+    private val tiendaRepository: TiendaRepository,
+    private val email: StateFlow<String>
 ) {
     suspend operator fun invoke(): Int {
         return tiendaRepository.getSaldo(email.value)
