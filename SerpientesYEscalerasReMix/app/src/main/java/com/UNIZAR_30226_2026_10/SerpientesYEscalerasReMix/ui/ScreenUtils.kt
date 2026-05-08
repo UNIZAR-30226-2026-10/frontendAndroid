@@ -35,9 +35,15 @@ fun prepararOrientacion(SEState: SENavHostController, Orientation: Int) {
 // Busca Icono de jugador en R
 fun buscarIconoJugadorR(icono: String): Int {
     val iconoR = when (icono) {
-        "default" -> R.drawable.icono_default
+        "icono_default" -> R.drawable.icono_jugador_default
+        "icono_nerd" -> R.drawable.icono_jugador_nerd
+        "icono_completista" -> R.drawable.icono_jugador_completista
+        "icono_platino" -> R.drawable.icono_jugador_platino
+        "icono_L" -> R.drawable.icono_jugador_l
+        "icono_W" -> R.drawable.icono_jugador_w
+        "icono_cofre" -> R.drawable.icono_jugador_cofre
         "bot" -> R.drawable.icono_bots
-        else -> R.drawable.icono_default
+        else -> R.drawable.icono_jugador_default
     }
 
     return iconoR
@@ -67,13 +73,6 @@ fun buscarIconoCartaR(icono: String): Int {
         "Noqueo" -> R.drawable.carta_noqueo
         "Exceso de medios" -> R.drawable.carta_exceso_de_medios
         else -> R.drawable.carta_moises
-    }
-}
-
-// Busca Miniatura de tablero en R
-fun buscarMiniaturaTableroR(tablero: String): Int {
-    return when (tablero) {
-        else -> R.drawable.tablero_debug
     }
 }
 
@@ -109,7 +108,56 @@ fun buscarIconoFichaR(ficha: String, color: Color): Int {
         else if (color == Color.Blue) R.drawable.jugador_azul_explorador
         else if (color == Color.Green) R.drawable.jugador_verde_explorador
         else R.drawable.jugador_amarillo_explorador
-
-
     }
 }
+
+// Busca Cabeza de serpiente en R
+fun buscarCabezaSerpienteR(serpiente: String): Int {
+    return when (serpiente) {
+        "serpiente_calcetin" -> R.drawable.serpiente_calcetin_cabeza
+        "serpiente_tribal" -> R.drawable.serpiente_tribal_cabeza
+        "serpiente_futuro" -> R.drawable.serpiente_futuro_cabeza
+        else -> R.drawable.serpiente_base_cabeza
+    }
+}
+
+// Busca Cuerpo de serpiente en R
+fun buscarCuerpoSerpienteR(serpiente: String): Int {
+    return when (serpiente) {
+        "serpiente_calcetin" -> R.drawable.serpiente_calcetin_cuerpo
+        "serpiente_tribal" -> R.drawable.serpiente_tribal_cuerpo
+        "serpiente_futuro" -> R.drawable.serpiente_futuro_cuerpo
+        else -> R.drawable.serpiente_base_cuerpo
+    }
+}
+
+// Busca Cola de serpiente en R
+fun buscarColaSerpienteR(serpiente: String): Int {
+    return when (serpiente) {
+        "serpiente_calcetin" -> R.drawable.serpiente_calcetin_cola
+        "serpiente_tribal" -> R.drawable.serpiente_tribal_cola
+        "serpiente_futuro" -> R.drawable.serpiente_futuro_cola
+        else -> R.drawable.serpiente_base_cola
+    }
+}
+
+// Busca Escalera en R
+fun buscarEscaleraR(escalera: String): Int {
+    return when (escalera) {
+        "escalera_estratega" -> R.drawable.escalera_estratega
+        "escalera_magnate" -> R.drawable.escalera_magnate
+        "escalera_jungla" -> R.drawable.escalera_jungla
+        else -> R.drawable.escalera
+    }
+}
+
+// Busca la miniatura del tablero
+fun buscarMiniaturaTableroR(tablero: String): Int {
+    return when (tablero) {
+        "Basico" -> R.drawable.miniatura_mapa_basico
+        "Jungla Loca" -> R.drawable.miniatura_mapa_jungla_loca
+        "La apuesta final" -> R.drawable.miniatura_mapa_la_apuesta_final
+        else -> R.drawable.miniatura_mapa_basico
+    }
+}
+

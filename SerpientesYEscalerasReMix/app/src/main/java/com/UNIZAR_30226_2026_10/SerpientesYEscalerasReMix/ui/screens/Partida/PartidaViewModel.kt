@@ -35,7 +35,9 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
     public fun cleanUiState() {
-        _uiState.update { PartidaUiState() }
+        viewModelScope.launch {
+            cF.cleanPartidaCase()
+        }
     }
 
     init {
@@ -47,6 +49,7 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
             launch { cF.jugadores.collect { data -> _uiState.update { it.copy( jugadores = data) } } }
             launch { cF.mano.collect { data -> _uiState.update { it.copy(mano = data.toMutableList()) } } }
             launch { cF.chat.collect { data -> _uiState.update { it.copy(chat = data) } } }
+            launch { cF.ganador.collect { data -> _uiState.update { it.copy(ganador = data, mostrarDialogoVictoria = data != "") } } }
         }
     }
 
@@ -118,7 +121,9 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                     it.copy(
                         mostrarDialogoPuntuacion = true,
                         bloquearDado = true,
-                        puntuacionDado = puntuacionDado
+                        puntuacionDado = puntuacionDado,
+
+                        puedeSalir = false
                     )
                 }
 
@@ -194,7 +199,9 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
                         casillasAElegir = emptyList(),
 
-                        bloquearDado = false
+                        bloquearDado = false,
+
+                        puedeSalir = true
                     )
                 }
 
@@ -218,7 +225,8 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
                     casillasAElegir = emptyList(),
 
-                    bloquearDado = false
+                    bloquearDado = false,
+                    puedeSalir = true
                 )
             }
 
@@ -252,7 +260,8 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
                     casillasAElegir = emptyList(),
 
-                    bloquearDado = false
+                    bloquearDado = false,
+                    puedeSalir = true
                 )
             }
 
@@ -278,7 +287,8 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
                     casillasAElegir = emptyList(),
 
-                    bloquearDado = false
+                    bloquearDado = false,
+                    puedeSalir = true
                 )
             }
 
@@ -450,6 +460,7 @@ data class PartidaUiState(
     val esMiTurno: Boolean = false,
     val yaJugadoCarta: Boolean = false,
     val chat: List<MsgChat> = emptyList(),
+    val puedeSalir: Boolean = true,
 
     // Fases de la partida
     val seleccionFichas: Boolean = false,
@@ -477,6 +488,9 @@ data class PartidaUiState(
 
     val mostrarDialogoIndicacion: Boolean = false,
     val indicacion: String = "",
+
+    val mostrarDialogoVictoria: Boolean = false,
+    val ganador: String = "",
 
     // Control de cartas
     val cartaJugada: Carta? = null,

@@ -16,6 +16,8 @@ interface PartidaRepository {
     val jugadores: StateFlow<JugadoresSnapshot>
     val mano: StateFlow<List<Carta?>>
     val chat: StateFlow<List<MsgChat>>
+    val ganador: StateFlow<String>
+
 
     // Modificar Flujos desde el exterior
     suspend fun setMatchId(matchId: String)

@@ -101,9 +101,11 @@ class CaseFacade(
     val jugadores = partidaRepository.jugadores
     val mano = partidaRepository.mano
     val chat = partidaRepository.chat
+    val ganador = partidaRepository.ganador
 
     // Casos de uso de Partida
     val syncPartidaCase = SyncPartidaCase(partidaRepository, username, matchId)
+    val cleanPartidaCase = CleanPartidaCase(partidaRepository)
     val lanzarDadoCase = LanzarDadoCase(partidaRepository, username, matchId)
     val confirmarDestinoCase = ConfirmarDestinoCase(partidaRepository, username, matchId)
     val chatCase = ChatCase(partidaRepository, matchId, username)

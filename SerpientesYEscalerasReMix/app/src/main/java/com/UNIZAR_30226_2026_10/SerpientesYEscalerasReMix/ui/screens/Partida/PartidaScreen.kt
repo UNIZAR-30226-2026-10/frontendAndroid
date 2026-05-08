@@ -29,10 +29,12 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoC
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoEscalera
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoIndicacionPartida
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoPuntuacionDado
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoVictoria
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ListaJugadores
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MazoVisual
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.SalirPartidaBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.Tablero
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 
@@ -86,7 +88,7 @@ fun PartidaScreen(
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.Start
                 ) {
-                    SalirPartidaBoton(navController = navController, onClose = { viewModel.cleanUiState() })
+                    SalirPartidaBoton(navController = navController, puedeCerrar = uiState.puedeSalir, onClose = { viewModel.cleanUiState() })
 
 
                     Box(modifier = Modifier.width(200.dp)) {
@@ -212,6 +214,16 @@ fun PartidaScreen(
                     modifier = Modifier
                         .offset(y = (-175).dp)
                         .wrapContentSize()
+                )
+            }
+
+            if (uiState.mostrarDialogoVictoria) {
+                DialogoVictoria(
+                    ganador = uiState.ganador,
+                    onSalir = {
+                        viewModel.cleanUiState()
+                        navController.goTo(Destinos.JUGAR_CREAR)
+                    }
                 )
             }
         }

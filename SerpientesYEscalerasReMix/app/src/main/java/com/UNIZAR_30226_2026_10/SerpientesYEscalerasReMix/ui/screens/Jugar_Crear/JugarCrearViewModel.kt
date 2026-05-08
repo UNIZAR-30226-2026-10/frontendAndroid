@@ -115,7 +115,6 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
     fun onAbandonar() {
         viewModelScope.launch {
             cF.abandonarExpulsarCase(cF.username.value)
-            _uiState.update { JugarCrearUiState() }
         }
     }
 
@@ -139,12 +138,7 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
             val lobbyId = _uiState.value.lobby?.id ?: ""
             cF.cambiarPreparadoCase(true)
             cF.empezarPartidaCase(lobbyId, onSucces)
-            _uiState.update { JugarCrearUiState() }
         }
-    }
-
-    fun dismissedError() {
-        _uiState.update { it.copy(mensajeError = null) }
     }
 }
 

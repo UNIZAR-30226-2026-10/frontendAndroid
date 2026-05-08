@@ -261,7 +261,7 @@ fun AvatarUsuario() {
             border = BorderStroke(2.dp, Color.Black)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.icono_default),
+                painter = painterResource(id = R.drawable.icono_jugador_default),
                 contentDescription = null,
                 modifier = Modifier.padding(4.dp)
             )

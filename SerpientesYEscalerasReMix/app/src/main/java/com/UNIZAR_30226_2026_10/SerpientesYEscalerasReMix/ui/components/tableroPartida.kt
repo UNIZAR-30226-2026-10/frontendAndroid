@@ -43,6 +43,10 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.FichaSnap
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Movimiento
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TableroSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TipoCasilla
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarCabezaSerpienteR
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarColaSerpienteR
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarCuerpoSerpienteR
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarEscaleraR
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarIconoEfectoR
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarIconoFichaR
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
@@ -199,10 +203,18 @@ fun Tablero(
 
 @Composable
 fun ColocarSerpientesEscaleras(tableroState: TableroSnapshot, casillaPx: Float) {
-    val bmpSerpienteCabeza = ImageBitmap.imageResource(id = R.drawable.serpiente_base_cabeza)
-    val bmpSerpienteCuerpo = ImageBitmap.imageResource(id = R.drawable.serpiente_base_cuerpo)
-    val bmpSerpienteCola = ImageBitmap.imageResource(id = R.drawable.serpiente_base_cola)
-    val bmpEscalera = ImageBitmap.imageResource(id = R.drawable.escalera)
+    val skinEscalera = tableroState.skinEscalera
+    val skinSerpiente = tableroState.skinSerpiente
+
+    val idREscalera = buscarEscaleraR(skinEscalera)
+    val idRSerpienteCabeza = buscarCabezaSerpienteR(skinSerpiente)
+    val idRSerpienteCuerpo = buscarCuerpoSerpienteR(skinSerpiente)
+    val idRSerpienteCola = buscarColaSerpienteR(skinSerpiente)
+
+    val bmpSerpienteCabeza = ImageBitmap.imageResource(id = idRSerpienteCabeza)
+    val bmpSerpienteCuerpo = ImageBitmap.imageResource(id = idRSerpienteCuerpo)
+    val bmpSerpienteCola = ImageBitmap.imageResource(id = idRSerpienteCola)
+    val bmpEscalera = ImageBitmap.imageResource(id = idREscalera)
 
     Canvas(
         modifier = Modifier

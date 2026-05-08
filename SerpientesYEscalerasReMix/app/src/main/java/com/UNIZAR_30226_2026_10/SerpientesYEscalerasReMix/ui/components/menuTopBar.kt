@@ -39,7 +39,7 @@ fun MenuTopBar(SEState: SENavHostController) {
             modifier = Modifier.fillMaxWidth()
         ) {
             TabItem(
-                R.drawable.jugar_icon,
+                R.drawable.icono_menu_jugar,
                 "Jugar",
                 tabSeleccionado == Destinos.JUGAR_CREAR || tabSeleccionado == Destinos.JUGAR_CONTINUAR || tabSeleccionado == Destinos.JUGAR_AMIGOS,
                 { SEState.goTo(Destinos.JUGAR_CREAR) },
@@ -47,7 +47,7 @@ fun MenuTopBar(SEState: SENavHostController) {
             )
 
             TabItem(
-                R.drawable.jugar_icon,
+                R.drawable.icono_menu_mazos,
                 "Mazos",
                 tabSeleccionado == Destinos.MAZOS,
                 { SEState.goTo(Destinos.MAZOS) },
@@ -55,7 +55,7 @@ fun MenuTopBar(SEState: SENavHostController) {
             )
 
             TabItem(
-                R.drawable.jugar_icon,
+                R.drawable.icono_menu_logros,
                 "Logros",
                 tabSeleccionado == Destinos.LOGROS,
                 { SEState.goTo(Destinos.LOGROS) },
@@ -63,7 +63,7 @@ fun MenuTopBar(SEState: SENavHostController) {
             )
 
             TabItem(
-                R.drawable.jugar_icon,
+                R.drawable.icono_menu_tienda,
                 "Tienda",
                 tabSeleccionado == Destinos.TIENDA,
                 { SEState.goTo(Destinos.TIENDA) },
@@ -71,7 +71,7 @@ fun MenuTopBar(SEState: SENavHostController) {
             )
 
             TabItem(
-                R.drawable.jugar_icon,
+                R.drawable.icono_menu_perfil,
                 "Perfil",
                 tabSeleccionado == Destinos.PERFIL,
                 { SEState.goTo(Destinos.PERFIL) },

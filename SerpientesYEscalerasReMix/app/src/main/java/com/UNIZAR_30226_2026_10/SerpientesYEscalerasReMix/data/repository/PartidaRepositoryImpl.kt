@@ -39,6 +39,8 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
     private val _jugadores = MutableStateFlow(JugadoresSnapshot(0, 0, emptyList()))
     private val _mano = MutableStateFlow<List<Carta?>>(emptyList())
     private val _chat = MutableStateFlow<List<MsgChat>>(emptyList())
+    private val _ganador = MutableStateFlow("")
+
 
     override val matchId = _matchId.asStateFlow()
     override val tablero = _tablero.asStateFlow()
@@ -46,6 +48,7 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
     override val jugadores = _jugadores.asStateFlow()
     override val mano = _mano.asStateFlow()
     override val chat = _chat.asStateFlow()
+    override val ganador = _ganador.asStateFlow()
 
     private val playerColors = listOf(
         color_fichas_rojas, 
@@ -181,6 +184,8 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
         } ?: emptyList()
 
         _chat.value = reply.chat.map { it.toDomain() }
+
+        _ganador.value = reply.ganador ?: ""
     }
 
     // --- Mapeos toDomain ---
