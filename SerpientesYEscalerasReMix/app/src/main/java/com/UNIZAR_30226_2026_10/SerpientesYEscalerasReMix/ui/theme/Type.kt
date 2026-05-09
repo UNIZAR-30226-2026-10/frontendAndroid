@@ -15,6 +15,11 @@ object SETextTypes {
         fontSize = 12.sp
     )
 
+    val enano = TextStyle(
+        color = color_text,
+        fontSize = 8.sp
+    )
+
     val pequeno = TextStyle(
         color = color_text,
         fontSize = 10.sp
@@ -35,6 +40,22 @@ object SETextTypes {
         fontSize = 30.sp,
         fontWeight = FontWeight.ExtraBold,
         // Centrar texto
+        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+    )
+
+    val nombreObjetoTienda = TextStyle( // Tipografica normal, pasada a MaterialDesign
+        color = color_text,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.ExtraBold,
+        // Centrar texto
+        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+    )
+
+    val avisoObjetoEnPosesion = TextStyle( // Tipografica normal, pasada a MaterialDesign
+        color = color_text,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.ExtraBold,
+        // Centrar texto horizontalmente
         textAlign = androidx.compose.ui.text.style.TextAlign.Center
     )
 

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -20,7 +19,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ChatBoton
@@ -31,12 +29,13 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoC
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoEscalera
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoIndicacionPartida
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoPuntuacionDado
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoVictoria
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ListaJugadores
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MazoVisual
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.SalirPartidaBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.Tablero
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.rememberSEAppState
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 
 @Composable
@@ -89,7 +88,7 @@ fun PartidaScreen(
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.Start
                 ) {
-                    SalirPartidaBoton(SEState = navController)
+                    SalirPartidaBoton(navController = navController, puedeCerrar = uiState.puedeSalir, onClose = { viewModel.cleanUiState() })
 
 
                     Box(modifier = Modifier.width(200.dp)) {
@@ -217,17 +216,16 @@ fun PartidaScreen(
                         .wrapContentSize()
                 )
             }
-        }
-    }
-}
 
-@Preview(showBackground = true, device = "spec:width=411dp,height=891dp,orientation=landscape")
-@Composable
-fun PartidaScreenPreview() {
-    val SEState = rememberSEAppState()
-    // Usamos el tema de tu proyecto
-    MaterialTheme {
-        // PASAMOS LOS DATOS MOCK AQUÍ
-        PartidaScreen(SEState)
+            if (uiState.mostrarDialogoVictoria) {
+                DialogoVictoria(
+                    ganador = uiState.ganador,
+                    onSalir = {
+                        viewModel.cleanUiState()
+                        navController.goTo(Destinos.JUGAR_CREAR)
+                    }
+                )
+            }
+        }
     }
 }

@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Calidad
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo_Carta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarIconoCartaR
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
@@ -154,7 +154,7 @@ fun CartaContent(
 @Preview(showBackground = true)
 @Composable
 fun DetallesPrev() {
-    val carta = Carta("Moises", "Te saltas el bloqueo", tipo = Tipo.Defensiva, calidad = Calidad.Epica)
+    val carta = Carta("Moises", "Te saltas el bloqueo", tipo = Tipo_Carta.Defensiva, calidad = Calidad.Epica)
 
     CartaContent(
         carta = carta,

@@ -6,8 +6,9 @@ import kotlinx.coroutines.flow.StateFlow
 
 class ChatCase(
     private val repository: PartidaRepository,
-    private val matchId: StateFlow<String>
+    private val matchId: StateFlow<String>,
+    private val username: StateFlow<String>
 ) {
     suspend fun enviar(mensaje: MsgChat) = repository.enviarMensaje(matchId.value, mensaje)
-    suspend fun recibir() = repository.recibirChat(matchId.value)
+    suspend fun recibir() = repository.recibirChat(matchId.value, username.value)
 }

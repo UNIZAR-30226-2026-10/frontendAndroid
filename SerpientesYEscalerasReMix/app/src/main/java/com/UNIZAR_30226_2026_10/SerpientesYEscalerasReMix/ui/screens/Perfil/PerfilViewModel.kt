@@ -1,8 +1,10 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -17,8 +19,9 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
         fun Factory(cF: CaseFacade): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                    PerfilViewModel(cF) as T
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return PerfilViewModel(cF) as T
+                }
             }
     }
 
@@ -70,7 +73,7 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
                 skinsFicha     = cF.obtenerCosmeticosCase.obtenerSkinsFicha()
                 iconos         = cF.obtenerCosmeticosCase.obtenerIconos()
             } catch (e: Exception) {
-                errorMessage = "Error al cargar cosméticos: ${e.message}"
+                errorMessage = "Error en cosméticos: ${e.message}"
             }
         }
     }
@@ -78,12 +81,8 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
     fun actualizarNombre(nuevoNombre: String) {
         viewModelScope.launch {
             try {
-                val result: Result<Unit> = cF.actualizarNombreCase(nuevoNombre)
-                if (result.isSuccess) {
-                    perfil = perfil?.copy(nombre = nuevoNombre)
-                } else {
-                    errorMessage = "Error al actualizar nombre: ${result.exceptionOrNull()?.message}"
-                }
+                cF.actualizarNombreCase(nuevoNombre)
+                perfil = perfil?.copy(nombre = nuevoNombre)
             } catch (e: Exception) {
                 errorMessage = "Error al actualizar nombre: ${e.message}"
             }
@@ -117,9 +116,9 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
         actualizarCosmetico(CategoriaCosmetico.ICONO, iconId)
     }
 
-    fun cerrarSesion(onSucces: () -> Unit) {
+    fun cerrarSesion(context: Context, onSucces: () -> Unit) {
         viewModelScope.launch {
-            cF.cerrarSesionCase()
+            cF.cerrarSesionCase(context)
             onSucces()
         }
     }

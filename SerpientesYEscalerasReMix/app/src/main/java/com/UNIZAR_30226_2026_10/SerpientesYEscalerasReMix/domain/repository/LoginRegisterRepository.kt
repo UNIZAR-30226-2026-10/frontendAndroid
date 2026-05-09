@@ -1,5 +1,6 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository
 
+import android.content.Context
 import kotlinx.coroutines.flow.StateFlow
 
 interface LoginRegisterRepository {
@@ -9,6 +10,6 @@ interface LoginRegisterRepository {
 
     suspend fun comprobarLogin(): String
     suspend fun iniciarSesion(email: String, passwd: String): Boolean
-    suspend fun cerrarSesion()
+    suspend fun cerrarSesion(context: Context)
     suspend fun registrarse(username: String, email: String, passwd: String): Boolean
 }

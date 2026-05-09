@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,12 +57,13 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 
 @Composable
 fun PerfilScreen(navHost: SENavHostController, viewModel: PerfilViewModel) {
-    val perfil       = viewModel.perfil
-    val cargando     = viewModel.cargando
+    val perfil = viewModel.perfil
+    val cargando = viewModel.cargando
     val errorMessage = viewModel.errorMessage
+    val context = LocalContext.current
 
     val nombre = perfil?.nombre ?: ""
-    val stats  = if (perfil != null) "${perfil.victorias}W/${perfil.derrotas}L" else ""
+    val stats = if (perfil != null) "${perfil.victorias}W/${perfil.derrotas}L" else ""
 
     if (cargando) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -78,21 +80,23 @@ fun PerfilScreen(navHost: SENavHostController, viewModel: PerfilViewModel) {
     }
 
     PerfilContent(
-        nombre                  = nombre,
-        stats                   = stats,
-        iconoActual             = perfil?.iconoActual ?: "",
-        iconos                  = viewModel.iconos,
-        skinsEscalera           = viewModel.skinsEscalera,
-        skinsSerpiente          = viewModel.skinsSerpiente,
-        skinsFicha              = viewModel.skinsFicha,
-        skinEscaleraActual      = perfil?.skinEscaleraActual ?: "",
-        skinSerpienteActual     = perfil?.skinSerpienteActual ?: "",
-        skinFichaActual         = perfil?.skinFichaActual ?: "",
-        onNombreConfirmado      = { nuevo -> viewModel.actualizarNombre(nuevo) },
+        nombre = nombre,
+        stats = stats,
+        skinsEscalera = viewModel.skinsEscalera,
+        skinsSerpiente = viewModel.skinsSerpiente,
+        skinsFicha = viewModel.skinsFicha,
+        iconos = viewModel.iconos,
+        skinEscaleraActual = perfil?.skinEscaleraActual ?: "",
+        skinSerpienteActual = perfil?.skinSerpienteActual ?: "",
+        skinFichaActual = perfil?.skinFichaActual ?: "",
+        iconoActual = perfil?.iconoActual ?: "",
+        onNombreConfirmado = { nuevo -> viewModel.actualizarNombre(nuevo) },
         onIconoSeleccionado     = { iconId -> viewModel.actualizarIcono(iconId) },
-        onCosmeticoSeleccionado = { categoria, skinId -> viewModel.actualizarCosmetico(categoria, skinId) },
-        onCerrarSesion          = { viewModel.cerrarSesion { navHost.goTo(Destinos.LOGIN) } }
-    )
+        onCosmeticoSeleccionado = { categoria, skinId ->
+                viewModel.actualizarCosmetico(categoria, skinId)
+            },
+        onCerrarSesion = { viewModel.cerrarSesion(context) { navHost.goTo(Destinos.LOGIN) } }
+        )
 }
 
 @Composable
@@ -112,6 +116,7 @@ fun PerfilContent(
     onCosmeticoSeleccionado: (CategoriaCosmetico, String) -> Unit,
     onCerrarSesion: () -> Unit
 ) {
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -120,22 +125,22 @@ fun PerfilContent(
     ) {
         Column {
             TarjetaUsuario(
-                nombre              = nombre,
-                stats               = stats,
-                iconoActual         = iconoActual,
-                iconos              = iconos,
-                onNombreConfirmado  = onNombreConfirmado,
+                nombre = nombre,
+                stats = stats,
+                iconoActual = iconoActual,
+                iconos = iconos,
+                onNombreConfirmado = onNombreConfirmado,
                 onIconoSeleccionado = onIconoSeleccionado,
-                onCerrarSesion      = onCerrarSesion
+                onCerrarSesion = onCerrarSesion
             )
             Spacer(modifier = Modifier.height(15.dp))
             SeccionCosmeticos(
-                skinsEscalera           = skinsEscalera,
-                skinsSerpiente          = skinsSerpiente,
-                skinsFicha              = skinsFicha,
-                skinEscaleraActual      = skinEscaleraActual,
-                skinSerpienteActual     = skinSerpienteActual,
-                skinFichaActual         = skinFichaActual,
+                skinsEscalera = skinsEscalera,
+                skinsSerpiente = skinsSerpiente,
+                skinsFicha = skinsFicha,
+                skinEscaleraActual = skinEscaleraActual,
+                skinSerpienteActual = skinSerpienteActual,
+                skinFichaActual = skinFichaActual,
                 onCosmeticoSeleccionado = onCosmeticoSeleccionado
             )
         }
@@ -160,15 +165,21 @@ fun TarjetaUsuario(
     ) {
         Box(modifier = Modifier.padding(8.dp)) {
 
+            // Esquina superior derecha: stats encima, botón logout debajo
             Column(
                 modifier = Modifier.align(Alignment.TopEnd),
                 horizontalAlignment = Alignment.End
             ) {
-                Text(text = stats, style = SETextTypes.grande, color = color_text)
+                Text(
+                    text = stats,
+                    style = SETextTypes.grande,
+                    color = color_text
+                )
                 Spacer(modifier = Modifier.height(8.dp))
                 LogoutBoton(onCerrarSesion)
             }
 
+            // Fila con avatar + etiqueta + caja nombre
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
@@ -202,7 +213,7 @@ fun AvatarUsuario(
             border = BorderStroke(2.dp, color_primary)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.icono_default),
+                painter = painterResource(id = R.drawable.icono_jugador_default),
                 contentDescription = "Avatar",
                 modifier = Modifier.padding(4.dp)
             )
@@ -309,6 +320,33 @@ fun CajaNombreUsuario(nombreActual: String, onConfirmar: (String) -> Unit) {
 }
 
 @Composable
+fun AvatarUsuario() {
+    Box(contentAlignment = Alignment.BottomEnd) {
+        Surface(
+            modifier = Modifier.size(85.dp),
+            shape = CircleShape,
+            color = color_text,
+            border = BorderStroke(2.dp, Color.Black)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.icono_jugador_default),
+                contentDescription = null,
+                modifier = Modifier.padding(4.dp)
+            )
+        }
+        Icon(
+            imageVector = Icons.Default.Edit,
+            contentDescription = "Cambiar avatar",
+            tint = color_text,
+            modifier = Modifier
+                .size(24.dp)
+                .offset(x = 2.dp, y = 2.dp)
+                .padding(4.dp)
+        )
+    }
+}
+
+@Composable
 fun EtiquetaNombre() {
     Text(
         text = "Nombre de usuario:",
@@ -344,21 +382,36 @@ fun SeccionCosmeticos(
                 imagenRes = R.drawable.tablero_debug,
                 skinActual = skinEscaleraActual,
                 opciones = skinsEscalera,
-                onSeleccion = { skinId -> onCosmeticoSeleccionado(CategoriaCosmetico.ESCALERA, skinId) }
+                onSeleccion = { skinId ->
+                    onCosmeticoSeleccionado(
+                        CategoriaCosmetico.ESCALERA,
+                        skinId
+                    )
+                }
             )
             CosmeticoItem(
                 label = "Serpientes",
                 imagenRes = R.drawable.tablero_debug,
                 skinActual = skinSerpienteActual,
                 opciones = skinsSerpiente,
-                onSeleccion = { skinId -> onCosmeticoSeleccionado(CategoriaCosmetico.SERPIENTE, skinId) }
+                onSeleccion = { skinId ->
+                    onCosmeticoSeleccionado(
+                        CategoriaCosmetico.SERPIENTE,
+                        skinId
+                    )
+                }
             )
             CosmeticoItem(
                 label = "Fichas",
                 imagenRes = R.drawable.tablero_debug,
                 skinActual = skinFichaActual,
                 opciones = skinsFicha,
-                onSeleccion = { skinId -> onCosmeticoSeleccionado(CategoriaCosmetico.FICHA, skinId) }
+                onSeleccion = { skinId ->
+                    onCosmeticoSeleccionado(
+                        CategoriaCosmetico.FICHA,
+                        skinId
+                    )
+                }
             )
         }
     }

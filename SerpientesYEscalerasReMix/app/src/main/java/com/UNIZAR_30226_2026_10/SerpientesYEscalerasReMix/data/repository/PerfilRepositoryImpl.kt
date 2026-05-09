@@ -1,6 +1,6 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository
 
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiService
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarEscaleraRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarFichaRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarIconoRequest
@@ -12,11 +12,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 
-class PerfilRepositoryImpl : PerfilRepository {
-    private val api = ApiClient.apiService
+class PerfilRepositoryImpl(
+    private val apiService: ApiService
+) : PerfilRepository {
 
     override suspend fun obtenerPerfil(email: String): PerfilUsuario = withContext(Dispatchers.IO) {
-        val response = api.getUserProfile(email)
+        val response = apiService.getUserProfile(email)
+
         if (response.isSuccessful && response.body() != null) {
             val r = response.body()!!
             PerfilUsuario(
@@ -30,6 +32,8 @@ class PerfilRepositoryImpl : PerfilRepository {
                 skinFichaActual     = r.skinFichaActual
             )
         } else {
+            // ERROR: En Kotlin con Retrofit, code() es una función o propiedad.
+            // Si te da error "cannot be invoked", usa .code sin paréntesis.
             throw Exception("Error al cargar perfil: ${response.code()} ${response.message()}")
         }
     }
@@ -37,15 +41,15 @@ class PerfilRepositoryImpl : PerfilRepository {
     override suspend fun actualizarNombre(email: String, nuevoNombre: String): Result<Unit> =
         withContext(Dispatchers.IO) {
             try {
-                val resp = api.updateUsername(email, mapOf("username" to nuevoNombre))
+                val resp = apiService.updateUsername(email, mapOf("username" to nuevoNombre))
                 if (resp.isSuccessful) Result.success(Unit)
                 else Result.failure(Exception("Error ${resp.code()}: ${resp.message()}"))
             } catch (e: Exception) {
-                Result.failure(e)
+                // ERROR: "Cannot infer type". Hay que especificar el tipo de Result
+                Result.failure<Unit>(e)
             }
         }
 
-    // Cada categoría usa su propio endpoint PUT según la API
     override suspend fun actualizarCosmetico(
         email: String,
         categoria: CategoriaCosmetico,
@@ -53,27 +57,28 @@ class PerfilRepositoryImpl : PerfilRepository {
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val resp = when (categoria) {
-                CategoriaCosmetico.ICONO     -> api.updateIcon(email,  ActualizarIconoRequest(skinId))
-                CategoriaCosmetico.FICHA     -> api.updatePawn(email,  ActualizarFichaRequest(skinId))
-                CategoriaCosmetico.SERPIENTE -> api.updateSnake(email, ActualizarSerpienteRequest(skinId))
-                CategoriaCosmetico.ESCALERA  -> api.updateStair(email, ActualizarEscaleraRequest(skinId))
+                CategoriaCosmetico.ICONO     -> apiService.updateIcon(email,  ActualizarIconoRequest(skinId))
+                CategoriaCosmetico.FICHA     -> apiService.updatePawn(email,  ActualizarFichaRequest(skinId))
+                CategoriaCosmetico.SERPIENTE -> apiService.updateSnake(email, ActualizarSerpienteRequest(skinId))
+                CategoriaCosmetico.ESCALERA  -> apiService.updateStair(email, ActualizarEscaleraRequest(skinId))
             }
             if (resp.isSuccessful) Result.success(Unit)
             else Result.failure(Exception("Error ${resp.code()}: ${resp.message()}"))
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure<Unit>(e)
         }
     }
 
-    // Las 4 llamadas se lanzan en paralelo para reducir la latencia total
     override suspend fun obtenerCosmeticosDisponibles(
         email: String
     ): Map<CategoriaCosmetico, List<String>> = withContext(Dispatchers.IO) {
-        val iconosDeferred     = async { api.getUserIcons(email) }
-        val fichasDeferred     = async { api.getUserPawns(email) }
-        val serpientesDeferred = async { api.getUserSnakes(email) }
-        val escalerasDeferred  = async { api.getUserStairs(email) }
+        // Lanzamos las peticiones
+        val iconosDeferred     = async { apiService.getUserIcons(email) }
+        val fichasDeferred     = async { apiService.getUserPawns(email) }
+        val serpientesDeferred = async { apiService.getUserSnakes(email) }
+        val escalerasDeferred  = async { apiService.getUserStairs(email) }
 
+        // Esperamos los resultados
         val iconosResp     = iconosDeferred.await()
         val fichasResp     = fichasDeferred.await()
         val serpientesResp = serpientesDeferred.await()
