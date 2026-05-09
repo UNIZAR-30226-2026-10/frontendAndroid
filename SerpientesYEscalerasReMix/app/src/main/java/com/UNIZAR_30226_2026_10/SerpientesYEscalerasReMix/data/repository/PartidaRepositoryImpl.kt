@@ -21,8 +21,8 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Jugadores
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Movimiento
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.MsgChat
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TableroSnapshot
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TipoCasilla
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo_Carta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PartidaRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fichas_amarillas
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fichas_azules
@@ -187,7 +187,7 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
                 id = it.toIntOrNull(),
                 nombre = it,
                 descripcion = "Carta de mazo ${localSnapshot.mazo}",
-                tipo = Tipo.Ofensiva,
+                tipo = Tipo_Carta.Ofensiva,
                 calidad = Calidad.Comun,
                 imagen = 0
             )
