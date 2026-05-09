@@ -3,19 +3,27 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote
 import android.content.Context
 import android.util.Log
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AceptarInvitacionRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarEscaleraRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarFichaRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarIconoRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarSerpienteRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AnadirBotRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AuthReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.CrearLobbyRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.EscalerasReply
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.FichasReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.GetAmigosReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.GetInvitacionesReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.GetPartidasReply
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.IconosReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LeaveOrExpelRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LobbyReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LoginRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PerfilUsuarioResponse
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PerfilUsuarioReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PostInvitacionRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.RegisterRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SeleccionMazoRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SerpientesReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SetBoardRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.SetReadyRequest
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
@@ -123,14 +131,37 @@ interface ApiService {
 
     // FUNCIONES PERFIL
 
-    @GET("users/{email}")
-    suspend fun getUserProfile(@Path("email") email: String): Response<PerfilUsuarioResponse>
+    @GET("users/{email}/profile")
+    suspend fun getUserProfile(@Path("email") email: String): Response<PerfilUsuarioReply>
 
     @PUT("users/{email}/username")
     suspend fun updateUsername(@Path("email") email: String, @Body body: Map<String, String>): Response<ResponseBody>
 
-    @PUT("users/{email}/cosmetics")
-    suspend fun updateCosmetic(@Path("email") email: String, @Body body: Map<String, String>): Response<ResponseBody>
+    // Actualizar cosméticos — endpoint separado por tipo según la API
+    @PUT("users/{email}/icon")
+    suspend fun updateIcon(@Path("email") email: String, @Body body: ActualizarIconoRequest): Response<ResponseBody>
+
+    @PUT("users/{email}/pawn")
+    suspend fun updatePawn(@Path("email") email: String, @Body body: ActualizarFichaRequest): Response<ResponseBody>
+
+    @PUT("users/{email}/snake")
+    suspend fun updateSnake(@Path("email") email: String, @Body body: ActualizarSerpienteRequest): Response<ResponseBody>
+
+    @PUT("users/{email}/stair")
+    suspend fun updateStair(@Path("email") email: String, @Body body: ActualizarEscaleraRequest): Response<ResponseBody>
+
+    // Obtener cosméticos disponibles del usuario — endpoint separado por tipo según la API
+    @GET("users/{email}/icons")
+    suspend fun getUserIcons(@Path("email") email: String): Response<IconosReply>
+
+    @GET("users/{email}/pawns")
+    suspend fun getUserPawns(@Path("email") email: String): Response<FichasReply>
+
+    @GET("users/{email}/snakes")
+    suspend fun getUserSnakes(@Path("email") email: String): Response<SerpientesReply>
+
+    @GET("users/{email}/stairs")
+    suspend fun getUserStairs(@Path("email") email: String): Response<EscalerasReply>
 
 }
 

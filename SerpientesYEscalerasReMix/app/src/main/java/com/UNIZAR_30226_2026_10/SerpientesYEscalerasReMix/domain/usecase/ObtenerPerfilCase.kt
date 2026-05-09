@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 class ObtenerPerfilCase(
     private val email: StateFlow<String>,
-    private val username: StateFlow<String>,
     private val repo: PerfilRepository
 ) {
     suspend operator fun invoke(): PerfilUsuario = repo.obtenerPerfil(email.value)

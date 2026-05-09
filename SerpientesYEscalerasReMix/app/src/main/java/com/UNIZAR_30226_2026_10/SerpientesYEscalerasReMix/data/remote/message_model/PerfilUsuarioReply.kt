@@ -2,7 +2,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_m
 
 import com.google.gson.annotations.SerializedName
 
-data class PerfilUsuarioResponse(
+data class PerfilUsuarioReply(
     @SerializedName("username") val nombre: String,
     @SerializedName("wins") val victorias: Int,
     @SerializedName("losses") val derrotas: Int,

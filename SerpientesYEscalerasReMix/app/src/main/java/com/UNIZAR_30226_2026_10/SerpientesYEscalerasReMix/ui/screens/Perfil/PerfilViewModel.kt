@@ -17,9 +17,8 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
         fun Factory(cF: CaseFacade): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return PerfilViewModel(cF) as T
-                }
+                override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                    PerfilViewModel(cF) as T
             }
     }
 
@@ -71,7 +70,7 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
                 skinsFicha     = cF.obtenerCosmeticosCase.obtenerSkinsFicha()
                 iconos         = cF.obtenerCosmeticosCase.obtenerIconos()
             } catch (e: Exception) {
-                errorMessage = "Error en cosméticos: ${e.message}"
+                errorMessage = "Error al cargar cosméticos: ${e.message}"
             }
         }
     }
@@ -79,8 +78,12 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
     fun actualizarNombre(nuevoNombre: String) {
         viewModelScope.launch {
             try {
-                cF.actualizarNombreCase(nuevoNombre)
-                perfil = perfil?.copy(nombre = nuevoNombre)
+                val result: Result<Unit> = cF.actualizarNombreCase(nuevoNombre)
+                if (result.isSuccess) {
+                    perfil = perfil?.copy(nombre = nuevoNombre)
+                } else {
+                    errorMessage = "Error al actualizar nombre: ${result.exceptionOrNull()?.message}"
+                }
             } catch (e: Exception) {
                 errorMessage = "Error al actualizar nombre: ${e.message}"
             }
@@ -90,17 +93,28 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
     fun actualizarCosmetico(categoria: CategoriaCosmetico, skinId: String) {
         viewModelScope.launch {
             try {
-                cF.actualizarSkinCase(categoria, skinId)
-                perfil = when (categoria) {
-                    CategoriaCosmetico.ESCALERA  -> perfil?.copy(skinEscaleraActual = skinId)
-                    CategoriaCosmetico.SERPIENTE -> perfil?.copy(skinSerpienteActual = skinId)
-                    CategoriaCosmetico.FICHA     -> perfil?.copy(skinFichaActual = skinId)
-                    CategoriaCosmetico.ICONO     -> perfil?.copy(iconoActual = skinId)
+                val result: Result<Unit> = cF.actualizarSkinCase(categoria, skinId)
+                if (result.isSuccess) {
+                    val perfilActual = perfil ?: return@launch
+                    perfil = when (categoria) {
+                        CategoriaCosmetico.ESCALERA  -> perfilActual.copy(skinEscaleraActual  = skinId)
+                        CategoriaCosmetico.SERPIENTE -> perfilActual.copy(skinSerpienteActual = skinId)
+                        CategoriaCosmetico.FICHA     -> perfilActual.copy(skinFichaActual     = skinId)
+                        CategoriaCosmetico.ICONO     -> perfilActual.copy(iconoActual         = skinId)
+                    }
+                } else {
+                    errorMessage = "Error al actualizar cosmético: ${result.exceptionOrNull()?.message}"
                 }
             } catch (e: Exception) {
                 errorMessage = "Error al actualizar cosmético: ${e.message}"
             }
         }
+    }
+
+    // El icono se actualiza a través del mismo actualizarSkinCase con categoría ICONO,
+    // ya que el endpoint PUT /users/{email}/cosmetics cubre todos los tipos de cosmético.
+    fun actualizarIcono(iconId: String) {
+        actualizarCosmetico(CategoriaCosmetico.ICONO, iconId)
     }
 
     fun cerrarSesion(onSucces: () -> Unit) {
