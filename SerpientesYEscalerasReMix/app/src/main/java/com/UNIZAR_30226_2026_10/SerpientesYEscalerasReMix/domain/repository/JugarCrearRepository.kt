@@ -10,7 +10,7 @@ interface JugarCrearRepository {
     suspend fun setLobbyId(lobbyId: String)
     suspend fun clearMatchId()
     suspend fun fetchLobby()
-    suspend fun fetchLobbyByPlayer(username: String)
+    suspend fun fetchLobbyByPlayer(username: String): Boolean
     suspend fun crearLobby(username: String) // Actualiza lobbyId
     suspend fun anadirBot(requestedBy: String)
     suspend fun cambiarPreparado(username: String, listo: Boolean)

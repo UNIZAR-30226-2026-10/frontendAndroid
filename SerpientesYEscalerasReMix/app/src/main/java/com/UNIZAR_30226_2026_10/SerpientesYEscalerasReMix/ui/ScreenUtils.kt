@@ -55,7 +55,7 @@ fun buscarIconoCartaR(icono: String): Int {
         "Moises" -> R.drawable.carta_moises
         "Wild Frank" -> R.drawable.carta_wild_frank
         "Carpintero" -> R.drawable.carta_carpintero
-        "Día de la marmota" -> R.drawable.carta_dia_de_la_marmota
+        "Dia de la marmota" -> R.drawable.carta_dia_de_la_marmota
         "Salto de longitud" -> R.drawable.carta_salto_de_longitud
         "Robo de identidad" -> R.drawable.carta_robo_de_identidad
         "Mal de ojo" -> R.drawable.carta_mal_de_ojo

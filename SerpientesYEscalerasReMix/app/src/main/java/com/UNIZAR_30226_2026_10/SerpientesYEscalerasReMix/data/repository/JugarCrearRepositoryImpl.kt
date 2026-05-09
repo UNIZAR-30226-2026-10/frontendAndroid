@@ -51,7 +51,7 @@ class JugarCrearRepositoryImpl(private val api: ApiService) : JugarCrearReposito
         }
     }
 
-    override suspend fun fetchLobbyByPlayer(username: String) {
+    override suspend fun fetchLobbyByPlayer(username: String): Boolean {
         try {
             val response = api.getLobbyByPlayer(username)
             if (response.isSuccessful) {
@@ -60,8 +60,10 @@ class JugarCrearRepositoryImpl(private val api: ApiService) : JugarCrearReposito
                     _lobbyActual.value = reply.toDomain()
                 }
             }
+            return response.isSuccessful
         } catch (e: Exception) {
             Log.e("API_ERROR", "Exception fetching lobby by player", e)
+            return false
         }
     }
 

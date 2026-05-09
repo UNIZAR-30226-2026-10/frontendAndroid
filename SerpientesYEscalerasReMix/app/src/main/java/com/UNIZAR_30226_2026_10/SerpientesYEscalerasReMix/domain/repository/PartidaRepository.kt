@@ -21,6 +21,8 @@ interface PartidaRepository {
 
     // Modificar Flujos desde el exterior
     suspend fun setMatchId(matchId: String)
+    
+    suspend fun cleanPartidaState()
 
     // Acciones respecto a paquete data
     suspend fun fetchEstadoCompleto(matchId: String, username: String)

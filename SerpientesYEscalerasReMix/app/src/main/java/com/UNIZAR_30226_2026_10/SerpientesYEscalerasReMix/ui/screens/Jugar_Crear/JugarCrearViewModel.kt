@@ -38,6 +38,7 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
     init {
         // Conexión de Flows del Repository a UI State
         viewModelScope.launch {
+            launch { cF.username.collect { data -> _uiState.update { it.copy(username = data) } } }
             launch {
                 cF.lobby.collect { data ->
                     _uiState.update { it.copy(lobby = data) }
@@ -46,7 +47,6 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
                     }
                 }
             }
-            launch { cF.username.collect { data -> _uiState.update { it.copy(username = data) } } }
         }
         obtenerTableros()
     }
@@ -63,7 +63,6 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
             while (isActive) {
                 cF.syncLobbyCase {
                     onPartidaIniciada()
-                    _uiState.update { JugarCrearUiState() }
                 }
                 _conCompaneros.value = (_uiState.value.lobby?.players?.filterNotNull()?.size ?: 0) > 1
                 if (_uiState.value.lobby != null) {
@@ -128,12 +127,6 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
     }
 
     fun onEmpezarPartida(onSucces: () -> Unit) {
-        val playersCount = _uiState.value.lobby?.players?.filterNotNull()?.size ?: 0
-        if (playersCount <= 1) {
-            _uiState.update { it.copy(mensajeError = "No se puede iniciar una partida solo, porfavor añada a alguien") }
-            return
-        }
-
         viewModelScope.launch {
             val lobbyId = _uiState.value.lobby?.id ?: ""
             cF.cambiarPreparadoCase(true)
@@ -147,6 +140,5 @@ data class JugarCrearUiState(
     val vistaLider: Boolean = false,
     val username: String = "",
     val seleccionTablero: String = "",
-    val nombreTableros: List<String> = emptyList(),
-    val mensajeError: String? = null
+    val nombreTableros: List<String> = emptyList()
 )

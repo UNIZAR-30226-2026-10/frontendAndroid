@@ -9,25 +9,9 @@ class SyncPartidaCase(
     private val matchId: StateFlow<String>
 ) {
 
-    private var init: Boolean = false
-
     suspend operator fun invoke() {
-
-        if (repository.jugadores.value.jugadores.isEmpty()) {
-            if (matchId.value.isNotEmpty()) {
-                repository.fetchEstadoCompleto(matchId.value, username.value)
-                init = true
-            }
-        } else {
-
-            val turno = repository.jugadores.value.turno
-            val jugadorTurno = repository.jugadores.value.jugadores[turno].username
-            val esMiTurno = jugadorTurno == username.value
-
-            if (!init || esMiTurno) {
-                repository.fetchEstadoCompleto(matchId.value, username.value)
-                init = true
-            }
+        if (matchId.value.isNotEmpty()) {
+            repository.fetchEstadoCompleto(matchId.value, username.value)
         }
     }
 }

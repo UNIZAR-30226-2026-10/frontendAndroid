@@ -61,6 +61,16 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
         _matchId.value = matchId
     }
 
+    override suspend fun cleanPartidaState() {
+        _matchId.value = ""
+        _tablero.value = TableroSnapshot(emptyList(), "default", "default")
+        _fichas.value = emptyList()
+        _jugadores.value = JugadoresSnapshot(0, 0, emptyList())
+        _mano.value = emptyList()
+        _chat.value = emptyList()
+        _ganador.value = ""
+    }
+
     override suspend fun fetchEstadoCompleto(matchId: String, username: String) {
         val response = api.getMatchStatus(matchId, username)
         if (response.isSuccessful) {

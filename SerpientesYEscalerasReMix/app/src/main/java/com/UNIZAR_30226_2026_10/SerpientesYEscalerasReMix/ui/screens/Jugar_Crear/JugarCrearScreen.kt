@@ -199,7 +199,7 @@ fun LobbyElementos(
                 Spacer(modifier = Modifier.width(10.dp))
                 EmpezarPartidaBoton(
                     esLider = vistaLider,
-                    estaListo = estaListo,
+                    estaListo = if (vistaLider) true else estaListo,
                     todosListos = todosListos,
                     mazoSeleccionado = mazoActual.isNotEmpty(),
                     conCompanieros = conCompanieros.collectAsState(initial = false).value,
@@ -249,11 +249,10 @@ fun JugarCrearScreenPreview() {
             null
         ),
         tableroSelect = "Estándar",
-        null
+        matchId = null
     )
     val mockUiState = JugarCrearUiState(
         lobby = mockLobby,
-        vistaLider = true,
         username = "host@test.com"
     )
 
