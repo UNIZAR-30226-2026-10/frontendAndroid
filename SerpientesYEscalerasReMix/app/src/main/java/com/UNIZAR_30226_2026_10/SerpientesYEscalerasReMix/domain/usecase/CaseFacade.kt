@@ -9,9 +9,13 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.Juga
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.JugarCrearRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.LoginRegisterRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PartidaRepository
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.TiendaRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class CaseFacade(
+
     // Repositorios
     // TODO ir añadiendo aqui las interfaces que se vayan creando, fuera seran instanciadas como toquen
 
@@ -24,14 +28,18 @@ class CaseFacade(
     // Lobby / Jugar_Crear
     private val jugarCrearRepository: JugarCrearRepository,
 
-    // Partida
-    private val partidaRepository: PartidaRepository,
+    // Continuar Partida
+    private val jugarContinuarRepository: JugarContinuarRepository,
 
     // Amigos
     private val amigosRepository: AmigosRepository,
 
-    // Continuar Partida
-    private val jugarContinuarRepository: JugarContinuarRepository
+    // Tienda
+    private val tiendaRepository: TiendaRepository,
+
+    // Partida
+    private val partidaRepository: PartidaRepository
+
 ) {
 
     // --- GENERAL STATE ---
@@ -92,6 +100,11 @@ class CaseFacade(
     public val actualizarNombreCase  = ActualizarNombreCase(email)
     public val actualizarSkinCase    = ActualizarSkinCase(email)
     public val obtenerCosmeticosCase = ObtenerCosmeticosCase()
+
+    // TIENDA
+    val getProductosCase = GetProductosCase(tiendaRepository, email)
+    val comprarProductoCase = ComprarProductoCase(tiendaRepository, email)
+    val getSaldoCase = GetSaldoCase(tiendaRepository, email)
 
     // PARTIDA
 

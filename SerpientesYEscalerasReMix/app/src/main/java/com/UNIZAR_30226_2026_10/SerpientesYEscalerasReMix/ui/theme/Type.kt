@@ -43,6 +43,22 @@ object SETextTypes {
         textAlign = androidx.compose.ui.text.style.TextAlign.Center
     )
 
+    val nombreObjetoTienda = TextStyle( // Tipografica normal, pasada a MaterialDesign
+        color = color_text,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.ExtraBold,
+        // Centrar texto
+        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+    )
+
+    val avisoObjetoEnPosesion = TextStyle( // Tipografica normal, pasada a MaterialDesign
+        color = color_text,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.ExtraBold,
+        // Centrar texto horizontalmente
+        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+    )
+
     val nombreMazo = TextStyle(
         color = color_text,
         fontSize = 24.sp,
