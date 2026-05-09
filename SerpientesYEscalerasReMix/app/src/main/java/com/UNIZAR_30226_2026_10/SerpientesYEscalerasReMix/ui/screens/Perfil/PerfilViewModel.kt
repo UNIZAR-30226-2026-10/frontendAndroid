@@ -1,8 +1,10 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Perfil
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -103,9 +105,9 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
         }
     }
 
-    fun cerrarSesion(onSucces: () -> Unit) {
+    fun cerrarSesion(context: Context, onSucces: () -> Unit) {
         viewModelScope.launch {
-            cF.cerrarSesionCase()
+            cF.cerrarSesionCase(context)
             onSucces()
         }
     }

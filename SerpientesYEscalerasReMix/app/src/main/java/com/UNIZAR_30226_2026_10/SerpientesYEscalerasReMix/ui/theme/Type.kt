@@ -15,6 +15,11 @@ object SETextTypes {
         fontSize = 12.sp
     )
 
+    val enano = TextStyle(
+        color = color_text,
+        fontSize = 8.sp
+    )
+
     val pequeno = TextStyle(
         color = color_text,
         fontSize = 10.sp

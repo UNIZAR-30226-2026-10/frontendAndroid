@@ -8,8 +8,9 @@ interface JugarCrearRepository {
     val lobbyActual: StateFlow<Lobby>
 
     suspend fun setLobbyId(lobbyId: String)
+    suspend fun clearMatchId()
     suspend fun fetchLobby()
-    suspend fun fetchLobbyByPlayer(username: String)
+    suspend fun fetchLobbyByPlayer(username: String): Boolean
     suspend fun crearLobby(username: String) // Actualiza lobbyId
     suspend fun anadirBot(requestedBy: String)
     suspend fun cambiarPreparado(username: String, listo: Boolean)
@@ -17,4 +18,5 @@ interface JugarCrearRepository {
     suspend fun seleccionarTablero(requestedBy: String, tablero: String)
     suspend fun abandonarExpulsar(requestedBy: String, targetUsername: String)
     suspend fun empezarPartida(): String // Devuelve matchId
+    suspend fun getBoards(): List<String>
 }

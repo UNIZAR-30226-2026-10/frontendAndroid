@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 class JugarCartaCase(
     private val repository: PartidaRepository,
-    private val email: StateFlow<String>,
+    private val username: StateFlow<String>,
     private val matchId: StateFlow<String>
 ) {
     suspend operator fun invoke(
@@ -14,6 +14,6 @@ class JugarCartaCase(
             inicio: Int? = null,
             fin: Int? = null
     ) {
-        repository.jugarCarta(matchId.value, email.value, cartaId, target, inicio, fin)
+        repository.jugarCarta(matchId.value, username.value, cartaId, target, inicio, fin)
     }
 }

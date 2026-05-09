@@ -89,7 +89,7 @@ fun MazoVisual(onSelectCarta: (Carta) -> Unit, manoState: MutableList<Carta?>) {
                         // Título
                         Text(
                             text = carta.nombre.uppercase(),
-                            style = SETextTypes.plano,
+                            style = SETextTypes.pequeno,
                             modifier = Modifier.drawBehind {
                                 val strokeWidth = 2.dp.toPx()
                                 val y = size.height + 4.dp.toPx()

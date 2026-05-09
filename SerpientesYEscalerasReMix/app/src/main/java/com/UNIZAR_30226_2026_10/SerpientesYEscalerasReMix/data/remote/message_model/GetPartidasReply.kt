@@ -5,5 +5,5 @@ import com.google.gson.annotations.SerializedName
 
 data class GetPartidasReply(
     @SerializedName("matches")
-    val matches: List<PartidaGetReply>
+    val matches: List<PartidaRegistroGetReply>
 )

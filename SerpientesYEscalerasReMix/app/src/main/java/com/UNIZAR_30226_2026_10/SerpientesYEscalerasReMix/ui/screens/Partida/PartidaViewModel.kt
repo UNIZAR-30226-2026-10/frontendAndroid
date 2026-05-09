@@ -34,14 +34,22 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
     private val _uiState = MutableStateFlow(PartidaUiState())
     val uiState = _uiState.asStateFlow()
 
+    public fun cleanUiState() {
+        viewModelScope.launch {
+            cF.cleanPartidaCase()
+        }
+    }
+
     init {
         // Conexión de Flows del Repository a UI State
         viewModelScope.launch {
+            launch { cF.username.collect { data -> _uiState.update { it.copy(username = data) } } }
             launch { cF.tablero.collect { data -> _uiState.update { it.copy(tablero = data) } } }
             launch { cF.fichas.collect { data -> _uiState.update { it.copy(fichas = data) } } }
             launch { cF.jugadores.collect { data -> _uiState.update { it.copy( jugadores = data) } } }
             launch { cF.mano.collect { data -> _uiState.update { it.copy(mano = data.toMutableList()) } } }
             launch { cF.chat.collect { data -> _uiState.update { it.copy(chat = data) } } }
+            launch { cF.ganador.collect { data -> _uiState.update { it.copy(ganador = data, mostrarDialogoVictoria = data != "") } } }
         }
     }
 
@@ -64,13 +72,13 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
                         // Comprobamos si el índice es válido para la lista actual
                         val esRealmenteMiTurno = if (lista.isNotEmpty() && indiceTurno in lista.indices) {
-                            lista[indiceTurno].email == cF.email.value
+                            lista[indiceTurno].username == uiState.value.username
 
                         } else {
                             false
                         }
 
-                        estadoActual.copy(esMiTurno = esRealmenteMiTurno)
+                        estadoActual.copy(esMiTurno = esRealmenteMiTurno, bloquearDado = !esRealmenteMiTurno)
                     }
                 } catch (e: Exception) {
                     // Evita que el polling se rompa por un error de red
@@ -113,7 +121,9 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                     it.copy(
                         mostrarDialogoPuntuacion = true,
                         bloquearDado = true,
-                        puntuacionDado = puntuacionDado
+                        puntuacionDado = puntuacionDado,
+
+                        puedeSalir = false
                     )
                 }
 
@@ -189,7 +199,9 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
                         casillasAElegir = emptyList(),
 
-                        bloquearDado = false
+                        bloquearDado = false,
+
+                        puedeSalir = true
                     )
                 }
 
@@ -213,7 +225,8 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
                     casillasAElegir = emptyList(),
 
-                    bloquearDado = false
+                    bloquearDado = false,
+                    puedeSalir = true
                 )
             }
 
@@ -247,7 +260,8 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
                     casillasAElegir = emptyList(),
 
-                    bloquearDado = false
+                    bloquearDado = false,
+                    puedeSalir = true
                 )
             }
 
@@ -273,7 +287,8 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
                     casillasAElegir = emptyList(),
 
-                    bloquearDado = false
+                    bloquearDado = false,
+                    puedeSalir = true
                 )
             }
 
@@ -363,8 +378,8 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
     }
 
-    fun onSeleccionJugadorCarta(emailObjetivo: String) {
-        ejecutarUsoCarta(target = emailObjetivo)
+    fun onSeleccionJugadorCarta(usernameObjetivo: String) {
+        ejecutarUsoCarta(target = usernameObjetivo)
         _uiState.update {
             it.copy(
                 seleccionJugadorCarta = false,
@@ -433,9 +448,11 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 }
 
 data class PartidaUiState(
-    // Todo cambiar por lineas comentadas (esta asi para poder usar preview)
+    // Datos user
+    val username: String = "",
+
     // Contenido dinamico
-    val tablero: TableroSnapshot = TableroSnapshot(emptyList()),
+    val tablero: TableroSnapshot = TableroSnapshot(emptyList(), "default", "default"),
     val fichas: List<FichaSnapshot> = emptyList(),
     val jugadores: JugadoresSnapshot = JugadoresSnapshot(0, 0, emptyList()),
     val mano: MutableList<Carta?> = mutableListOf(),
@@ -443,6 +460,7 @@ data class PartidaUiState(
     val esMiTurno: Boolean = false,
     val yaJugadoCarta: Boolean = false,
     val chat: List<MsgChat> = emptyList(),
+    val puedeSalir: Boolean = true,
 
     // Fases de la partida
     val seleccionFichas: Boolean = false,
@@ -470,6 +488,9 @@ data class PartidaUiState(
 
     val mostrarDialogoIndicacion: Boolean = false,
     val indicacion: String = "",
+
+    val mostrarDialogoVictoria: Boolean = false,
+    val ganador: String = "",
 
     // Control de cartas
     val cartaJugada: Carta? = null,

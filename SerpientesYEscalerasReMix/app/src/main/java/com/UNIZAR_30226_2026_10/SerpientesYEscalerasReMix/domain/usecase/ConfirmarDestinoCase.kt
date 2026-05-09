@@ -6,15 +6,15 @@ import kotlinx.coroutines.flow.StateFlow
 
 class ConfirmarDestinoCase(
     private val repository: PartidaRepository,
-    private val email: StateFlow<String>,
+    private val username: StateFlow<String>,
     private val matchId: StateFlow<String>
 ) {
 
-    suspend operator fun invoke(movimiento: Movimiento): List<Movimiento> {
+    suspend operator fun invoke(movimiento: Movimiento) {
         // Confirmar movimiento
-        return repository.confirmarMovimiento(
+        repository.confirmarMovimiento(
             matchId = matchId.value,
-            email = email.value,
+            username = username.value,
             fichaId = movimiento.fichaId,
             destinoId = movimiento.casillaId,
             pasosRestantes = if (movimiento.pasosRestantes == 0) null
@@ -22,14 +22,15 @@ class ConfirmarDestinoCase(
         )
     }
 
-    suspend operator fun invoke(movimiento: Movimiento, casillaDir: Int): List<Movimiento> {
+    suspend operator fun invoke(movimiento: Movimiento, casillaDir: Int) {
         // Confirmar movimiento
-        return repository.confirmarMovimiento(
+        repository.confirmarMovimiento(
             matchId = matchId.value,
-            email = email.value,
+            username = username.value,
             fichaId = movimiento.fichaId,
-            destinoId = movimiento.fichaId,
-            pasosRestantes = movimiento.pasosRestantes
-        ) // TODO añadir decision mediante casillaDir
+            destinoId = casillaDir,
+            pasosRestantes = if (movimiento.pasosRestantes == 0) null
+                             else movimiento.pasosRestantes
+        )
     }
 }
