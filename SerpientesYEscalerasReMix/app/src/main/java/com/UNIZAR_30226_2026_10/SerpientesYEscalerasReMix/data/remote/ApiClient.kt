@@ -220,7 +220,7 @@ object ApiClient {
 
         // Cliente OKHttp
         val okHttpClient = OkHttpClient.Builder()
-            .protocols(listOf(okhttp3.Protocol.HTTP_1_1)) // TODO ELIMINAR ESTA LINEA CUANDO NO SE TRABAJE EN LOCAL 192.168.1.36
+            // .protocols(listOf(okhttp3.Protocol.HTTP_1_1)) // TODO ELIMINAR ESTA LINEA CUANDO NO SE TRABAJE EN LOCAL 192.168.1.36
             .addInterceptor(forceInsecureInterceptor)
             .addNetworkInterceptor(loggingInterceptor)
             .cookieJar(cookieJar)
