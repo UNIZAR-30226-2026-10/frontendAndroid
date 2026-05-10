@@ -27,6 +27,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.JugarC
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.JugarCrearRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.LoginRegisterRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PartidaRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PerfilRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.TiendaRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MenuTopBar
@@ -57,7 +58,8 @@ class MainActivity : ComponentActivity() {
             jugarCrearRepository = JugarCrearRepositoryImpl(apiService),
             amigosRepository = AmigosRepositoryImpl(apiService),
             jugarContinuarRepository = JugarContinuarRepositoryImpl(apiService),
-            tiendaRepository = TiendaRepositoryImpl(apiService)
+            tiendaRepository = TiendaRepositoryImpl(apiService),
+            perfilRepository = PerfilRepositoryImpl(apiService)
             //applicationContext // TODO elminar e instanciarComo Retrofit
 
         )

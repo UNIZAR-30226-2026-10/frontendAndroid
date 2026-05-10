@@ -9,6 +9,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.Juga
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.JugarCrearRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.LoginRegisterRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PartidaRepository
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PerfilRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.TiendaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,8 +39,10 @@ class CaseFacade(
     private val tiendaRepository: TiendaRepository,
 
     // Partida
-    private val partidaRepository: PartidaRepository
+    private val partidaRepository: PartidaRepository,
 
+    // Perfil
+    private val perfilRepository: PerfilRepository
 ) {
 
     // --- GENERAL STATE ---
@@ -95,11 +98,12 @@ class CaseFacade(
     val obtenerRegistroPartidasCase = ObtenerRegistroPartidasCase(jugarContinuarRepository, email)
     val continuarPartidaCase = ContinuarPartidaCase(partidaRepository)
 
-    // Casos de uso de Perfil
-    public val obtenerPerfilCase     = ObtenerPerfilCase(email, username)
-    public val actualizarNombreCase  = ActualizarNombreCase(email)
-    public val actualizarSkinCase    = ActualizarSkinCase(email)
-    public val obtenerCosmeticosCase = ObtenerCosmeticosCase()
+    // PERFIL
+    val obtenerPerfilCase     = ObtenerPerfilCase(email, perfilRepository)
+    val actualizarNombreCase  = ActualizarNombreCase(email, perfilRepository)
+    val actualizarSkinCase    = ActualizarSkinCase(email, perfilRepository)
+    val actualizarIconoCase   = ActualizarIconoCase(email, perfilRepository)
+    val obtenerCosmeticosCase = ObtenerCosmeticosCase(email, perfilRepository) // ahora recibe email
 
     // TIENDA
     val getProductosCase = GetProductosCase(tiendaRepository, email)
