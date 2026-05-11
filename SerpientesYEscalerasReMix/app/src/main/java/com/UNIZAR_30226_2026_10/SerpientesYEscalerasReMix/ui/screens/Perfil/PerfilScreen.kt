@@ -219,44 +219,53 @@ fun AvatarUsuario(
             )
         }
 
-        IconButton(
-            onClick = { mostrarMenu = true },
-            modifier = Modifier
-                .size(24.dp)
-                .offset(x = 2.dp, y = 2.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Edit,
-                contentDescription = "Cambiar avatar",
-                tint = color_text,
-                modifier = Modifier.size(18.dp)
-            )
-        }
-
-        DropdownMenu(
-            expanded = mostrarMenu,
-            onDismissRequest = { mostrarMenu = false }
-        ) {
-            iconos.forEach { iconId ->
-                DropdownMenuItem(
-                    text = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Image(
-                                painter = painterResource(id = obtenerImagenCosmetico(iconId, CategoriaCosmetico.ICONO)),
-                                contentDescription = null,
-                                modifier = Modifier.size(30.dp).padding(end = 8.dp)
-                            )
-                            Text(
-                                text = iconId.replace("icono_", "").replace("_", " "),
-                                color = if (iconId == iconoActual) color_primary else color_text
-                            )
-                        }
-                    },
-                    onClick = {
-                        mostrarMenu = false
-                        onIconoSeleccionado(iconId)
-                    }
+        Box {
+            IconButton(
+                onClick = { mostrarMenu = true },
+                modifier = Modifier.size(32.dp) // ← aumentado para mejor área táctil
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Cambiar avatar",
+                    tint = color_text,
+                    modifier = Modifier.size(18.dp)
                 )
+            }
+
+            DropdownMenu(
+                expanded = mostrarMenu,
+                onDismissRequest = { mostrarMenu = false }
+            ) {
+                if (iconos.isEmpty()) {
+                    DropdownMenuItem(
+                        text = { Text("Sin avatares disponibles", color = color_text) },
+                        onClick = { mostrarMenu = false }
+                    )
+                } else {
+                    iconos.forEach { iconId ->
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Image(
+                                        painter = painterResource(
+                                            id = obtenerImagenCosmetico(iconId, CategoriaCosmetico.ICONO)
+                                        ),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(30.dp).padding(end = 8.dp)
+                                    )
+                                    Text(
+                                        text = iconId.replace("icono_", "").replace("_", " "),
+                                        color = if (iconId == iconoActual) color_primary else color_text
+                                    )
+                                }
+                            },
+                            onClick = {
+                                mostrarMenu = false
+                                onIconoSeleccionado(iconId)
+                            }
+                        )
+                    }
+                }
             }
         }
     }
@@ -452,35 +461,44 @@ fun CosmeticoItem(
                     contentScale = ContentScale.Crop,
                     colorFilter = ColorFilter.tint(Color.Black.copy(alpha = 0.4f), BlendMode.Darken)
                 )
-                IconButton(
-                    onClick = { mostrarMenu = true },
-                    modifier = Modifier.size(60.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Editar $label",
-                        tint = color_text,
+                Box(contentAlignment = Alignment.Center) {  // ← Box ancla
+                    IconButton(
+                        onClick = { mostrarMenu = true },
                         modifier = Modifier.size(60.dp)
-                    )
-                }
-            }
-            DropdownMenu(
-                expanded = mostrarMenu,
-                onDismissRequest = { mostrarMenu = false }
-            ) {
-                opciones.forEach { skinId ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = skinId,
-                                color = if (skinId == skinActual) color_primary else color_text
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Editar $label",
+                            tint = color_text,
+                            modifier = Modifier.size(60.dp)
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = mostrarMenu,
+                        onDismissRequest = { mostrarMenu = false }
+                    ) {
+                        if (opciones.isEmpty()) {
+                            DropdownMenuItem(
+                                text = { Text("Sin skins disponibles", color = color_text) },
+                                onClick = { mostrarMenu = false }
                             )
-                        },
-                        onClick = {
-                            mostrarMenu = false
-                            onSeleccion(skinId)
+                        } else {
+                            opciones.forEach { skinId ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            text = skinId.replace("icono_", "").replace("_", " "),
+                                            color = if (skinId == skinActual) color_primary else color_text
+                                        )
+                                    },
+                                    onClick = {
+                                        mostrarMenu = false
+                                        onSeleccion(skinId)
+                                    }
+                                )
+                            }
                         }
-                    )
+                    }
                 }
             }
         }

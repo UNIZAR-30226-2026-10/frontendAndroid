@@ -76,14 +76,17 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
         viewModelScope.launch {
             try {
                 // 1. Usamos la nueva función optimizada que devuelve todo el mapa
-                val todos = cF.obtenerCosmeticosCase.obtenerTodosLosCosmeticos()
-                iconos = todos[CategoriaCosmetico.ICONO] ?: emptyList()
-                // 2. Repartimos los datos en las variables del ViewModel
-                skinsEscalera  = todos[CategoriaCosmetico.ESCALERA] ?: emptyList()
-                skinsSerpiente = todos[CategoriaCosmetico.SERPIENTE] ?: emptyList()
-                skinsFicha     = todos[CategoriaCosmetico.FICHA] ?: emptyList()
-                iconos         = todos[CategoriaCosmetico.ICONO] ?: emptyList()
+                val mapa = cF.obtenerCosmeticosCase.obtenerTodosLosCosmeticos()
+                val sE = mapa[CategoriaCosmetico.ESCALERA]  ?: emptyList()
+                val sS = mapa[CategoriaCosmetico.SERPIENTE] ?: emptyList()
+                val sF = mapa[CategoriaCosmetico.FICHA]     ?: emptyList()
+                val ic = mapa[CategoriaCosmetico.ICONO]     ?: emptyList()
 
+                // Solo sobreescribimos si el servidor devuelve algo real
+                if (sE.isNotEmpty()) skinsEscalera = sE
+                if (sS.isNotEmpty()) skinsSerpiente = sS
+                if (sF.isNotEmpty()) skinsFicha = sF
+                if (ic.isNotEmpty()) iconos = ic
                 // Debug opcional para que veas en consola si llegan datos
                 println("DEBUG: Iconos cargados -> ${iconos.size}")
 
