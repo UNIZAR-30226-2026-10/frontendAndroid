@@ -1,5 +1,6 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Mazos
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonCategoriaCustom
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
@@ -37,11 +40,8 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonEdi
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonNuevoMazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonEliminarMazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_offline
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Mazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Tienda.TiendaContent
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Tienda.TiendaUiState
 
 @Composable
 fun MazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
@@ -60,10 +60,15 @@ fun MazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
             MazosContent(
                 mazos = viewModel.mazos,
                 mazoSeleccionado = viewModel.mazoSeleccionado,
-                onSeleccionarMazo = { viewModel.seleccionarMazoPorNumero(it) },
-                onCrearNuevoMazo = { viewModel.crearNuevoMazo() },
-                onEliminarMazoSeleccionado = { viewModel.eliminarMazoSeleccionado() },
-                onEditarMazo = { viewModel.editarMazoSeleccionado() },
+                onSeleccionarMazo = viewModel::seleccionarMazo,
+                onCrearNuevoMazo = {
+                    viewModel.crearNuevoMazo()
+                    navController.navController.navigate(Destinos.EDITAR_MAZOS)
+                },
+                onEditarMazo = {
+                    navController.navController.navigate(Destinos.EDITAR_MAZOS)
+                },
+                onEliminarMazoSeleccionado = viewModel::eliminarMazoSeleccionado
             )
         }
         is MazosUiState.Error -> {
@@ -80,10 +85,10 @@ fun MazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
 fun MazosContent(
     mazos: List<Mazo>,
     mazoSeleccionado: Mazo,
-    onSeleccionarMazo: (Int) -> Unit,
+    onSeleccionarMazo: (Mazo) -> Unit,
     onCrearNuevoMazo: () -> Unit,
-    onEliminarMazoSeleccionado: () -> Unit, // FIXME mirar de pasar parametro para mas claridad
-    onEditarMazo: () -> Unit // FIXME mirar de pasar parametro para mas claridad
+    onEditarMazo: () -> Unit,
+    onEliminarMazoSeleccionado: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -150,15 +155,32 @@ fun MazosContent(
                         .weight(1f)
                 ) {
                     items(mazoSeleccionado.cartas) { carta ->
-                        // FIXME mostrar carta, ahora mismo solo un placeholder
-                        Box (
+                        val imagenRes = carta.imagen
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(0.7f)
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(color_offline, RoundedCornerShape(4.dp))
                                 .border(1.dp, color_sf.copy(alpha = 0.5f), RoundedCornerShape(4.dp)),
-                        )
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (imagenRes != null && imagenRes != 0) {
+                                Image(
+                                    painter = painterResource(id = imagenRes),
+                                    contentDescription = "imagen carta",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } else {
+                                Text(
+                                    text = carta.nombre,
+                                    style = SETextTypes.pequeno,
+                                    color = color_text,
+                                    modifier = Modifier.padding(6.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -174,12 +196,7 @@ fun MazosContent(
         ) {
             // BOTON PARA CREAR NUEVO MAZO
             BotonNuevoMazo(
-                onClick = {
-                    onCrearNuevoMazo()
-                    // TODO si hay menos de 8 mazos cambio a pantalla de edicion de mazo con uno vacio
-                    // TODO si hay 8 mazos muestro mensaje de error
-                    navController.navController.navigate(Destinos.EDITAR_MAZOS)
-                },
+                onClick = onCrearNuevoMazo,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
@@ -187,11 +204,7 @@ fun MazosContent(
 
             // BOTON PARA EDITAR MAZO SELECCIONADO
             BotonEditarMazo(
-                onClick = {
-                    // TODO cambio a pantalla de edicion de mazo con el mazo seleccionado
-                    navController.navController.navigate(Destinos.EDITAR_MAZOS)
-
-                },
+                onClick = onEditarMazo,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
@@ -200,9 +213,7 @@ fun MazosContent(
 
             // BOTON PARA ELIMINAR MAZO SELECCIONADO
             BotonEliminarMazo(
-                onClick = {
-                    onEliminarMazoSeleccionado()
-                },
+                onClick = onEliminarMazoSeleccionado,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)

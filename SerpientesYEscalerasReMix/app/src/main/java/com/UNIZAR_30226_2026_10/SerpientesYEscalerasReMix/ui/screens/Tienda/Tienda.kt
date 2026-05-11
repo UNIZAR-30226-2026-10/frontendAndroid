@@ -50,7 +50,7 @@ import androidx.compose.ui.graphics.Color
 
 
 @Composable
-fun TiendaScreen(SEState: SENavHostController, viewModel: TiendaViewModel) {
+fun TiendaScreen(navController: SENavHostController, viewModel: TiendaViewModel) {
 
     val state by viewModel.uiState.collectAsState()
 

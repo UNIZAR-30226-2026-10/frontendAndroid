@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.fakes.carta1
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.fakes.carta2
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.fakes.carta3
@@ -20,6 +21,8 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFac
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Tienda.TiendaUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
 
@@ -50,16 +53,14 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
     var cartasDisponibles by mutableStateOf(listaCartasDisponibles())
         private set
 
-    // Como ya tenemos la lista de mazos no necesitamos pedirselo a la API, podemos seleccionar por
-    // indice en la lista que tenemos, aunque de hecho cuando trabajamos con una mazo ya estamos en el
-    // asi que no es necesario ni siquiera el indice, se puede seleccionar directamente por el mazo
-    fun seleccionarMazoPorNumero(mazo: Int?) {
-        if (mazo == null) {
-            mazoSeleccionado = mazos.firstOrNull() ?: mazoVacio
-            return
+    init {
+        viewModelScope.launch {
+            cF.email.collectLatest { email ->
+                if (email.isNotBlank()) {
+                    fetchMazos()
+                }
+            }
         }
-
-        mazos.getOrNull(mazo) ?: mazoVacio
     }
 
     suspend fun fetchMazos() {
@@ -74,11 +75,28 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
                 Log.e("TiendaViewModel", "Error al obtener mazos, usando lista de mazos vacía: ${e.message}")
                 emptyList<Mazo>()
             }
+            this.mazos = mazos
+            mazoSeleccionado = mazos.firstOrNull() ?: mazoVacio
             _uiState.value = MazosUiState.Success(mazos)
         } catch (e: Exception) {
             _uiState.value = MazosUiState.Error("No se pudo conectar con el servidor")
         }
     }
+
+
+    // Como ya tenemos la lista de mazos no necesitamos pedirselo a la API, podemos seleccionar por
+    // indice en la lista que tenemos, aunque de hecho cuando trabajamos con una mazo ya estamos en el
+    // asi que no es necesario ni siquiera el indice, se puede seleccionar directamente por el mazo
+    fun seleccionarMazoPorNumero(mazo: Int?) {
+        if (mazo == null) {
+            mazoSeleccionado = mazos.firstOrNull() ?: mazoVacio
+            return
+        }
+
+        mazos.getOrNull(mazo) ?: mazoVacio
+    }
+
+
 
     fun seleccionarMazo(mazo: Mazo) {
         mazoSeleccionado = mazo

@@ -22,7 +22,7 @@ class MazosRepositoryImpl(
         if (!response.isSuccessful) {
             throw IllegalStateException("Error getMazos: ${response.code()}")
         }
-        val body = response.body() ?: emptyList()
+        val body = response.body()?.decks ?: emptyList()
         // Convertir la respuesta a la lista de mazos del dominio
         return body.map { it.toDomain() }
     }

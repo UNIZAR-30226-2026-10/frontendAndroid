@@ -15,9 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -28,7 +25,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,7 +36,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Calidad
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
@@ -56,6 +51,8 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selecte
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @Composable
 fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
@@ -73,6 +70,7 @@ fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewMo
             .fillMaxSize()
             .background(color_bg)
             .padding(16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         Text(
             text = "Editar mazo",
@@ -156,20 +154,30 @@ fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewMo
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(5),
+        Column(
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxWidth()
         ) {
-            items(cartasDisponibles) { carta ->
-                CartaDisponibleItem(
-                    carta = carta,
-                    habilitado = !mazoCompleto,
-                    onAdd = { viewModel.anadirCarta(carta) }
-                )
+            cartasDisponibles.chunked(5).forEach { fila ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    fila.forEach { carta ->
+                        CartaDisponibleItem(
+                            carta = carta,
+                            habilitado = !mazoCompleto,
+                            onAdd = { viewModel.anadirCarta(carta) }
+                        )
+                    }
+                    repeat(5 - fila.size) {
+                        Spacer(modifier = Modifier.width(80.dp))
+                    }
+                }
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
