@@ -1,5 +1,6 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Mazos
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -14,16 +15,28 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.fakes.listaDeMazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.fakes.mazoVacio
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Mazo
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Producto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Tienda.TiendaUiState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
+
+    // Estado privado
+    private val _uiState = MutableStateFlow<MazosUiState>(MazosUiState.Loading)
+    // Estado público inmutable
+    val uiState: StateFlow<MazosUiState> = _uiState
 
     companion object {
         fun Factory(cF: CaseFacade): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return MazosViewModel(cF) as T
+                    if (modelClass.isAssignableFrom(MazosViewModel::class.java)) {
+                        return MazosViewModel(cF) as T
+                    }
+                    throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             }
     }
@@ -47,6 +60,24 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
         }
 
         mazos.getOrNull(mazo) ?: mazoVacio
+    }
+
+    suspend fun fetchMazos() {
+        if (cF.email.value.isBlank()) {
+            return
+        }
+        _uiState.value = MazosUiState.Loading
+        try {
+            val mazos = try {
+                cF.obtenerMazosCase()
+            } catch (e: Exception) {
+                Log.e("TiendaViewModel", "Error al obtener mazos, usando lista de mazos vacía: ${e.message}")
+                emptyList<Mazo>()
+            }
+            _uiState.value = MazosUiState.Success(mazos)
+        } catch (e: Exception) {
+            _uiState.value = MazosUiState.Error("No se pudo conectar con el servidor")
+        }
     }
 
     fun seleccionarMazo(mazo: Mazo) {

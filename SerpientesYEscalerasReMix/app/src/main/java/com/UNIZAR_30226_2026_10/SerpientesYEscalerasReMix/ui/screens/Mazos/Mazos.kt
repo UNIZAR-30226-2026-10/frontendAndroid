@@ -31,19 +31,60 @@ import androidx.compose.material3.Text
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonEditarMazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonNuevoMazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonEliminarMazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_offline
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Mazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Tienda.TiendaContent
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Tienda.TiendaUiState
 
 @Composable
 fun MazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
 
-    val mazos = viewModel.mazos
-    val mazoSeleccionado = viewModel.mazoSeleccionado
+    val state by viewModel.uiState.collectAsState()
 
+    when (val s = state) {
+        is MazosUiState.Loading -> {
+            // TODO Mostrar pantalla de carga
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Cargando mazos...")
+            }
+        }
+        is MazosUiState.Success -> {
+            // TODO Mostrar los mazos
+            MazosContent(
+                mazos = viewModel.mazos,
+                mazoSeleccionado = viewModel.mazoSeleccionado,
+                onSeleccionarMazo = { viewModel.seleccionarMazoPorNumero(it) },
+                onCrearNuevoMazo = { viewModel.crearNuevoMazo() },
+                onEliminarMazoSeleccionado = { viewModel.eliminarMazoSeleccionado() },
+                onEditarMazo = { viewModel.editarMazoSeleccionado() },
+            )
+        }
+        is MazosUiState.Error -> {
+            // TODO Mostrar mensaje de error
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Error al cargar los mazos: ${s.message}")
+            }
+        }
+    }
+
+
+}
+@Composable
+fun MazosContent(
+    mazos: List<Mazo>,
+    mazoSeleccionado: Mazo,
+    onSeleccionarMazo: (Int) -> Unit,
+    onCrearNuevoMazo: () -> Unit,
+    onEliminarMazoSeleccionado: () -> Unit, // FIXME mirar de pasar parametro para mas claridad
+    onEditarMazo: () -> Unit // FIXME mirar de pasar parametro para mas claridad
+) {
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -73,7 +114,7 @@ fun MazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
                         estaSeleccionado = mazoSeleccionado == mazo,
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            viewModel.seleccionarMazo(mazo)
+                            onSeleccionarMazo(mazo)
                         }
                     )
                 }
@@ -134,7 +175,7 @@ fun MazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
             // BOTON PARA CREAR NUEVO MAZO
             BotonNuevoMazo(
                 onClick = {
-                    viewModel.crearNuevoMazo()
+                    onCrearNuevoMazo()
                     // TODO si hay menos de 8 mazos cambio a pantalla de edicion de mazo con uno vacio
                     // TODO si hay 8 mazos muestro mensaje de error
                     navController.navController.navigate(Destinos.EDITAR_MAZOS)
@@ -160,7 +201,7 @@ fun MazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
             // BOTON PARA ELIMINAR MAZO SELECCIONADO
             BotonEliminarMazo(
                 onClick = {
-                    viewModel.eliminarMazoSeleccionado()
+                    onEliminarMazoSeleccionado()
                 },
                 modifier = Modifier
                     .fillMaxWidth()

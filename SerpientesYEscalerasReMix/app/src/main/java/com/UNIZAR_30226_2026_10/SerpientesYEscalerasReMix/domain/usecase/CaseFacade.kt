@@ -38,7 +38,7 @@ class CaseFacade(
     private val tiendaRepository: TiendaRepository,
 
     // Mazos
-    private val mazoRepository: MazosRepository
+    private val mazoRepository: MazosRepository,
     // Partida
     private val partidaRepository: PartidaRepository,
 
@@ -131,11 +131,6 @@ class CaseFacade(
     val ganador = partidaRepository.ganador
 
     // Casos de uso de Partida
-    val syncPartidaCase = SyncPartidaCase(partidaRepository, email, matchId)
-    val lanzarDadoCase = LanzarDadoCase(partidaRepository, email, matchId)
-    val confirmarDestinoCase = ConfirmarDestinoCase(partidaRepository, email, matchId)
-    val chatCase = ChatCase(partidaRepository, matchId)
-    val jugarCartaCase = JugarCartaCase(partidaRepository, email, matchId)
 
     val syncPartidaCase = SyncPartidaCase(partidaRepository, username, matchId)
     val cleanPartidaCase = CleanPartidaCase(partidaRepository)
@@ -143,9 +138,5 @@ class CaseFacade(
     val confirmarDestinoCase = ConfirmarDestinoCase(partidaRepository, username, matchId)
     val chatCase = ChatCase(partidaRepository, matchId, username)
     val jugarCartaCase = JugarCartaCase(partidaRepository, username, matchId)
-
-    // Pruebas conexion
-    val pruebaConexionCase = PruebaConexionCase(pruebaConexionRepository)
-
 
 }
