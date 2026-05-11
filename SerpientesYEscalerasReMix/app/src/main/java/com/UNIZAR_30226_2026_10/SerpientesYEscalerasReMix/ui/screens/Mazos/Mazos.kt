@@ -1,6 +1,5 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Mazos
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -22,8 +21,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonCategoriaCustom
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
@@ -40,13 +41,16 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonEdi
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonNuevoMazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonEliminarMazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_offline
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.CartaDetalleDialog
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.CartaImagen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.longPressAfter
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Mazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 
 @Composable
 fun MazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
 
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.mazosUiState.collectAsState()
 
     when (val s = state) {
         is MazosUiState.Loading -> {
@@ -133,6 +137,8 @@ fun MazosContent(
                     .fillMaxSize()
                     .padding(start = 16.dp, end = 16.dp, top = 4.dp)
             ) {
+                var cartaDetalle by remember { mutableStateOf<com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta?>(null) }
+
                 Text(
                     text = mazoSeleccionado.nombre,
                     style = SETextTypes.nombreMazo,
@@ -155,33 +161,21 @@ fun MazosContent(
                         .weight(1f)
                 ) {
                     items(mazoSeleccionado.cartas) { carta ->
-                        val imagenRes = carta.imagen
-                        Box(
+                        CartaImagen(
+                            carta = carta,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(0.7f)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(color_offline, RoundedCornerShape(4.dp))
-                                .border(1.dp, color_sf.copy(alpha = 0.5f), RoundedCornerShape(4.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (imagenRes != null && imagenRes != 0) {
-                                Image(
-                                    painter = painterResource(id = imagenRes),
-                                    contentDescription = "imagen carta",
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop
-                                )
-                            } else {
-                                Text(
-                                    text = carta.nombre,
-                                    style = SETextTypes.pequeno,
-                                    color = color_text,
-                                    modifier = Modifier.padding(6.dp)
-                                )
-                            }
-                        }
+                                .longPressAfter(1000L) { cartaDetalle = carta }
+                        )
                     }
+                }
+
+                cartaDetalle?.let { carta ->
+                    CartaDetalleDialog(
+                        carta = carta,
+                        onDismiss = { cartaDetalle = null }
+                    )
                 }
             }
         }

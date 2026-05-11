@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,9 +20,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,19 +37,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Calidad
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_cardComun
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_cardEpica
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_cardLegendaria
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_cardRara
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fondoTienda
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_offline
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selectedText
@@ -53,17 +52,83 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.CartaDetalleDialog
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.CartaImagen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.longPressAfter
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Mazo
 
 @Composable
 fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
 
-    /*LaunchedEffect(viewModel.mazoSeleccionado) {
-        viewModel.seleccionarMazoPorNumero()
-    }*/
+    val state by viewModel.editarMazoUiState.collectAsState()
 
-    val mazo = viewModel.mazoSeleccionado
-    val cartasDisponibles = viewModel.cartasDisponibles
-    val mazoCompleto = mazo.cartas.size >= 10
+    when (val s = state) {
+        is EditarMazoUiState.Loading -> {
+            // Mostrar pantalla de carga
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Cargando mazo...")
+            }
+        }
+
+        is EditarMazoUiState.Success -> {
+            // Mostrar los mazos
+            EditarMazoContent(
+                mazoAntiguo = viewModel.mazoSeleccionado,
+                mazoAEditar = viewModel.mazoSeleccionado,
+                cartasDisponibles = viewModel.cartasDisponibles,
+                onGuardarCambios = { mazoAntiguo, mazoAEditar ->
+                    // guardar cambios en el servidor
+                    viewModel.guardarCambios(mazoAntiguo, mazoAEditar)
+
+                },
+                onSalir = {
+                    navController.navController.popBackStack()
+                },
+                onActualizarNombre = { nuevoNombre ->
+                    viewModel.actualizarNombreMazoSeleccionado(nuevoNombre)
+                },
+                onAnadirCarta = { carta ->
+                    viewModel.anadirCartaAMazoSeleccionado(carta)
+                },
+                onEliminarCarta = { indice ->
+                    viewModel.eliminarCartaAMazoSeleccionado(indice)
+                }
+            )
+        }
+
+        is EditarMazoUiState.Error -> {
+            // Mostrar mensaje de error
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Error al cargar el mazo: ${s.message}")
+            }
+        }
+    }
+
+}
+
+@Composable
+fun EditarMazoContent(
+    mazoAntiguo: Mazo,
+    mazoAEditar: Mazo,
+    cartasDisponibles: List<Carta>,
+    onGuardarCambios: (Mazo, Mazo) -> Unit,
+    onSalir: () -> Unit,
+    onActualizarNombre: (String) -> Unit,
+    onAnadirCarta: (Carta) -> Unit,
+    onEliminarCarta: (Int) -> Unit
+
+){
+
+    val mazoCompleto = mazoAEditar.cartas.size >= 10
+    var cartaDetalle by remember { mutableStateOf<Carta?>(null) }
+    var mostrarSalida by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -72,14 +137,83 @@ fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewMo
             .padding(16.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        Text(
-            text = "Editar mazo",
-            style = SETextTypes.titulo,
-            color = color_text,
-            modifier = Modifier.fillMaxWidth()
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
-        Spacer(modifier = Modifier.height(16.dp))
+            // Boton guardar cambios
+            IconButton(
+                onClick = {
+                    // guardar cambios en el servidor
+                        onGuardarCambios(mazoAntiguo, mazoAEditar)
+                },
+                modifier = Modifier.size(36.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Guardar cambios",
+                    tint = color_text
+                )
+            }
+
+            // Icono cierre
+            IconButton(
+                onClick = { mostrarSalida = true },
+                modifier = Modifier
+                    .offset(x = (-4).dp, y = 4.dp)
+                    .size(36.dp)
+                    .rotate(45f)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.plus_simbol),
+                    contentDescription = "Salir",
+                    tint = color_text,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
+
+
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        if (mostrarSalida) {
+            AlertDialog(
+                onDismissRequest = { mostrarSalida = false },
+                title = {
+                    Text(
+                        text = "Salir sin guardar",
+                        style = SETextTypes.mediano,
+                        color = color_text
+                    )
+                },
+                text = {
+                    Text(
+                        text = "No se guardaran los cambios al mazo.",
+                        style = SETextTypes.plano,
+                        color = color_text
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            mostrarSalida = false
+                            onSalir()
+                        }
+                    ) {
+                        Text("Salir", color = color_text)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { mostrarSalida = false }) {
+                        Text("Cancelar", color = color_text)
+                    }
+                },
+                containerColor = color_bg
+            )
+        }
 
         Text(
             text = "Nombre del mazo",
@@ -89,7 +223,7 @@ fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewMo
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        var nombreMazo by remember(mazo.nombre) { mutableStateOf(mazo.nombre) }
+        var nombreMazo by remember(mazoAEditar.nombre) { mutableStateOf(mazoAEditar.nombre) }
 
         Surface(
             modifier = Modifier
@@ -107,7 +241,7 @@ fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewMo
                     value = nombreMazo,
                     onValueChange = {
                         nombreMazo = it
-                        viewModel.actualizarNombreMazo(it)
+                        onActualizarNombre(it)
                     },
                     textStyle = SETextTypes.plano.copy(fontSize = 16.sp, color = color_text),
                     modifier = Modifier.fillMaxWidth(),
@@ -132,14 +266,15 @@ fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewMo
             modifier = Modifier.fillMaxWidth()
         ) {
             items((0 until 10).toList()) { index ->
-                val carta = mazo.cartas.getOrNull(index)
+                val carta = mazoAEditar.cartas.getOrNull(index)
                 CartaMazoSlot(
                     carta = carta,
                     onRemove = {
                         if (carta != null) {
-                            viewModel.eliminarCarta(index)
+                            onEliminarCarta(index)
                         }
-                    }
+                    },
+                    onLongPress = { cartaDetalle = carta }
                 )
             }
         }
@@ -167,7 +302,8 @@ fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewMo
                         CartaDisponibleItem(
                             carta = carta,
                             habilitado = !mazoCompleto,
-                            onAdd = { viewModel.anadirCarta(carta) }
+                            onAdd = { onAnadirCarta(carta) },
+                            onLongPress = { cartaDetalle = carta }
                         )
                     }
                     repeat(5 - fila.size) {
@@ -178,17 +314,28 @@ fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewMo
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        cartaDetalle?.let { carta ->
+            CartaDetalleDialog(
+                carta = carta,
+                onDismiss = { cartaDetalle = null }
+            )
+        }
     }
 }
 
 @Composable
-private fun CartaMazoSlot(carta: Carta?, onRemove: () -> Unit) {
+private fun CartaMazoSlot(
+    carta: Carta?,
+    onRemove: () -> Unit,
+    onLongPress: () -> Unit
+) {
     Box(
         modifier = Modifier
             .width(80.dp)
             .aspectRatio(0.7f)
             .clip(RoundedCornerShape(8.dp))
-            .background(carta?.let { colorCarta(it) } ?: color_fondoTienda)
+            .background(color_fondoTienda)
             .border(1.dp, color_sf.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
     ) {
         if (carta == null) {
@@ -199,13 +346,11 @@ private fun CartaMazoSlot(carta: Carta?, onRemove: () -> Unit) {
                 modifier = Modifier.align(Alignment.Center)
             )
         } else {
-            Text(
-                text = carta.nombre,
-                style = SETextTypes.pequeno,
-                color = color_text,
+            CartaImagen(
+                carta = carta,
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(6.dp)
+                    .fillMaxSize()
+                    .longPressAfter(1000L, onLongPress)
             )
             IconButton(
                 onClick = onRemove,
@@ -225,24 +370,20 @@ private fun CartaMazoSlot(carta: Carta?, onRemove: () -> Unit) {
 }
 
 @Composable
-private fun CartaDisponibleItem(carta: Carta, habilitado: Boolean, onAdd: () -> Unit) {
+private fun CartaDisponibleItem(
+    carta: Carta,
+    habilitado: Boolean,
+    onAdd: () -> Unit,
+    onLongPress: () -> Unit
+) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(
+        CartaImagen(
+            carta = carta,
             modifier = Modifier
                 .width(80.dp)
                 .aspectRatio(0.7f)
-                .clip(RoundedCornerShape(8.dp))
-                .background(colorCarta(carta))
-                .border(1.dp, color_sf.copy(alpha = 0.5f), RoundedCornerShape(8.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = carta.nombre,
-                style = SETextTypes.pequeno,
-                color = color_text,
-                modifier = Modifier.padding(6.dp)
-            )
-        }
+                .longPressAfter(1000L, onLongPress)
+        )
 
         IconButton(
             onClick = onAdd,
@@ -256,14 +397,5 @@ private fun CartaDisponibleItem(carta: Carta, habilitado: Boolean, onAdd: () -> 
                 modifier = Modifier.size(20.dp)
             )
         }
-    }
-}
-
-private fun colorCarta(carta: Carta): Color {
-    return when (carta.calidad) {
-        Calidad.Comun -> color_cardComun
-        Calidad.Rara -> color_cardRara
-        Calidad.Epica -> color_cardEpica
-        Calidad.Legendaria -> color_cardLegendaria
     }
 }

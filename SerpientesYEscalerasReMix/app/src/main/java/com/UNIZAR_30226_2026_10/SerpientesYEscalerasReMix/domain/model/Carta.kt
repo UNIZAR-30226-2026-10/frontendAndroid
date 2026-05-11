@@ -15,10 +15,8 @@ enum class Calidad {
 
 data class Carta (
     val nombre: String,
-    val descripcion: String,
-    val tipo: Tipo_Carta,
     val calidad: Calidad,
-    val id: Int? = null,
-    val efecto: String? = null,
+    val tipo: Tipo_Carta,
+    val descripcion: String,
     val imagen: Int? = null
 )

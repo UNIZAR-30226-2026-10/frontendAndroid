@@ -216,7 +216,7 @@ interface ApiService {
         @Body eliminarCartas: List<CartaDto>?
     ) : Response<Unit>
 
-    @GET("cards")
+    @GET("users/{email}/cards")
     suspend fun getCartasDisponibles(
         @Path("email") email: String
     ) : Response<List<CartaDto>>

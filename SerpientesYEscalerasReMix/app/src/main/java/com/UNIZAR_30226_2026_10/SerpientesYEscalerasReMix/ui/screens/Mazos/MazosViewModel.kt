@@ -27,9 +27,11 @@ import kotlinx.coroutines.launch
 class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
 
     // Estado privado
-    private val _uiState = MutableStateFlow<MazosUiState>(MazosUiState.Loading)
+    private val _mazoUiState = MutableStateFlow<MazosUiState>(MazosUiState.Loading)
+    private val _editarMazoUiState = MutableStateFlow<EditarMazoUiState>(EditarMazoUiState.Loading)
     // Estado público inmutable
-    val uiState: StateFlow<MazosUiState> = _uiState
+    val mazosUiState: StateFlow<MazosUiState> = _mazoUiState
+    val editarMazoUiState: StateFlow<EditarMazoUiState> = _editarMazoUiState
 
     companion object {
         fun Factory(cF: CaseFacade): ViewModelProvider.Factory =
@@ -58,6 +60,7 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
             cF.email.collectLatest { email ->
                 if (email.isNotBlank()) {
                     fetchMazos()
+                    fetchCartasDisponibles()
                 }
             }
         }
@@ -67,7 +70,7 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
         if (cF.email.value.isBlank()) {
             return
         }
-        _uiState.value = MazosUiState.Loading
+        _mazoUiState.value = MazosUiState.Loading
         try {
             val mazos = try {
                 cF.obtenerMazosCase()
@@ -77,9 +80,28 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
             }
             this.mazos = mazos
             mazoSeleccionado = mazos.firstOrNull() ?: mazoVacio
-            _uiState.value = MazosUiState.Success(mazos)
+            _mazoUiState.value = MazosUiState.Success(mazos)
         } catch (e: Exception) {
-            _uiState.value = MazosUiState.Error("No se pudo conectar con el servidor")
+            _mazoUiState.value = MazosUiState.Error("No se pudo conectar con el servidor")
+        }
+    }
+
+    suspend fun fetchCartasDisponibles() {
+        if (cF.email.value.isBlank()) {
+            return
+        }
+        _editarMazoUiState.value = EditarMazoUiState.Loading
+        try {
+            val cartas = try {
+                cF.obtenerCartasDisponiblesCase()
+            } catch (e: Exception) {
+                Log.e("MazosViewModel", "Error al obtener cartas disponibles, usando lista de cartas vacía: ${e.message}")
+                emptyList<Carta>()
+            }
+            this.cartasDisponibles = cartas
+            _editarMazoUiState.value = EditarMazoUiState.Success(mazoSeleccionado, cartasDisponibles)
+        } catch (e: Exception) {
+            _editarMazoUiState.value = EditarMazoUiState.Error("No se pudo conectar con el servidor")
         }
     }
 
@@ -96,25 +118,23 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
         mazos.getOrNull(mazo) ?: mazoVacio
     }
 
-
-
     fun seleccionarMazo(mazo: Mazo) {
         mazoSeleccionado = mazo
     }
 
-    fun actualizarNombreMazo(nombre: String) {
+    fun actualizarNombreMazoSeleccionado(nombre: String) {
         mazoSeleccionado = mazoSeleccionado.copy(nombre = nombre)
         actualizarMazoEnLista(mazoSeleccionado)
     }
 
-    fun anadirCarta(carta: Carta) {
+    fun anadirCartaAMazoSeleccionado(carta: Carta) {
         if (mazoSeleccionado.cartas.size >= 10) return
         val nuevasCartas = mazoSeleccionado.cartas + carta
         mazoSeleccionado = mazoSeleccionado.copy(cartas = nuevasCartas)
         actualizarMazoEnLista(mazoSeleccionado)
     }
 
-    fun eliminarCarta(indice: Int) {
+    fun eliminarCartaAMazoSeleccionado(indice: Int) {
         if (indice !in mazoSeleccionado.cartas.indices) return
         val nuevasCartas = mazoSeleccionado.cartas.toMutableList().also { it.removeAt(indice) }
         mazoSeleccionado = mazoSeleccionado.copy(cartas = nuevasCartas)
@@ -138,10 +158,30 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
         mazoSeleccionado = mazos.firstOrNull() ?: mazoVacio
     }
 
+    fun guardarCambios(mazoAntiguo: Mazo, mazoNuevo: Mazo) {
+        viewModelScope.launch {
+            try{
+                if (cF.email.value.isBlank()) {
+                    _editarMazoUiState.value = EditarMazoUiState.Error("Usuario no ha iniciado sesión")
+                    return@launch
+                }
+                val exito = cF.editarMazoCase(mazoAntiguo.nombre, mazoNuevo.nombre, mazoNuevo.cartas, mazoAntiguo.cartas)
+                if (exito) {
+                    // Refrescar la lista de mazos después de una edición exitosa para asegurarnos de que se reflejen los cambios realizados
+                    fetchMazos()
+                }
+            } catch (e: Exception) {
+                _editarMazoUiState.value = EditarMazoUiState.Error("Error al guardar los cambios del mazo")
+            }
+
+        }
+    }
     private fun actualizarMazoEnLista(mazo: Mazo) {
         mazos = mazos.map { if (it == mazoSeleccionado) mazo else it }
     }
 
+
+    // Para pruebas
     private fun listaCartasDisponibles(): List<Carta> {
         return listOf(
             carta1, carta2, carta3, carta4, carta5,
