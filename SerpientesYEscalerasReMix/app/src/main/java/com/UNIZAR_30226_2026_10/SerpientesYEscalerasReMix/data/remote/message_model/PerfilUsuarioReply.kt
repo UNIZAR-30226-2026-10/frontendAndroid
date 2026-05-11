@@ -3,12 +3,12 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_m
 import com.google.gson.annotations.SerializedName
 
 data class PerfilUsuarioReply(
-    @SerializedName("username") val nombre: String,
-    @SerializedName("wins") val victorias: Int,
-    @SerializedName("losses") val derrotas: Int,
-    @SerializedName("coins") val monedas: Int,
-    @SerializedName("current_icon") val iconoActual: String,
-    @SerializedName("current_ladder_skin") val skinEscaleraActual: String,
-    @SerializedName("current_snake_skin") val skinSerpienteActual: String,
-    @SerializedName("current_token_skin") val skinFichaActual: String
+    @SerializedName("nombre") val nombre: String,
+    @SerializedName("victorias") val victorias: Int,
+    @SerializedName("derrotas") val derrotas: Int,
+    @SerializedName("monedas") val monedas: Int,
+    @SerializedName("iconoActual") val iconoActual: String,
+    @SerializedName("skinEscaleraActual") val skinEscaleraActual: String,
+    @SerializedName("skinSerpienteActual") val skinSerpienteActual: String,
+    @SerializedName("skinFichaActual") val skinFichaActual: String
 )

@@ -81,8 +81,12 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
     fun actualizarNombre(nuevoNombre: String) {
         viewModelScope.launch {
             try {
-                cF.actualizarNombreCase(nuevoNombre)
-                perfil = perfil?.copy(nombre = nuevoNombre)
+                val result = cF.actualizarNombreCase(nuevoNombre)
+                if (result.isSuccess) {
+                    perfil = perfil?.copy(nombre = nuevoNombre)
+                } else {
+                    errorMessage = "Error al actualizar nombre"
+                }
             } catch (e: Exception) {
                 errorMessage = "Error al actualizar nombre: ${e.message}"
             }
