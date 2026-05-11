@@ -1,16 +1,12 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase
 
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PerfilRepository
 import kotlinx.coroutines.flow.StateFlow
 
 class ActualizarSkinCase(
-    private val email: StateFlow<String>
+    private val email: StateFlow<String>,
+    private val repo: PerfilRepository
 ) {
-    suspend operator fun invoke(categoria: CategoriaCosmetico, skinId: String) {
-        when (categoria) {
-            CategoriaCosmetico.ESCALERA  -> { /* TODO: PUT /api/users/${email.value}/stair */ }
-            CategoriaCosmetico.SERPIENTE -> { /* TODO: Pendiente de API */ }
-            CategoriaCosmetico.FICHA     -> { /* TODO: PUT /api/users/${email.value}/pawn */ }
-            CategoriaCosmetico.ICONO     -> { /* TODO: PUT /api/users/${email.value}/icon */ }
-        }
-    }
+    suspend operator fun invoke(categoria: CategoriaCosmetico, skinId: String) =
+        repo.actualizarCosmetico(email.value, categoria, skinId)
 }

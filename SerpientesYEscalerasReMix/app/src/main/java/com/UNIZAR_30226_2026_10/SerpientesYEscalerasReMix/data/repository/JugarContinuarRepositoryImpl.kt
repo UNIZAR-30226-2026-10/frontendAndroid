@@ -2,7 +2,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository
 
 import android.util.Log
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiService
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PartidaGetReply
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PartidaRegistroGetReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.RegistroPartida
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.JugarContinuarRepository
 
@@ -22,7 +22,7 @@ class JugarContinuarRepositoryImpl(private val api: ApiService) : JugarContinuar
         }
     }
 
-    private fun PartidaGetReply.toDomain() = RegistroPartida(
+    private fun PartidaRegistroGetReply.toDomain() = RegistroPartida(
         fecha = fecha,
         jugadores = jugadores.joinToString(", "),
         id = iD,

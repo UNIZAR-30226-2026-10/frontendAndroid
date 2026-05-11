@@ -1,5 +1,7 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository
 
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
@@ -41,7 +43,10 @@ class LoginRegisterRepositoryImpl(
                 user.email
             } else {
                 // Si la cookie expiró o no existe (401), limpiamos
-                cerrarSesion()
+                local.clearLogin()
+                ApiClient.clearCookies()
+                _email.value = ""
+                _username.value = ""
                 ""
             }
         } catch (e: Exception) {
@@ -72,11 +77,19 @@ class LoginRegisterRepositoryImpl(
         }
     }
 
-    override suspend fun cerrarSesion() {
+    override suspend fun cerrarSesion(context: Context) {
         local.clearLogin()
         ApiClient.clearCookies()
         _email.value = ""
         _username.value = ""
+
+        // Reiniciar app
+        val packageManager = context.packageManager
+        val intent = packageManager.getLaunchIntentForPackage(context.packageName)
+        val componentName = intent?.component
+        val mainIntent = Intent.makeRestartActivityTask(componentName)
+        context.startActivity(mainIntent)
+        Runtime.getRuntime().exit(0)
     }
 
     override suspend fun registrarse(username: String, email: String, passwd: String): Boolean {

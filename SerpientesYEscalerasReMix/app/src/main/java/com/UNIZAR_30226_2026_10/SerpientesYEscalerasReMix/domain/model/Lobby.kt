@@ -4,5 +4,6 @@ data class Lobby(
     val id: String,
     val hostUsername: String,
     val players: List<JugadorLobby?>,
-    val tableroSelect: String
+    val tableroSelect: String,
+    val matchId: String?
 )

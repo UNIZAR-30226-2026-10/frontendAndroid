@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeJugadoresSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.JugadoresSnapshot
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarIconoJugadorR
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fg
@@ -82,79 +83,101 @@ fun ListaJugadores(
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            var numJugador: Int = 0
-            jugadoresState.jugadores.forEach { jugador ->
-                val esTurno = numJugador == jugadoresState.turno
-                numJugador++
+            repeat(4) { index ->
+                val jugador = jugadoresState.jugadores.getOrNull(index)
+                if (jugador != null) {
+                    val esTurno = index == jugadoresState.turno
 
-                val colorJugadorFondo =
-                    if(seleccionCarta) color_selectedText.copy(alpha = alphaAnimado)
-                    else if (esTurno) color_selected
-                    else color_unselected
+                    val colorJugadorFondo =
+                        if (seleccionCarta) color_selectedText.copy(alpha = alphaAnimado)
+                        else if (esTurno) color_selected
+                        else color_unselected
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(CircleShape)
-                        .background(colorJugadorFondo)
-                        .border(1.dp, if (esTurno && !seleccionCarta) color_fg else color_transparent, CircleShape)
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                        .then( // seleccionar jugador para accion de una carta
-                            if (seleccionCarta) {
-                                Modifier
-                                    .clickable { onSeleccionCarta(jugador.email) }
-                            } else Modifier
-                        ),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Imagen de perfil y Corona
-                    Box(contentAlignment = Alignment.Center) {
-                        Surface(
-                            shape = CircleShape,
-                            color = color_fg,
-                            modifier = Modifier.size(24.dp),
-                            border = BorderStroke(1.dp, color_bg)
-                        ) {
-                            Image(
-                                painter = painterResource(id = jugador.icono),
-                                contentDescription = "Perfil Snake",
-                                modifier = Modifier.padding(4.dp),
-                                contentScale = ContentScale.Fit
-                            )
-                        }
-                        if (jugador.esLider == true) {
-                            Image(
-                                painter = painterResource(id = R.drawable.corona),
-                                contentDescription = "corona del lider del lobby",
-                                modifier = Modifier
-                                    .size(15.dp)
-                                    .graphicsLayer(
-                                        scaleX = -1f, // Espejo horizontal
-                                        rotationZ = 40f
-                                    )
-                                    .offset(y = (-13).dp)
-                            )
-
-                        }
-                    }
-
-                    // Icono correspondiente a la skin
-                    Box(
+                    Row(
                         modifier = Modifier
-                            .size(14.dp)
+                            .fillMaxWidth()
                             .clip(CircleShape)
-                            .background(jugador.color)
-                            .border(1.dp, color_fg.copy(alpha = 0.8f), CircleShape)
-                    )
+                            .background(colorJugadorFondo)
+                            .border(
+                                1.dp,
+                                if (esTurno && !seleccionCarta) color_fg else color_transparent,
+                                CircleShape
+                            )
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .then( // seleccionar jugador para accion de una carta
+                                if (seleccionCarta) {
+                                    Modifier
+                                        .clickable { onSeleccionCarta(jugador.username) }
+                                } else Modifier
+                            ),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Imagen de perfil y Corona
+                        Box(contentAlignment = Alignment.Center) {
+                            Surface(
+                                shape = CircleShape,
+                                color = color_fg,
+                                modifier = Modifier.size(24.dp),
+                                border = BorderStroke(1.dp, color_bg)
+                            ) {
+                                Image(
+                                    painter = painterResource(id = buscarIconoJugadorR(jugador.icono)),
+                                    contentDescription = "Perfil Snake",
+                                    modifier = Modifier.padding(4.dp),
+                                    contentScale = ContentScale.Fit
+                                )
+                            }
+                            if (jugador.esLider == true) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.corona),
+                                    contentDescription = "corona del lider del lobby",
+                                    modifier = Modifier
+                                        .size(15.dp)
+                                        .graphicsLayer(
+                                            scaleX = -1f, // Espejo horizontal
+                                            rotationZ = 40f
+                                        )
+                                        .offset(y = (-13).dp)
+                                )
 
-                    Text(
-                        text = jugador.nombre,
-                        style = SETextTypes.plano.copy(fontSize = 13.sp),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f)
-                    )
+                            }
+                        }
+
+                        // Icono correspondiente a la skin
+                        Box(
+                            modifier = Modifier
+                                .size(14.dp)
+                                .clip(CircleShape)
+                                .background(jugador.color)
+                                .border(1.dp, color_fg.copy(alpha = 0.8f), CircleShape)
+                        )
+
+                        Text(
+                            text = jugador.username,
+                            style = SETextTypes.plano.copy(fontSize = 13.sp),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                } else {
+                    // Fila invisible para mantener el espacio de 4 jugadores
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Box(modifier = Modifier.size(24.dp))
+                        Box(modifier = Modifier.size(14.dp))
+                        Text(
+                            text = "",
+                            style = SETextTypes.plano.copy(fontSize = 13.sp),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
             }
         }

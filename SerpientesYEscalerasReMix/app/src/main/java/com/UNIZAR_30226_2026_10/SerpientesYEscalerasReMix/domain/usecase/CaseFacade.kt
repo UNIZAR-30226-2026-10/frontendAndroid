@@ -10,6 +10,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.Juga
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.LoginRegisterRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.MazosRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PartidaRepository
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PerfilRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.TiendaRepository
 import kotlinx.coroutines.flow.StateFlow
 
@@ -27,20 +28,22 @@ class CaseFacade(
     // Lobby / Jugar_Crear
     private val jugarCrearRepository: JugarCrearRepository,
 
-    // Partida
-    private val partidaRepository: PartidaRepository,
+    // Continuar Partida
+    private val jugarContinuarRepository: JugarContinuarRepository,
 
     // Amigos
     private val amigosRepository: AmigosRepository,
-
-    // Continuar Partida
-    private val jugarContinuarRepository: JugarContinuarRepository,
 
     // Tienda
     private val tiendaRepository: TiendaRepository,
 
     // Mazos
     private val mazoRepository: MazosRepository
+    // Partida
+    private val partidaRepository: PartidaRepository,
+
+    // Perfil
+    private val perfilRepository: PerfilRepository
 ) {
 
     // --- GENERAL STATE ---
@@ -54,6 +57,9 @@ class CaseFacade(
     // --- USECASE ---
 
     // TEST/LOG
+
+    // Caso de uso de prueba ping con API/Retrofit
+    val pruebaConexionCase = PruebaConexionCase(pruebaConexionRepository)
 
     // LOGIN/REGISTER
     val comprobarLoginCase = ComprobarLoginCase(loginRegisterRepository)
@@ -72,8 +78,9 @@ class CaseFacade(
     val seleccionarMazoCase = SeleccionarMazoCase(jugarCrearRepository, username)
     val seleccionarTableroCase = SeleccionarTableroCase(jugarCrearRepository, username)
     val abandonarExpulsarCase = AbandonarExpulsarCase(jugarCrearRepository, username)
-    val syncLobbyCase = SyncLobbyCase(jugarCrearRepository, username)
+    val syncLobbyCase = SyncLobbyCase(jugarCrearRepository, partidaRepository, username, lobby)
     val empezarPartidaCase = EmpezarPartidaCase(jugarCrearRepository, partidaRepository)
+    val obtenerTablerosCase = ObtenerTablerosCase(jugarCrearRepository)
 
     // AMIGOS
 
@@ -90,12 +97,14 @@ class CaseFacade(
 
     // JUGAR CONTINUAR
     val obtenerRegistroPartidasCase = ObtenerRegistroPartidasCase(jugarContinuarRepository, email)
+    val continuarPartidaCase = ContinuarPartidaCase(partidaRepository)
 
-    // Casos de uso de Perfil
-    public val obtenerPerfilCase     = ObtenerPerfilCase(email, username)
-    public val actualizarNombreCase  = ActualizarNombreCase(email)
-    public val actualizarSkinCase    = ActualizarSkinCase(email)
-    public val obtenerCosmeticosCase = ObtenerCosmeticosCase()
+    // PERFIL
+    val obtenerPerfilCase     = ObtenerPerfilCase(email, perfilRepository)
+    val actualizarNombreCase  = ActualizarNombreCase(email, perfilRepository)
+    val actualizarSkinCase    = ActualizarSkinCase(email, perfilRepository)
+    val actualizarIconoCase   = ActualizarIconoCase(email, perfilRepository)
+    val obtenerCosmeticosCase = ObtenerCosmeticosCase(email, perfilRepository) // ahora recibe email
 
     // TIENDA
     val getProductosCase = GetProductosCase(tiendaRepository, email)
@@ -119,6 +128,7 @@ class CaseFacade(
     val jugadores = partidaRepository.jugadores
     val mano = partidaRepository.mano
     val chat = partidaRepository.chat
+    val ganador = partidaRepository.ganador
 
     // Casos de uso de Partida
     val syncPartidaCase = SyncPartidaCase(partidaRepository, email, matchId)
@@ -127,7 +137,15 @@ class CaseFacade(
     val chatCase = ChatCase(partidaRepository, matchId)
     val jugarCartaCase = JugarCartaCase(partidaRepository, email, matchId)
 
+    val syncPartidaCase = SyncPartidaCase(partidaRepository, username, matchId)
+    val cleanPartidaCase = CleanPartidaCase(partidaRepository)
+    val lanzarDadoCase = LanzarDadoCase(partidaRepository, username, matchId)
+    val confirmarDestinoCase = ConfirmarDestinoCase(partidaRepository, username, matchId)
+    val chatCase = ChatCase(partidaRepository, matchId, username)
+    val jugarCartaCase = JugarCartaCase(partidaRepository, username, matchId)
+
     // Pruebas conexion
     val pruebaConexionCase = PruebaConexionCase(pruebaConexionRepository)
 
-   }
+
+}

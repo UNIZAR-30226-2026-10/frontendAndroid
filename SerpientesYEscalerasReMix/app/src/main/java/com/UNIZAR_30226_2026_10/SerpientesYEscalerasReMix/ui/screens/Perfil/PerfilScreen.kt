@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,6 +60,7 @@ fun PerfilScreen(navHost: SENavHostController, viewModel: PerfilViewModel) {
     val perfil = viewModel.perfil
     val cargando = viewModel.cargando
     val errorMessage = viewModel.errorMessage
+    val context = LocalContext.current
 
     val nombre = perfil?.nombre ?: ""
     val stats = if (perfil != null) "${perfil.victorias}W/${perfil.derrotas}L" else ""
@@ -89,10 +91,11 @@ fun PerfilScreen(navHost: SENavHostController, viewModel: PerfilViewModel) {
         skinFichaActual = perfil?.skinFichaActual ?: "",
         iconoActual = perfil?.iconoActual ?: "",
         onNombreConfirmado = { nuevo -> viewModel.actualizarNombre(nuevo) },
+        onIconoSeleccionado     = { iconId -> viewModel.actualizarIcono(iconId) },
         onCosmeticoSeleccionado = { categoria, skinId ->
                 viewModel.actualizarCosmetico(categoria, skinId)
             },
-        onCerrarSesion = { viewModel.cerrarSesion { navHost.goTo(Destinos.LOGIN) } }
+        onCerrarSesion = { viewModel.cerrarSesion(context) { navHost.goTo(Destinos.LOGIN) } }
         )
 }
 
@@ -100,15 +103,16 @@ fun PerfilScreen(navHost: SENavHostController, viewModel: PerfilViewModel) {
 fun PerfilContent(
     nombre: String,
     stats: String,
+    iconoActual: String,
+    iconos: List<String>,
     skinsEscalera: List<String>,
     skinsSerpiente: List<String>,
     skinsFicha: List<String>,
-    iconos: List<String>,
     skinEscaleraActual: String,
     skinSerpienteActual: String,
     skinFichaActual: String,
-    iconoActual: String,
     onNombreConfirmado: (String) -> Unit,
+    onIconoSeleccionado: (String) -> Unit,
     onCosmeticoSeleccionado: (CategoriaCosmetico, String) -> Unit,
     onCerrarSesion: () -> Unit
 ) {
@@ -117,15 +121,16 @@ fun PerfilContent(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        color = color_secondary,
-        border = BorderStroke(2.dp, color_primary),
-        shape = RoundedCornerShape(28.dp)
+        color = color_bg
     ) {
         Column {
             TarjetaUsuario(
                 nombre = nombre,
                 stats = stats,
+                iconoActual = iconoActual,
+                iconos = iconos,
                 onNombreConfirmado = onNombreConfirmado,
+                onIconoSeleccionado = onIconoSeleccionado,
                 onCerrarSesion = onCerrarSesion
             )
             Spacer(modifier = Modifier.height(15.dp))
@@ -146,7 +151,10 @@ fun PerfilContent(
 fun TarjetaUsuario(
     nombre: String,
     stats: String,
+    iconoActual: String,
+    iconos: List<String>,
     onNombreConfirmado: (String) -> Unit,
+    onIconoSeleccionado: (String) -> Unit,
     onCerrarSesion: () -> Unit
 ) {
     Surface(
@@ -176,10 +184,72 @@ fun TarjetaUsuario(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
             ) {
-                AvatarUsuario()
+                AvatarUsuario(
+                    iconoActual         = iconoActual,
+                    iconos              = iconos,
+                    onIconoSeleccionado = onIconoSeleccionado
+                )
                 Spacer(modifier = Modifier.width(16.dp))
                 EtiquetaNombre()
                 CajaNombreUsuario(nombre, onNombreConfirmado)
+            }
+        }
+    }
+}
+
+@Composable
+fun AvatarUsuario(
+    iconoActual: String,
+    iconos: List<String>,
+    onIconoSeleccionado: (String) -> Unit
+) {
+    var mostrarMenu by remember { mutableStateOf(false) }
+
+    Box(contentAlignment = Alignment.BottomEnd) {
+        Surface(
+            modifier = Modifier.size(85.dp),
+            shape = CircleShape,
+            color = color_text,
+            border = BorderStroke(2.dp, color_primary)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.icono_jugador_default),
+                contentDescription = "Avatar",
+                modifier = Modifier.padding(4.dp)
+            )
+        }
+
+        IconButton(
+            onClick = { mostrarMenu = true },
+            modifier = Modifier
+                .size(24.dp)
+                .offset(x = 2.dp, y = 2.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Cambiar avatar",
+                tint = color_text,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+
+        DropdownMenu(
+            expanded = mostrarMenu,
+            onDismissRequest = { mostrarMenu = false }
+        ) {
+            iconos.forEach { iconId ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = iconId,
+                            color = if (iconId == iconoActual) color_primary else color_text
+                        )
+                    },
+                    onClick = {
+                        mostrarMenu = false
+                        onIconoSeleccionado(iconId)
+                    }
+                )
             }
         }
     }
@@ -193,7 +263,7 @@ fun CajaNombreUsuario(nombreActual: String, onConfirmar: (String) -> Unit) {
     Surface(
         modifier = Modifier
             .padding(start = 20.dp)
-            .width(420.dp)
+            .width(300.dp)
             .height(40.dp),
         color = color_bg,
         border = BorderStroke(1.dp, if (editando) color_primary else color_text),
@@ -259,7 +329,7 @@ fun AvatarUsuario() {
             border = BorderStroke(2.dp, Color.Black)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.icono_default),
+                painter = painterResource(id = R.drawable.icono_jugador_default),
                 contentDescription = null,
                 modifier = Modifier.padding(4.dp)
             )
@@ -297,7 +367,7 @@ fun SeccionCosmeticos(
 ) {
     Column {
         Text(
-            text = "Cosmeticos:",
+            text = "Cosméticos",
             style = SETextTypes.grande.copy(fontSize = 25.sp),
             color = color_text,
             modifier = Modifier.padding(start = 50.dp)
@@ -363,8 +433,8 @@ fun CosmeticoItem(
         Box(contentAlignment = Alignment.Center) {
             Surface(
                 modifier = Modifier
-                    .size(200.dp, 115.dp)
-                    .border(2.dp, color_text, RoundedCornerShape(4.dp)),
+                    .size(240.dp, 145.dp)
+                    .border(2.dp, color_primary, RoundedCornerShape(4.dp)),
                 color = color_bg,
                 shape = RoundedCornerShape(4.dp)
             ) {

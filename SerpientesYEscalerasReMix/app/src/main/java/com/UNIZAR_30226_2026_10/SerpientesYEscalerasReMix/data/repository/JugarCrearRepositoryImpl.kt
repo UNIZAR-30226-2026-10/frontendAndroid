@@ -4,6 +4,7 @@ import android.util.Log
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiService
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AnadirBotRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.CrearLobbyRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.IniciarPartidaRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.JugadoresLobbyReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LeaveOrExpelRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LobbyReply
@@ -22,11 +23,16 @@ class JugarCrearRepositoryImpl(private val api: ApiService) : JugarCrearReposito
     private val _lobbyId = MutableStateFlow("")
     override val lobbyId: StateFlow<String> = _lobbyId.asStateFlow()
 
-    private val _lobbyActual = MutableStateFlow(Lobby("", "", emptyList(), ""))
+    private val _lobbyActual = MutableStateFlow(Lobby("", "", emptyList(), "", null))
     override val lobbyActual: StateFlow<Lobby> = _lobbyActual.asStateFlow()
 
     override suspend fun setLobbyId(lobbyId: String) {
         _lobbyId.value = lobbyId
+    }
+
+    override suspend fun clearMatchId() {
+        _lobbyId.value = ""
+        _lobbyActual.value = Lobby("", "", emptyList(), "", null)
     }
 
     override suspend fun fetchLobby() {
@@ -45,7 +51,7 @@ class JugarCrearRepositoryImpl(private val api: ApiService) : JugarCrearReposito
         }
     }
 
-    override suspend fun fetchLobbyByPlayer(username: String) {
+    override suspend fun fetchLobbyByPlayer(username: String): Boolean {
         try {
             val response = api.getLobbyByPlayer(username)
             if (response.isSuccessful) {
@@ -54,8 +60,10 @@ class JugarCrearRepositoryImpl(private val api: ApiService) : JugarCrearReposito
                     _lobbyActual.value = reply.toDomain()
                 }
             }
+            return response.isSuccessful
         } catch (e: Exception) {
             Log.e("API_ERROR", "Exception fetching lobby by player", e)
+            return false
         }
     }
 
@@ -119,15 +127,30 @@ class JugarCrearRepositoryImpl(private val api: ApiService) : JugarCrearReposito
 
     override suspend fun empezarPartida(): String {
         return try {
-            val response = api.startMatch(_lobbyId.value)
+            val response = api.startMatch(IniciarPartidaRequest(lobbyId.value))
             if (response.isSuccessful) {
-                response.body()?.get("match_id") ?: ""
+                response.body()?.iD!!
             } else {
                 ""
             }
         } catch (e: Exception) {
             Log.e("API_ERROR", "Exception starting match", e)
             ""
+        }
+    }
+
+    override suspend fun getBoards(): List<String> {
+        return try {
+            val response = api.getAllBoards()
+            if (response.isSuccessful) {
+                response.body() ?: emptyList()
+            } else {
+                Log.e("API_ERROR", "Error fetching boards: ${response.errorBody()?.string()}")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("API_ERROR", "Exception fetching boards", e)
+            emptyList()
         }
     }
 
@@ -139,7 +162,8 @@ class JugarCrearRepositoryImpl(private val api: ApiService) : JugarCrearReposito
             while (mutable.size < 4) mutable.add(null)
             mutable
         },
-        tableroSelect = tablero
+        tableroSelect = tablero,
+        matchId = idPartida
     )
 
     private fun JugadoresLobbyReply.toDomain() = JugadorLobby(
