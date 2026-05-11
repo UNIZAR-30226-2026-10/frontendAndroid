@@ -213,7 +213,7 @@ fun AvatarUsuario(
             border = BorderStroke(2.dp, color_primary)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.icono_jugador_default),
+                painter = painterResource(id = obtenerImagenCosmetico(iconoActual, CategoriaCosmetico.ICONO)),
                 contentDescription = "Avatar",
                 modifier = Modifier.padding(4.dp)
             )
@@ -240,10 +240,17 @@ fun AvatarUsuario(
             iconos.forEach { iconId ->
                 DropdownMenuItem(
                     text = {
-                        Text(
-                            text = iconId,
-                            color = if (iconId == iconoActual) color_primary else color_text
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Image(
+                                painter = painterResource(id = obtenerImagenCosmetico(iconId, CategoriaCosmetico.ICONO)),
+                                contentDescription = null,
+                                modifier = Modifier.size(30.dp).padding(end = 8.dp)
+                            )
+                            Text(
+                                text = iconId.replace("icono_", "").replace("_", " "),
+                                color = if (iconId == iconoActual) color_primary else color_text
+                            )
+                        }
                     },
                     onClick = {
                         mostrarMenu = false
@@ -379,7 +386,7 @@ fun SeccionCosmeticos(
         ) {
             CosmeticoItem(
                 label = "Escaleras",
-                imagenRes = R.drawable.tablero_debug,
+                categoria = CategoriaCosmetico.ESCALERA,
                 skinActual = skinEscaleraActual,
                 opciones = skinsEscalera,
                 onSeleccion = { skinId ->
@@ -391,7 +398,7 @@ fun SeccionCosmeticos(
             )
             CosmeticoItem(
                 label = "Serpientes",
-                imagenRes = R.drawable.tablero_debug,
+                categoria = CategoriaCosmetico.SERPIENTE,
                 skinActual = skinSerpienteActual,
                 opciones = skinsSerpiente,
                 onSeleccion = { skinId ->
@@ -403,7 +410,7 @@ fun SeccionCosmeticos(
             )
             CosmeticoItem(
                 label = "Fichas",
-                imagenRes = R.drawable.tablero_debug,
+                categoria = CategoriaCosmetico.FICHA,
                 skinActual = skinFichaActual,
                 opciones = skinsFicha,
                 onSeleccion = { skinId ->
@@ -420,7 +427,7 @@ fun SeccionCosmeticos(
 @Composable
 fun CosmeticoItem(
     label: String,
-    imagenRes: Int,
+    categoria: CategoriaCosmetico,
     skinActual: String,
     opciones: List<String>,
     onSeleccion: (String) -> Unit
@@ -439,7 +446,7 @@ fun CosmeticoItem(
                 shape = RoundedCornerShape(4.dp)
             ) {
                 Image(
-                    painter = painterResource(id = imagenRes),
+                    painter = painterResource(id = obtenerImagenCosmetico(skinActual, categoria)),
                     contentDescription = label,
                     modifier = Modifier.padding(8.dp),
                     contentScale = ContentScale.Crop,
@@ -476,6 +483,33 @@ fun CosmeticoItem(
                     )
                 }
             }
+        }
+    }
+}
+
+fun obtenerImagenCosmetico(id: String, cat: CategoriaCosmetico): Int {
+    return when (id) {
+        "icono_nerd" -> R.drawable.icono_jugador_nerd
+        "icono_completista" -> R.drawable.icono_jugador_completista
+        "icono_platino" -> R.drawable.icono_jugador_platino
+        "serpiente_calcetin" -> R.drawable.serpiente_calcetin
+        "serpiente_futuro" -> R.drawable.serpiente_futuro
+        "ficha_totem" -> R.drawable.jugador_azul_totem
+        "ficha_esqueleto" -> R.drawable.jugador_verde_calavera
+        "icono_default" -> R.drawable.icono_jugador_default
+        "serpiente_default" -> R.drawable.serpiente
+        "ficha_default" -> R.drawable.jugador_rojo_totem
+        "escalera"          -> R.drawable.escalera
+        "escalera2"         -> R.drawable.escalera2
+        "escalera_estratega" -> R.drawable.escalera_estratega
+        "escalera_jungla"    -> R.drawable.escalera_jungla
+        "escalera_magnate"   -> R.drawable.escalera_magnate
+        else -> when(cat) {
+            CategoriaCosmetico.ICONO -> R.drawable.icono_jugador_default
+            CategoriaCosmetico.SERPIENTE -> R.drawable.serpiente
+            CategoriaCosmetico.FICHA -> R.drawable.jugador_rojo_totem
+            CategoriaCosmetico.ESCALERA  -> R.drawable.escalera
+            else -> R.drawable.tablero_debug
         }
     }
 }

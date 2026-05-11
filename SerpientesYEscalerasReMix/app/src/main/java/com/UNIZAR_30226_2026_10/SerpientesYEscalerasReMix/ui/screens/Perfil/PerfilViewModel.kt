@@ -47,8 +47,15 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
         private set
 
     init {
-        cargarPerfil()
-        cargarCosmeticosDisponibles()
+        viewModelScope.launch {
+            // En tu CaseFacade la variable se llama 'email'
+            cF.email.collect { email: String ->
+                if (email.isNotEmpty()) {
+                    cargarPerfil()
+                    cargarCosmeticosDisponibles()
+                }
+            }
+        }
     }
 
     fun cargarPerfil() {
@@ -68,12 +75,20 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
     private fun cargarCosmeticosDisponibles() {
         viewModelScope.launch {
             try {
-                skinsEscalera  = cF.obtenerCosmeticosCase.obtenerSkinsEscalera()
-                skinsSerpiente = cF.obtenerCosmeticosCase.obtenerSkinsSerpiente()
-                skinsFicha     = cF.obtenerCosmeticosCase.obtenerSkinsFicha()
-                iconos         = cF.obtenerCosmeticosCase.obtenerIconos()
+                // 1. Usamos la nueva función optimizada que devuelve todo el mapa
+                val todos = cF.obtenerCosmeticosCase.obtenerTodosLosCosmeticos()
+                iconos = todos[CategoriaCosmetico.ICONO] ?: emptyList()
+                // 2. Repartimos los datos en las variables del ViewModel
+                skinsEscalera  = todos[CategoriaCosmetico.ESCALERA] ?: emptyList()
+                skinsSerpiente = todos[CategoriaCosmetico.SERPIENTE] ?: emptyList()
+                skinsFicha     = todos[CategoriaCosmetico.FICHA] ?: emptyList()
+                iconos         = todos[CategoriaCosmetico.ICONO] ?: emptyList()
+
+                // Debug opcional para que veas en consola si llegan datos
+                println("DEBUG: Iconos cargados -> ${iconos.size}")
+
             } catch (e: Exception) {
-                errorMessage = "Error en cosméticos: ${e.message}"
+                errorMessage = "Error al cargar cosméticos: ${e.message}"
             }
         }
     }
