@@ -31,6 +31,8 @@ fun CartaDto.toDomain(): Carta {
         } catch (e: Exception) {
             Calidad.Comun // Valor por defecto en caso de que la calidad no sea reconocida
         },
+        id = null, // Asignar un valor predeterminado o manejarlo según sea necesario
+        efecto = null, // Asignar un valor predeterminado o manejarlo según sea
         imagen = imageResId
     )
 }

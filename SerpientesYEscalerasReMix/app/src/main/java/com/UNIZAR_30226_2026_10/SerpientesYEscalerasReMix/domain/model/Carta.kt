@@ -15,8 +15,11 @@ enum class Calidad {
 
 data class Carta (
     val nombre: String,
-    val calidad: Calidad,
-    val tipo: Tipo_Carta,
     val descripcion: String,
-    val imagen: Int? = null
+    val tipo: Tipo_Carta,
+    val calidad: Calidad,
+    val imagen: Int? = null,
+    //FIXME TEMP PARA QUE NO DE ERRORES; SI FUNCIONA BORRA TODAS LAS REFERENCIAS A ESTOS ATRIB
+    val id: Int? = null,
+    val efecto: String? = null
 )

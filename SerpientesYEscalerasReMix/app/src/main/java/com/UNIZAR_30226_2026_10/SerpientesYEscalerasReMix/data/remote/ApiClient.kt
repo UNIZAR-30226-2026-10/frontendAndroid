@@ -3,6 +3,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote
 import android.content.Context
 import android.util.Log
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.CartaDto
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.CartasDisponiblesResponseDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.ComprarProductoRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.MazoDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.MazosResponseDto
@@ -219,7 +220,7 @@ interface ApiService {
     @GET("users/{email}/cards")
     suspend fun getCartasDisponibles(
         @Path("email") email: String
-    ) : Response<List<CartaDto>>
+    ) : Response<CartasDisponiblesResponseDto>
 
     // FUNCIONES PERFIL
 
