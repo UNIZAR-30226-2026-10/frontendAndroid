@@ -58,7 +58,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.CartaDetalleDialog
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DetallesCarta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.CartaImagen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.longPressAfter
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
@@ -144,10 +144,10 @@ fun EditarMazoContent(
         ) {
 
             // Boton guardar cambios
-            IconButton(
+            Text(
                 onClick = {
                     // guardar cambios en el servidor
-                        onGuardarCambios(mazoAntiguo, mazoAEditar)
+                    onGuardarCambios(mazoAntiguo, mazoAEditar)
                 },
                 modifier = Modifier.size(36.dp)
             ) {
@@ -316,7 +316,7 @@ fun EditarMazoContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         cartaDetalle?.let { carta ->
-            CartaDetalleDialog(
+            DetallesCarta(
                 carta = carta,
                 onDismiss = { cartaDetalle = null }
             )

@@ -41,10 +41,10 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonEdi
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonNuevoMazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonEliminarMazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_offline
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.CartaDetalleDialog
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.CartaImagen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.longPressAfter
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Mazo
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DetallesCarta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 
 @Composable
@@ -172,7 +172,7 @@ fun MazosContent(
                 }
 
                 cartaDetalle?.let { carta ->
-                    CartaDetalleDialog(
+                    DetallesCarta(
                         carta = carta,
                         onDismiss = { cartaDetalle = null }
                     )

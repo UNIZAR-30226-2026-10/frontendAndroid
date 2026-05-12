@@ -33,8 +33,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.unit.Dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Calidad
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo_Carta
@@ -103,71 +101,6 @@ fun CartaImagen(
                     .background(colorPorTipoDeCarta(carta.tipo), RoundedCornerShape(6.dp))
                     .padding(horizontal = 8.dp, vertical = 2.dp)
             )
-        }
-    }
-}
-
-@Composable
-fun CartaDetalleDialog(
-    carta: Carta,
-    onDismiss: () -> Unit
-) {
-    val configuration = LocalConfiguration.current
-    val dialogWidth: Dp = configuration.screenWidthDp.dp * 0.6f
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(dismissOnClickOutside = true)
-    ) {
-        Surface(
-            shape = RoundedCornerShape(12.dp),
-            color = color_bg,
-            border = androidx.compose.foundation.BorderStroke(2.dp, color_sf),
-            modifier = Modifier.width(dialogWidth)
-        ) {
-            Box(modifier = Modifier.padding(16.dp)) {
-                IconButton(
-                    onClick = onDismiss,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(28.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Cerrar detalle",
-                        tint = color_text
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(end = 32.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    CartaImagen(
-                        carta = carta,
-                        modifier = Modifier
-                            .width(120.dp)
-                            .aspectRatio(0.7f)
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = carta.nombre,
-                            style = SETextTypes.mediano,
-                            color = color_text
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = carta.descripcion,
-                            style = SETextTypes.plano,
-                            color = color_text
-                        )
-                    }
-                }
-            }
         }
     }
 }
