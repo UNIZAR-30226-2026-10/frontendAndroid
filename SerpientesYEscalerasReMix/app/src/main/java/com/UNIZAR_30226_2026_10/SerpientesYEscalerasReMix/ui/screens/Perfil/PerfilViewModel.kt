@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -48,7 +47,6 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            // En tu CaseFacade la variable se llama 'email'
             cF.email.collect { email: String ->
                 if (email.isNotEmpty()) {
                     cargarPerfil()
@@ -59,6 +57,8 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
     }
 
     fun cargarPerfil() {
+        // FIX: guardia para evitar llamada de red si el email aún no está listo
+        if (cF.email.value.isEmpty()) return
         viewModelScope.launch {
             cargando = true
             errorMessage = null
@@ -73,25 +73,28 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
     }
 
     private fun cargarCosmeticosDisponibles() {
+        // FIX: una sola llamada que devuelve el mapa completo (4 peticiones en paralelo)
+        // en lugar de 4 llamadas individuales que internamente hacían 4 peticiones cada una (16 total)
         viewModelScope.launch {
             try {
-                // 1. Usamos la nueva función optimizada que devuelve todo el mapa
                 val mapa = cF.obtenerCosmeticosCase.obtenerTodosLosCosmeticos()
                 val sE = mapa[CategoriaCosmetico.ESCALERA]  ?: emptyList()
                 val sS = mapa[CategoriaCosmetico.SERPIENTE] ?: emptyList()
                 val sF = mapa[CategoriaCosmetico.FICHA]     ?: emptyList()
                 val ic = mapa[CategoriaCosmetico.ICONO]     ?: emptyList()
 
-                // Solo sobreescribimos si el servidor devuelve algo real
-                if (sE.isNotEmpty()) skinsEscalera = sE
-                if (sS.isNotEmpty()) skinsSerpiente = sS
-                if (sF.isNotEmpty()) skinsFicha = sF
-                if (ic.isNotEmpty()) iconos = ic
-                // Debug opcional para que veas en consola si llegan datos
-                println("DEBUG: Iconos cargados -> ${iconos.size}")
-
+                // Sobreescribimos siempre para reflejar el estado real del servidor,
+                // incluso si viene vacío (el usuario no tiene cosméticos de esa categoría)
+                skinsEscalera  = sE
+                skinsSerpiente = sS
+                skinsFicha     = sF
+                iconos         = ic
             } catch (e: Exception) {
-                errorMessage = "Error al cargar cosméticos: ${e.message}"
+                // FIX: no sobreescribimos errorMessage si el perfil ya cargó bien,
+                // para no bloquear la pantalla por un fallo secundario de cosméticos
+                if (perfil == null) {
+                    errorMessage = "Error al cargar cosméticos: ${e.message}"
+                }
             }
         }
     }
@@ -132,8 +135,6 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
         }
     }
 
-    // El icono se actualiza a través del mismo actualizarSkinCase con categoría ICONO,
-    // ya que el endpoint PUT /users/{email}/cosmetics cubre todos los tipos de cosmético.
     fun actualizarIcono(iconId: String) {
         actualizarCosmetico(CategoriaCosmetico.ICONO, iconId)
     }

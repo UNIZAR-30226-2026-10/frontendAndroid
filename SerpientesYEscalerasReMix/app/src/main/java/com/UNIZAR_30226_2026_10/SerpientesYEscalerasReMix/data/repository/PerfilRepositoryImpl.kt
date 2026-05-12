@@ -1,5 +1,6 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository
 
+import android.util.Log
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiService
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarEscaleraRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarFichaRequest
@@ -80,9 +81,16 @@ class PerfilRepositoryImpl(
 
         // Esperamos los resultados
         val iconosResp     = iconosDeferred.await()
+        Log.d("PERFIL_DEBUG", "Icons raw: ${iconosResp.errorBody()?.string() ?: "sin error body"}")
         val fichasResp     = fichasDeferred.await()
         val serpientesResp = serpientesDeferred.await()
         val escalerasResp  = escalerasDeferred.await()
+
+        Log.d("PERFIL_DEBUG", "Icons code: ${iconosResp.code()} body: ${iconosResp.body()}")
+        Log.d("PERFIL_DEBUG", "Fichas code: ${fichasResp.code()} body: ${fichasResp.body()}")
+        Log.d("PERFIL_DEBUG", "Serpientes code: ${serpientesResp.code()} body: ${serpientesResp.body()}")
+        Log.d("PERFIL_DEBUG", "Escaleras code: ${escalerasResp.code()} body: ${escalerasResp.body()}")
+
 
         mapOf(
             CategoriaCosmetico.ICONO     to (iconosResp.body()?.iconos         ?: emptyList()),
