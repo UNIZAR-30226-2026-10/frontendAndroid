@@ -70,6 +70,7 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
         if (cF.email.value.isBlank()) {
             return
         }
+        val nombreSeleccionado = mazoSeleccionado.nombre
         _mazoUiState.value = MazosUiState.Loading
         try {
             val mazos = try {
@@ -79,7 +80,9 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
                 emptyList<Mazo>()
             }
             this.mazos = mazos
-            mazoSeleccionado = mazos.firstOrNull() ?: mazoVacio
+            mazoSeleccionado = mazos.firstOrNull { it.nombre == nombreSeleccionado }
+                ?: mazos.firstOrNull()
+                        ?: mazoVacio
             _mazoUiState.value = MazosUiState.Success(mazos)
         } catch (e: Exception) {
             _mazoUiState.value = MazosUiState.Error("No se pudo conectar con el servidor")
