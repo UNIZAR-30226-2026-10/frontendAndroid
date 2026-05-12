@@ -91,7 +91,6 @@ fun TarjetaLogro(logro: LogroUsuario, onReclamar: (String) -> Unit) {
                     style = if (logro.esCompletado) SETextTypes.sombreado else SETextTypes.plano
                 )
 
-                // Botón para reclamar según la API (POST /api/users/{email}/achievements)
                 if (logro.esCompletado && !logro.recompensaReclamada) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(
@@ -106,18 +105,27 @@ fun TarjetaLogro(logro: LogroUsuario, onReclamar: (String) -> Unit) {
             Spacer(modifier = Modifier.width(8.dp))
             Column(modifier = Modifier.width(80.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = "Recompensa", style = SETextTypes.seleccionable)
-                if (logro.tipoRecompensa == "Moneda") {
-                    Box(modifier = Modifier.height(80.dp), contentAlignment = Alignment.Center) {
-                        Text(text = "${logro.valorRecompensa} Sep", style = SETextTypes.plano)
-                    }
-                } else {
-                    Box(modifier = Modifier.width(60.dp).aspectRatio(3f/4f).background(color_selectedText)) {
+                if (logro.imagen != 0) {
+                    Box(
+                        modifier = Modifier
+                            .width(60.dp)
+                            .aspectRatio(3f / 4f)
+                            .background(color_selectedText)
+                    ) {
                         Image(
-                            painter = painterResource(id = if(logro.imagen != 0) logro.imagen else R.drawable.tablero_debug),
+                            painter = painterResource(id = logro.imagen),
                             contentDescription = null,
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Fit
                         )
+                    }
+                } else if (logro.valorRecompensa.isNotEmpty() && logro.valorRecompensa != "null") {
+                    Box(modifier = Modifier.height(80.dp), contentAlignment = Alignment.Center) {
+                        Text(text = "${logro.valorRecompensa} Sep", style = SETextTypes.plano)
+                    }
+                } else {
+                    Box(modifier = Modifier.height(80.dp), contentAlignment = Alignment.Center) {
+                        Text(text = "Carta", style = SETextTypes.plano)
                     }
                 }
             }

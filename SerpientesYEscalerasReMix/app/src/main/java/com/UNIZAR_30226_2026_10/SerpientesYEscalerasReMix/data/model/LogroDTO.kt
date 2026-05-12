@@ -9,7 +9,7 @@ data class LogroDTO(
     @SerializedName("requisito")           val objetivo: Int,
     @SerializedName("tipo")                val tipoRecompensa: String,
     @SerializedName("recompensaMonetaria") val valorRecompensa: Int?,
-    val imagen: Int = 0
+    @SerializedName("cartaID")             val cartaID: String?,   // ← añadir esto
 ) {
     val nombre: String get() = id
 }
