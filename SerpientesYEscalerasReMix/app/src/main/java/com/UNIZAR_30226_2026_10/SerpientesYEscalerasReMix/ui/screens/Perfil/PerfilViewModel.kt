@@ -78,10 +78,10 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
         viewModelScope.launch {
             try {
                 val mapa = cF.obtenerCosmeticosCase.obtenerTodosLosCosmeticos()
-                val sE = mapa[CategoriaCosmetico.ESCALERA]  ?: emptyList()
-                val sS = mapa[CategoriaCosmetico.SERPIENTE] ?: emptyList()
-                val sF = mapa[CategoriaCosmetico.FICHA]     ?: emptyList()
-                val ic = mapa[CategoriaCosmetico.ICONO]     ?: emptyList()
+                val sE  = listOf("escalera_default") + (mapa[CategoriaCosmetico.ESCALERA] ?: emptyList())
+                val sS  = listOf("serpiente_default") + (mapa[CategoriaCosmetico.SERPIENTE] ?: emptyList())
+                val sF = listOf("ficha_default") + (mapa[CategoriaCosmetico.FICHA]     ?: emptyList())
+                val ic = listOf("icono_default") + (mapa[CategoriaCosmetico.ICONO]     ?: emptyList())
                 println("DEBUG: Escaleras recibidas: ${sE.size}")
                 // Sobreescribimos siempre para reflejar el estado real del servidor,
                 // incluso si viene vacío (el usuario no tiene cosméticos de esa categoría)
