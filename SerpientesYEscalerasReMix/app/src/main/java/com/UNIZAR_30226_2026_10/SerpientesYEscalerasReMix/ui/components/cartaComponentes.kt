@@ -29,10 +29,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.Dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Calidad
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo_Carta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_cardComun
@@ -46,6 +51,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.gestures.detectTapGestures
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_carta_defensiva
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_carta_entorno
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_carta_ofensiva
 
 @Composable
 fun CartaImagen(
@@ -78,6 +86,24 @@ fun CartaImagen(
                     .padding(6.dp)
             )
         }
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .background(Color.Black.copy(alpha = 0.6f))
+                .padding(vertical = 4.dp)
+        ) {
+            Text(
+                text = tipoAbreviado(carta.tipo),
+                style = SETextTypes.pequeno.copy(fontWeight = FontWeight.Bold),
+                color = Color.White,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .background(colorPorTipoDeCarta(carta.tipo), RoundedCornerShape(6.dp))
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
+            )
+        }
     }
 }
 
@@ -86,6 +112,8 @@ fun CartaDetalleDialog(
     carta: Carta,
     onDismiss: () -> Unit
 ) {
+    val configuration = LocalConfiguration.current
+    val dialogWidth: Dp = configuration.screenWidthDp.dp * 0.6f
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(dismissOnClickOutside = true)
@@ -94,7 +122,7 @@ fun CartaDetalleDialog(
             shape = RoundedCornerShape(12.dp),
             color = color_bg,
             border = androidx.compose.foundation.BorderStroke(2.dp, color_sf),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.width(dialogWidth)
         ) {
             Box(modifier = Modifier.padding(16.dp)) {
                 IconButton(
@@ -119,7 +147,7 @@ fun CartaDetalleDialog(
                     CartaImagen(
                         carta = carta,
                         modifier = Modifier
-                            .width(90.dp)
+                            .width(120.dp)
                             .aspectRatio(0.7f)
                     )
 
@@ -149,6 +177,18 @@ private fun colorCartaPorCalidad(calidad: Calidad) = when (calidad) {
     Calidad.Rara -> color_cardRara
     Calidad.Epica -> color_cardEpica
     Calidad.Legendaria -> color_cardLegendaria
+}
+
+private fun colorPorTipoDeCarta(tipo: Tipo_Carta) = when (tipo) {
+    Tipo_Carta.Ofensiva -> color_carta_ofensiva
+    Tipo_Carta.Defensiva -> color_carta_defensiva
+    Tipo_Carta.Entorno -> color_carta_entorno
+}
+
+private fun tipoAbreviado(tipo: Tipo_Carta) = when (tipo) {
+    Tipo_Carta.Ofensiva -> "ATQ"
+    Tipo_Carta.Defensiva -> "DEF"
+    Tipo_Carta.Entorno -> "ENT"
 }
 
 fun Modifier.longPressAfter(

@@ -31,6 +31,10 @@ val color_cardRara = Color(0xFF00BB27)
 val color_cardEpica = Color(0xFFCB00AF)
 val color_cardLegendaria = Color(0xFFFFBB30)
 
+val color_carta_ofensiva = Color(0xE4EE1628)
+val color_carta_defensiva = Color(0xFF5F6FC4)
+val color_carta_entorno = Color(0xFF8FDC33)
+
 val color_fichas_rojas = Color(0xffff6366)
 val color_fichas_azules = Color(0xff4587de)
 val color_fichas_verdes = Color(0xff09b86f)
