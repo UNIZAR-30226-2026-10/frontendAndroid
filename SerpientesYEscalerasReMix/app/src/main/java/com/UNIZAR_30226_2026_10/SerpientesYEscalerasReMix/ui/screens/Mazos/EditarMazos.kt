@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,7 +21,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
@@ -46,6 +46,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fondoTienda
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_offline
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_online
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_selectedText
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
@@ -53,16 +54,16 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DetallesCarta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.CartaImagen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.longPressAfter
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Mazo
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
 
 @Composable
 fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
@@ -78,17 +79,22 @@ fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewMo
         }
 
         is EditarMazoUiState.Success -> {
+            androidx.compose.runtime.LaunchedEffect(s.mazo) {
+                viewModel.fijarMazoOriginalActual()
+            }
             // Mostrar los mazos
             EditarMazoContent(
-                mazoAntiguo = viewModel.mazoSeleccionado,
+                mazoAntiguo = s.mazoOriginal,
                 mazoAEditar = viewModel.mazoSeleccionado,
                 cartasDisponibles = viewModel.cartasDisponibles,
+                editarState = s,
                 onGuardarCambios = { mazoAntiguo, mazoAEditar ->
                     // guardar cambios en el servidor
                     viewModel.guardarCambios(mazoAntiguo, mazoAEditar)
 
                 },
                 onSalir = {
+                    viewModel.cancelarEdicion(s.mazoOriginal)
                     navController.navController.popBackStack()
                 },
                 onActualizarNombre = { nuevoNombre ->
@@ -105,8 +111,25 @@ fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewMo
 
         is EditarMazoUiState.Error -> {
             // Mostrar mensaje de error
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Error al cargar el mazo: ${s.message}")
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("Error: ${s.message}")
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "SALIR",
+                    style = SETextTypes.mediano,
+                    color = color_text,
+                    modifier = Modifier
+                        .background(color_primary, RoundedCornerShape(6.dp))
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                        .clickable {
+                            viewModel.resetEditarMazoState()
+                            navController.navController.popBackStack()
+                        }
+                )
             }
         }
     }
@@ -118,6 +141,7 @@ fun EditarMazoContent(
     mazoAntiguo: Mazo,
     mazoAEditar: Mazo,
     cartasDisponibles: List<Carta>,
+    editarState: EditarMazoUiState.Success,
     onGuardarCambios: (Mazo, Mazo) -> Unit,
     onSalir: () -> Unit,
     onActualizarNombre: (String) -> Unit,
@@ -142,23 +166,33 @@ fun EditarMazoContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-            // Boton guardar cambios
-            Text(
-                onClick = {
-                    // guardar cambios en el servidor
-                    onGuardarCambios(mazoAntiguo, mazoAEditar)
-                },
-                modifier = Modifier.size(36.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = "Guardar cambios",
-                    tint = color_text
-                )
+            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                if (editarState.saving) {
+                    Text(
+                        text = "Guardando...",
+                        style = SETextTypes.plano,
+                        color = color_text
+                    )
+                } else if (editarState.saveSuccess && !editarState.hasChanges) {
+                    Text(
+                        text = "Cambios guardados ✓",
+                        style = SETextTypes.plano,
+                        color = color_text
+                    )
+                } else {
+                    Text(
+                        text = "Guardar cambios",
+                        style = SETextTypes.plano,
+                        color = Color.White,
+                        modifier = Modifier
+                            .background(color_online, RoundedCornerShape(6.dp))
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                            .border(1.dp, color_online, RoundedCornerShape(6.dp))
+                            .clickable { onGuardarCambios(mazoAntiguo, mazoAEditar) }
+                    )
+                }
             }
 
-            // Icono cierre
             IconButton(
                 onClick = { mostrarSalida = true },
                 modifier = Modifier
@@ -173,8 +207,6 @@ fun EditarMazoContent(
                     modifier = Modifier.size(30.dp)
                 )
             }
-
-
         }
 
         Spacer(modifier = Modifier.height(12.dp))

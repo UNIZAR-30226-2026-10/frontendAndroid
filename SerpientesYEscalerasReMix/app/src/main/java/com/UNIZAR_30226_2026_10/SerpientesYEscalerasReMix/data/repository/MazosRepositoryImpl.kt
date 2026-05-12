@@ -1,5 +1,6 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository
 
+import android.util.Log
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.MazosRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Mazo
@@ -8,6 +9,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.toDomain
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.CartaDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiService
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.EditarMazoRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Calidad
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo_Carta
 import kotlin.String
@@ -77,6 +79,7 @@ class MazosRepositoryImpl(
         eliminarCartas: List<Carta>?
     ): Boolean {
         // Llamada a la API para editar el mazo con el id dado, cambiando su nombre y/o su lista de cartas
+        Log.d("MazosRepositoryImpl", "Editar mazo: id=$id, nuevoNombre=$nuevoNombre, nuevasCartas=${nuevasCartas?.map { it.nombre }}, eliminarCartas=${eliminarCartas?.map { it.nombre }}")
         val nuevasCartasDto = nuevasCartas?.map { carta ->
             CartaDto(
                 nombre = carta.nombre,
@@ -93,7 +96,9 @@ class MazosRepositoryImpl(
                 descripcion = carta.descripcion
             )
         }
-        val response = apiService.editarMazo(email, id, nuevoNombre, nuevasCartasDto, eliminarCartasDto)
+        Log.d("MazosRepositoryImpl", "email: ${email}, id: ${id}, nuevoNombre: ${nuevoNombre}, Nuevas cartas DTO: ${nuevasCartasDto?.map { it.nombre }}, Eliminar cartas DTO: ${eliminarCartasDto?.map { it.nombre }}")
+        val response = apiService.editarMazo(email, id, EditarMazoRequest(nuevoNombre, nuevasCartasDto, eliminarCartasDto))
+        Log.d("MazosRepositoryImpl", "Respuesta editarMazo: ${response.code()}, ${response.message()}")
         if (!response.isSuccessful) {
             throw IllegalStateException("Error editarMazo: ${response.code()}")
         }

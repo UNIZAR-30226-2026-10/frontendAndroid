@@ -99,7 +99,15 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
                 emptyList<Carta>()
             }
             this.cartasDisponibles = cartas
-            _editarMazoUiState.value = EditarMazoUiState.Success(mazoSeleccionado, cartasDisponibles)
+            val mazoOriginal = mazoSeleccionado.copy(cartas = mazoSeleccionado.cartas.toList())
+            _editarMazoUiState.value = EditarMazoUiState.Success(
+                mazoOriginal = mazoOriginal,
+                mazo = mazoSeleccionado,
+                cartasDisponibles = cartasDisponibles,
+                hasChanges = false,
+                saveSuccess = false,
+                saving = false
+            )
         } catch (e: Exception) {
             _editarMazoUiState.value = EditarMazoUiState.Error("No se pudo conectar con el servidor")
         }
@@ -125,6 +133,43 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
     fun actualizarNombreMazoSeleccionado(nombre: String) {
         mazoSeleccionado = mazoSeleccionado.copy(nombre = nombre)
         actualizarMazoEnLista(mazoSeleccionado)
+        marcarCambios()
+    }
+
+    fun fijarMazoOriginalActual() {
+        val current = _editarMazoUiState.value
+        if (current is EditarMazoUiState.Success) {
+            val original = mazoSeleccionado.copy(cartas = mazoSeleccionado.cartas.toList())
+            _editarMazoUiState.value = current.copy(
+                mazoOriginal = original,
+                mazo = mazoSeleccionado,
+                hasChanges = false,
+                saveSuccess = false,
+                saving = false
+            )
+        }
+    }
+
+    fun cancelarEdicion(mazoOriginal: Mazo) {
+        mazoSeleccionado = mazoOriginal.copy(cartas = mazoOriginal.cartas.toList())
+        actualizarMazoEnLista(mazoSeleccionado)
+        val current = _editarMazoUiState.value
+        if (current is EditarMazoUiState.Success) {
+            _editarMazoUiState.value = current.copy(
+                mazoOriginal = mazoSeleccionado,
+                mazo = mazoSeleccionado,
+                hasChanges = false,
+                saveSuccess = false,
+                saving = false
+            )
+        }
+    }
+
+    fun resetEditarMazoState() {
+        viewModelScope.launch {
+            fetchMazos()
+            fetchCartasDisponibles()
+        }
     }
 
     fun anadirCartaAMazoSeleccionado(carta: Carta) {
@@ -132,6 +177,7 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
         val nuevasCartas = mazoSeleccionado.cartas + carta
         mazoSeleccionado = mazoSeleccionado.copy(cartas = nuevasCartas)
         actualizarMazoEnLista(mazoSeleccionado)
+        marcarCambios()
     }
 
     fun eliminarCartaAMazoSeleccionado(indice: Int) {
@@ -139,6 +185,7 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
         val nuevasCartas = mazoSeleccionado.cartas.toMutableList().also { it.removeAt(indice) }
         mazoSeleccionado = mazoSeleccionado.copy(cartas = nuevasCartas)
         actualizarMazoEnLista(mazoSeleccionado)
+        marcarCambios()
     }
 
     fun crearNuevoMazo() {
@@ -165,15 +212,56 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
                     _editarMazoUiState.value = EditarMazoUiState.Error("Usuario no ha iniciado sesión")
                     return@launch
                 }
+                Log.d("MazosViewModel", "Guardando cambios del mazo: ${mazoAntiguo.nombre} -> ${mazoNuevo.nombre}")
+                actualizarEstadoGuardando(true)
                 val exito = cF.editarMazoCase(mazoAntiguo.nombre, mazoNuevo.nombre, mazoNuevo.cartas, mazoAntiguo.cartas)
+                Log.d("MazosViewModel", "Resultado de editarMazoCase: $exito")
                 if (exito) {
                     // Refrescar la lista de mazos después de una edición exitosa para asegurarnos de que se reflejen los cambios realizados
                     fetchMazos()
+                    actualizarEstadoGuardado()
                 }
             } catch (e: Exception) {
                 _editarMazoUiState.value = EditarMazoUiState.Error("Error al guardar los cambios del mazo")
             }
 
+        }
+    }
+
+    private fun marcarCambios() {
+        val current = _editarMazoUiState.value
+        if (current is EditarMazoUiState.Success) {
+            _editarMazoUiState.value = current.copy(
+                hasChanges = true,
+                saveSuccess = false,
+                saving = false
+            )
+        }
+    }
+
+    private fun actualizarEstadoGuardando(guardando: Boolean) {
+        val current = _editarMazoUiState.value
+        if (current is EditarMazoUiState.Success) {
+            _editarMazoUiState.value = current.copy(
+                mazoOriginal = current.mazoOriginal.copy(
+                    cartas = current.mazoOriginal.cartas.toList()
+                ),
+                saving = guardando
+            )
+        }
+    }
+
+    private fun actualizarEstadoGuardado() {
+        val current = _editarMazoUiState.value
+        if (current is EditarMazoUiState.Success) {
+            _editarMazoUiState.value = current.copy(
+                mazoOriginal = current.mazoOriginal.copy(
+                    cartas = current.mazoOriginal.cartas.toList()
+                ),
+                hasChanges = false,
+                saveSuccess = true,
+                saving = false
+            )
         }
     }
     private fun actualizarMazoEnLista(mazo: Mazo) {

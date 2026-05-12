@@ -4,7 +4,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiService
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Producto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.toDomain
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.TiendaRepository
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.ComprarProductoRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ComprarProductoRequest
 
 class TiendaRepositoryImpl(
     private val apiService: ApiService

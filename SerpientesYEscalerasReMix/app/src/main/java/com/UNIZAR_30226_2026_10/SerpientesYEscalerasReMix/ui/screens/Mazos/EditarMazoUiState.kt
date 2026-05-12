@@ -9,8 +9,12 @@ sealed class EditarMazoUiState {
 
     // Cuando los datos llegan correctamente
     data class Success(
+        val mazoOriginal: Mazo,
         val mazo: Mazo,
-        val cartasDisponibles: List<Carta>
+        val cartasDisponibles: List<Carta>,
+        val hasChanges: Boolean = false,
+        val saveSuccess: Boolean = false,
+        val saving: Boolean = false
     ) : EditarMazoUiState()
 
     // Si hay un error al cargar los datos
