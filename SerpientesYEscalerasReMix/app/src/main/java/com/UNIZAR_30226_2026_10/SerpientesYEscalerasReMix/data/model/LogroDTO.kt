@@ -4,23 +4,33 @@ import com.google.gson.annotations.SerializedName
 
 // Coincide con la respuesta de GET /api/achievements/
 data class LogroDTO(
-    @SerializedName("id")              val id: String,
-    @SerializedName("nombre")          val nombre: String,
-    @SerializedName("descripcion")     val descripcion: String,
-    @SerializedName("objetivo")        val objetivo: Int,
-    @SerializedName("tipoRecompensa")  val tipoRecompensa: String,
-    @SerializedName("valorRecompensa") val valorRecompensa: String,
-    @SerializedName("claveMetrica")    val claveMetrica: String,
-    // imagen es un recurso local drawable — se resuelve en el mapper, no viene de la API
+    @SerializedName("nombre")              val id: String,
+    @SerializedName("descripcion")         val descripcion: String,
+    @SerializedName("requisito")           val objetivo: Int,
+    @SerializedName("tipo")                val tipoRecompensa: String,
+    @SerializedName("recompensaMonetaria") val valorRecompensa: Int?,
     val imagen: Int = 0
-)
+) {
+    val nombre: String get() = id
+}
 
 // Coincide con la respuesta de GET /api/users/{email}/stats
 data class StatsDTO(
-    @SerializedName("stats") val stats: Map<String, Int>
+    @SerializedName("victorias")         val victorias: Int = 0,
+    @SerializedName("derrotas")          val derrotas: Int = 0,
+    @SerializedName("SEP")               val sep: Int = 0,
+    @SerializedName("CartasJugadas")     val cartasJugadas: Int = 0,
+    @SerializedName("PartidasJugadas")   val partidasJugadas: Int = 0,
+    @SerializedName("NumeroAmigos")      val numeroAmigos: Int = 0,
+    @SerializedName("CartasLegendarias") val cartasLegendarias: Int = 0,
+    @SerializedName("LogrosCompletados") val logrosCompletados: List<String> = emptyList()
 )
 
 // Coincide con la respuesta de GET /api/users/{email}/achievements (logros ya reclamados)
 data class LogrosReclamadosDTO(
     @SerializedName("achievements") val ids: List<String>
+)
+
+data class LogrosReply(
+    @SerializedName("logros") val achievements: List<LogroDTO>  // ← era "achievements"
 )

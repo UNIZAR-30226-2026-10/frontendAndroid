@@ -15,28 +15,28 @@ class LogrosRepositoryImpl(
 
     override suspend fun getAllAchievements(): List<LogroDTO> = withContext(Dispatchers.IO) {
         val response = apiService.getAllAchievements()
-        if (response.isSuccessful) {
-            response.body() ?: emptyList()
-        } else {
-            throw Exception("Error al obtener logros: ${response.code()} ${response.message()}")
+        when {
+            response.isSuccessful -> response.body()?.achievements ?: emptyList()
+            response.code() == 404 -> emptyList()
+            else -> throw Exception("Error al obtener logros: ${response.code()} ${response.message()}")
         }
     }
 
     override suspend fun getUserStats(email: String): StatsDTO = withContext(Dispatchers.IO) {
         val response = apiService.getUserStats(email)
-        if (response.isSuccessful) {
-            response.body() ?: throw Exception("Respuesta vacía al obtener stats")
-        } else {
-            throw Exception("Error al obtener stats: ${response.code()} ${response.message()}")
+        when {
+            response.isSuccessful -> response.body() ?: StatsDTO()
+            response.code() == 404 -> StatsDTO()
+            else -> throw Exception("Error al obtener stats: ${response.code()} ${response.message()}")
         }
     }
 
     override suspend fun getClaimedAchievements(email: String): List<String> = withContext(Dispatchers.IO) {
         val response = apiService.getClaimedAchievements(email)
-        if (response.isSuccessful) {
-            response.body()?.ids ?: emptyList()
-        } else {
-            throw Exception("Error al obtener logros reclamados: ${response.code()} ${response.message()}")
+        when {
+            response.isSuccessful -> response.body()?.ids ?: emptyList()
+            response.code() == 404 -> emptyList()   // ← sin logros reclamados aún
+            else -> throw Exception("Error al obtener logros reclamados: ${response.code()} ${response.message()}")
         }
     }
 
