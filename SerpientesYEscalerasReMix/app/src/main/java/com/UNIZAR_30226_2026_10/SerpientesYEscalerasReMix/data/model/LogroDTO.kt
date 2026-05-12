@@ -9,7 +9,7 @@ data class LogroDTO(
     @SerializedName("requisito")           val objetivo: Int,
     @SerializedName("tipo")                val tipoRecompensa: String,
     @SerializedName("recompensaMonetaria") val valorRecompensa: Int?,
-    @SerializedName("cartaID")             val cartaID: String?,   // ← añadir esto
+    @SerializedName("cartaID")             val cartaID: String?,
 ) {
     val nombre: String get() = id
 }
@@ -32,5 +32,5 @@ data class LogrosReclamadosDTO(
 )
 
 data class LogrosReply(
-    @SerializedName("logros") val achievements: List<LogroDTO>  // ← era "achievements"
+    @SerializedName("logros") val achievements: List<LogroDTO>
 )

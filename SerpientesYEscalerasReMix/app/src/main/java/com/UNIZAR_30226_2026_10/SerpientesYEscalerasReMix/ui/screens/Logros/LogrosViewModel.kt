@@ -69,15 +69,29 @@ class LogrosViewModel(private val cF: CaseFacade) : ViewModel() {
         viewModelScope.launch {
             errorReclamar = null
             try {
+                // 1. Llamada al caso de uso para persistir en el servidor
                 cF.reclamarLogroCase(achievementId)
-                // Actualizamos el estado local optimistamente sin recargar toda la lista
+
+                // 2. Actualizamos el estado local de la lista de logros de forma optimista
                 logros = logros.map { logro ->
-                    if (logro.id == achievementId) logro.copy(recompensaReclamada = true)
-                    else logro
+                    if (logro.id == achievementId) {
+                        logro.copy(recompensaReclamada = true)
+                    } else {
+                        logro
+                    }
                 }
+
+                // 3. FIX: Forzamos la actualización de las estadísticas globales (SEP)
+                // Esto hará que el contador de monedas se refresque en toda la app
+                try {
+                    cargarLogros() // O la función equivalente que actualice el StateFlow de SEP
+                } catch (e: Exception) {
+                    // Error silencioso: el logro se reclamó, pero falló la recarga visual de monedas
+                    println("Error al refrescar SEP: ${e.message}")
+                }
+
             } catch (e: Exception) {
-                // FIX: usamos errorReclamar en lugar de errorMessage para no
-                // bloquear la pantalla entera con el error de un solo logro
+                // Usamos errorReclamar para no bloquear la pantalla entera
                 errorReclamar = "Error al reclamar: ${e.message}"
             }
         }

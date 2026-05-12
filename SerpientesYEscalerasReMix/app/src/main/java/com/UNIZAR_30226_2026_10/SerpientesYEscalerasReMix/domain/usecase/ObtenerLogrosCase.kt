@@ -25,50 +25,37 @@ class ObtenerLogrosCase(
                 "LogrosDesbloqueados" -> statsResponse.logrosCompletados.size
                 else -> 0
             }
-            android.util.Log.d("LOGROS", "id=${dto.id} tipo=${dto.tipoRecompensa} cartaID=${dto.cartaID}")
+
+            val cartaIDReal = when (dto.id) {
+                "Primeros pasos" -> "Serpiente en tu bota"
+                "Imparable" -> "Wild Frank"
+                "Derrotado" -> "Pickpocket"
+                "Negado" -> "Carpintero"
+                "Completista" -> "Mal de ojo"
+                else -> null
+            }
+
             val esEscalera = dto.tipoRecompensa == "Escalera" || dto.id.contains("Escalera", ignoreCase = true)
+            val esIcono = dto.tipoRecompensa == "Icono" || dto.id.contains("Avatar", ignoreCase = true)
+
             // Lógica para el TEXTO de la recompensa
             val textoRecompensa = when {
                 dto.tipoRecompensa == "SEP" -> {
                     val cantidad = dto.valorRecompensa ?: dto.objetivo
                     "$cantidad SEP"
                 }
-                dto.valorRecompensa != null && dto.valorRecompensa > 0 -> "${dto.valorRecompensa} Monedas"
-                dto.cartaID != null && dto.cartaID.isNotBlank() -> "Carta"
-                esEscalera -> "Skin"  // ← ahora cubre ambos casos
-                else -> "Skin"
+                cartaIDReal != null && cartaIDReal.isNotBlank() -> "Carta"
+                // Para todo lo demás (Skins, Iconos, Fichas o nulos), enviamos vacío
+                else -> ""
             }
 
-            // Determinación del recurso de imagen basado en la prioridad de recompensa
-            // ... dentro de globalAchievements.map { dto -> ... }
-
-// Determinación del recurso de imagen basada en la prioridad de recompensa
-            // Dentro del map en ObtenerLogrosCase.kt
+            // 3. DETERMINACIÓN DEL RECURSO DE IMAGEN
             val recursoImagen = when {
-                // 1. Recompensa de CARTA (Prioridad alta)
-                dto.cartaID != null && dto.cartaID.isNotBlank() -> imagenParaCarta(dto.cartaID)
+                // Si es Carta: Usamos el mapeo de imágenes
+                cartaIDReal != null && cartaIDReal.isNotBlank() -> imagenParaCarta(cartaIDReal)
 
-                // 2. Recompensa de PUNTOS SEP (Visto en los logs de stats)
-                dto.tipoRecompensa == "SEP" -> 0
-
-                // 3. Recompensa de MONEDAS (Si valorRecompensa > 0 y no es SEP)
-                dto.valorRecompensa != null && dto.valorRecompensa > 0 -> R.drawable.corona
-
-                // 4. Recompensa de TABLEROS / SKINS (Basado en los logs de /api/boards)
-                dto.tipoRecompensa == "Escalera" || esEscalera -> {
-                    when {
-                        dto.id.contains("Jungla", ignoreCase = true) -> R.drawable.escalera_jungla
-                        dto.id.contains("Final", ignoreCase = true) -> R.drawable.escalera_estratega // Cubre "La apuesta final"
-                        dto.id.contains("Basico", ignoreCase = true) -> R.drawable.escalera_magnate
-                        else -> R.drawable.escalera
-                    }
-                }
-
-                // 5. Recompensa de AVATAR / ICONO (Visto en el log del lobby)
-                dto.tipoRecompensa == "Icono" || dto.id.contains("Avatar") -> R.drawable.icono_jugador_platino
-
-                // Fallback: Logros de mérito (Victorias/Amigos) que no dan objeto físico
-                else -> R.drawable.corona
+                // Si no es Carta (incluyendo SEP y Monedas): No ponemos imagen
+                else -> 0
             }
 
             LogroUsuario(
@@ -86,8 +73,8 @@ class ObtenerLogrosCase(
         }
     }
 
-    private fun imagenParaCarta(cartaID: String?): Int {
-        return when (cartaID) {
+    private fun imagenParaCarta(logroID: String?): Int {
+        return when (logroID) {
             "Serpiente en tu bota" -> R.drawable.cata_serpiente_en_tu_bota
             "Wild Frank" -> R.drawable.carta_wild_frank
             "Moises" -> R.drawable.carta_moises
