@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.LogroUsuario
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class LogrosViewModel(private val cF: CaseFacade) : ViewModel() {
@@ -40,8 +41,10 @@ class LogrosViewModel(private val cF: CaseFacade) : ViewModel() {
         // FIX: esperamos a que el email esté listo antes de cargar,
         // igual que en PerfilViewModel
         viewModelScope.launch {
-            cF.email.collect { email ->
-                if (email.isNotEmpty()) cargarLogros()
+            viewModelScope.launch {
+                cF.email.first { it.isNotEmpty() }.let {
+                    cargarLogros()
+                }
             }
         }
     }

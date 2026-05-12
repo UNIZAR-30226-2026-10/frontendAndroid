@@ -43,29 +43,31 @@ class ObtenerLogrosCase(
             // ... dentro de globalAchievements.map { dto -> ... }
 
 // Determinación del recurso de imagen basada en la prioridad de recompensa
+            // Dentro del map en ObtenerLogrosCase.kt
             val recursoImagen = when {
-                // 1. Prioridad: Cartas (si tiene ID de carta, es una carta)
+                // 1. Recompensa de CARTA (Prioridad alta)
                 dto.cartaID != null && dto.cartaID.isNotBlank() -> imagenParaCarta(dto.cartaID)
 
-                // 2. Prioridad: Skins (Si el tipo es "Escalera" O es "Victorias", buscamos skin)
-                // Esto cubrirá los casos donde el servidor envía "Victorias" para los tableros
-                dto.tipoRecompensa == "Escalera" || dto.tipoRecompensa == "Victorias" -> {
-                    // Intentamos obtener la imagen de la escalera.
-                    // Si no encuentra una específica (ej. es una victoria normal de monedas),
-                    // la función imagenParaEscalera debería gestionar el fallback.
-                    val imagenEscalera = imagenParaEscalera(dto.id)
+                // 2. Recompensa de PUNTOS SEP (Visto en los logs de stats)
+                dto.tipoRecompensa == "SEP" -> 0
 
-                    // Si es un logro de victorias pero NO es un tablero (monedas), ponemos corona
-                    if (imagenEscalera == R.drawable.escalera_jungla && (dto.valorRecompensa ?: 0) > 0) {
-                        0
-                    } else {
-                        R.drawable.corona
+                // 3. Recompensa de MONEDAS (Si valorRecompensa > 0 y no es SEP)
+                dto.valorRecompensa != null && dto.valorRecompensa > 0 -> R.drawable.corona
+
+                // 4. Recompensa de TABLEROS / SKINS (Basado en los logs de /api/boards)
+                dto.tipoRecompensa == "Escalera" || esEscalera -> {
+                    when {
+                        dto.id.contains("Jungla", ignoreCase = true) -> R.drawable.escalera_jungla
+                        dto.id.contains("Final", ignoreCase = true) -> R.drawable.escalera_estratega // Cubre "La apuesta final"
+                        dto.id.contains("Basico", ignoreCase = true) -> R.drawable.escalera_magnate
+                        else -> R.drawable.escalera
                     }
                 }
 
-                // 3. Recompensa monetaria genérica
-                dto.valorRecompensa != null && dto.valorRecompensa > 0 -> 0
+                // 5. Recompensa de AVATAR / ICONO (Visto en el log del lobby)
+                dto.tipoRecompensa == "Icono" || dto.id.contains("Avatar") -> R.drawable.icono_jugador_platino
 
+                // Fallback: Logros de mérito (Victorias/Amigos) que no dan objeto físico
                 else -> R.drawable.corona
             }
 
@@ -116,8 +118,7 @@ class ObtenerLogrosCase(
             logroID.contains("Estratega", ignoreCase = true) -> R.drawable.escalera_estratega
             logroID.contains("Jungla", ignoreCase = true) -> R.drawable.escalera_jungla
             logroID.contains("Magnate", ignoreCase = true) -> R.drawable.escalera_magnate
-            // Si el logro simplemente se llama "Básico" o contiene "Escalera" genérica
-            logroID.contains("Basico", ignoreCase = true) || logroID.contains("Escalera", ignoreCase = true) -> R.drawable.escalera
+            logroID.contains("Basico", ignoreCase = true) -> R.drawable.escalera
             else -> R.drawable.escalera
         }
     }

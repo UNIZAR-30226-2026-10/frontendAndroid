@@ -82,7 +82,7 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
                 val sS = mapa[CategoriaCosmetico.SERPIENTE] ?: emptyList()
                 val sF = mapa[CategoriaCosmetico.FICHA]     ?: emptyList()
                 val ic = mapa[CategoriaCosmetico.ICONO]     ?: emptyList()
-
+                println("DEBUG: Escaleras recibidas: ${sE.size}")
                 // Sobreescribimos siempre para reflejar el estado real del servidor,
                 // incluso si viene vacío (el usuario no tiene cosméticos de esa categoría)
                 skinsEscalera  = sE

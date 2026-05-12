@@ -457,15 +457,26 @@ fun CosmeticoItem(
                         opciones.forEach { skinId ->
                             DropdownMenuItem(
                                 text = {
-                                    Text(
-                                        text = skinId
-                                            .replace("escalera_", "")
-                                            .replace("serpiente_", "")
-                                            .replace("ficha_", "")
-                                            .replace("icono_", "")
-                                            .replace("_", " "),
-                                        color = if (skinId == skinActual) color_primary else color_text
-                                    )
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Image(
+                                            painter = painterResource(
+                                                id = obtenerImagenCosmetico(skinId, categoria)
+                                            ),
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .size(30.dp)
+                                                .padding(end = 8.dp)
+                                        )
+                                        Text(
+                                            text = skinId
+                                                .replace("escalera_", "")
+                                                .replace("serpiente_", "")
+                                                .replace("ficha_", "")
+                                                .replace("icono_", "")
+                                                .replace("_", " "),
+                                            color = if (skinId == skinActual) color_primary else color_text
+                                        )
+                                    }
                                 },
                                 onClick = {
                                     mostrarMenu = false
