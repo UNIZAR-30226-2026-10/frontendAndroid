@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -72,7 +71,9 @@ fun PerfilScreen(navHost: SENavHostController, viewModel: PerfilViewModel) {
         return
     }
 
-    if (errorMessage != null) {
+    // FIX: El error de cosméticos no bloquea toda la pantalla.
+    // Se muestra el perfil igualmente y el error aparece solo si no hay perfil cargado.
+    if (errorMessage != null && perfil == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(text = errorMessage, color = Color.Red, style = SETextTypes.plano)
         }
@@ -93,10 +94,10 @@ fun PerfilScreen(navHost: SENavHostController, viewModel: PerfilViewModel) {
         onNombreConfirmado = { nuevo -> viewModel.actualizarNombre(nuevo) },
         onIconoSeleccionado     = { iconId -> viewModel.actualizarIcono(iconId) },
         onCosmeticoSeleccionado = { categoria, skinId ->
-                viewModel.actualizarCosmetico(categoria, skinId)
-            },
+            viewModel.actualizarCosmetico(categoria, skinId)
+        },
         onCerrarSesion = { viewModel.cerrarSesion(context) { navHost.goTo(Destinos.LOGIN) } }
-        )
+    )
 }
 
 @Composable
@@ -116,7 +117,6 @@ fun PerfilContent(
     onCosmeticoSeleccionado: (CategoriaCosmetico, String) -> Unit,
     onCerrarSesion: () -> Unit
 ) {
-
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -205,51 +205,70 @@ fun AvatarUsuario(
 ) {
     var mostrarMenu by remember { mutableStateOf(false) }
 
-    Box(contentAlignment = Alignment.BottomEnd) {
+    Box(
+        modifier = Modifier.size(95.dp), // ← 10dp más que el Surface (85dp)
+        contentAlignment = Alignment.BottomEnd
+    ) {
         Surface(
-            modifier = Modifier.size(85.dp),
+            modifier = Modifier.size(85.dp).align(Alignment.TopStart), // ← anclado arriba-izquierda
             shape = CircleShape,
             color = color_text,
             border = BorderStroke(2.dp, color_primary)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.icono_jugador_default),
+                painter = painterResource(id = obtenerImagenCosmetico(iconoActual, CategoriaCosmetico.ICONO)),
                 contentDescription = "Avatar",
                 modifier = Modifier.padding(4.dp)
             )
         }
 
-        IconButton(
-            onClick = { mostrarMenu = true },
-            modifier = Modifier
-                .size(24.dp)
-                .offset(x = 2.dp, y = 2.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Edit,
-                contentDescription = "Cambiar avatar",
-                tint = color_text,
-                modifier = Modifier.size(18.dp)
-            )
-        }
-
-        DropdownMenu(
-            expanded = mostrarMenu,
-            onDismissRequest = { mostrarMenu = false }
-        ) {
-            iconos.forEach { iconId ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = iconId,
-                            color = if (iconId == iconoActual) color_primary else color_text
-                        )
-                    },
-                    onClick = {
-                        mostrarMenu = false
-                        onIconoSeleccionado(iconId)
-                    }
+        // El Box ancla queda en BottomEnd, completamente fuera del círculo
+        Box(modifier = Modifier.align(Alignment.BottomEnd)) {
+            IconButton(
+                onClick = { mostrarMenu = true },
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Cambiar avatar",
+                    tint = color_primary, // ← cambiado a color_primary para que se vea mejor
+                    modifier = Modifier.size(20.dp)
                 )
+            }
+            DropdownMenu(
+                expanded = mostrarMenu,
+                onDismissRequest = { mostrarMenu = false }
+            ) {
+                if (iconos.isEmpty()) {
+                    DropdownMenuItem(
+                        text = { Text("Sin avatares disponibles", color = color_text) },
+                        onClick = { mostrarMenu = false }
+                    )
+                } else {
+                    iconos.forEach { iconId ->
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Image(
+                                        painter = painterResource(
+                                            id = obtenerImagenCosmetico(iconId, CategoriaCosmetico.ICONO)
+                                        ),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(30.dp).padding(end = 8.dp)
+                                    )
+                                    Text(
+                                        text = iconId.replace("icono_", "").replace("_", " "),
+                                        color = if (iconId == iconoActual) color_primary else color_text
+                                    )
+                                }
+                            },
+                            onClick = {
+                                mostrarMenu = false
+                                onIconoSeleccionado(iconId)
+                            }
+                        )
+                    }
+                }
             }
         }
     }
@@ -320,33 +339,6 @@ fun CajaNombreUsuario(nombreActual: String, onConfirmar: (String) -> Unit) {
 }
 
 @Composable
-fun AvatarUsuario() {
-    Box(contentAlignment = Alignment.BottomEnd) {
-        Surface(
-            modifier = Modifier.size(85.dp),
-            shape = CircleShape,
-            color = color_text,
-            border = BorderStroke(2.dp, Color.Black)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.icono_jugador_default),
-                contentDescription = null,
-                modifier = Modifier.padding(4.dp)
-            )
-        }
-        Icon(
-            imageVector = Icons.Default.Edit,
-            contentDescription = "Cambiar avatar",
-            tint = color_text,
-            modifier = Modifier
-                .size(24.dp)
-                .offset(x = 2.dp, y = 2.dp)
-                .padding(4.dp)
-        )
-    }
-}
-
-@Composable
 fun EtiquetaNombre() {
     Text(
         text = "Nombre de usuario:",
@@ -379,38 +371,29 @@ fun SeccionCosmeticos(
         ) {
             CosmeticoItem(
                 label = "Escaleras",
-                imagenRes = R.drawable.tablero_debug,
+                categoria = CategoriaCosmetico.ESCALERA,
                 skinActual = skinEscaleraActual,
                 opciones = skinsEscalera,
                 onSeleccion = { skinId ->
-                    onCosmeticoSeleccionado(
-                        CategoriaCosmetico.ESCALERA,
-                        skinId
-                    )
+                    onCosmeticoSeleccionado(CategoriaCosmetico.ESCALERA, skinId)
                 }
             )
             CosmeticoItem(
                 label = "Serpientes",
-                imagenRes = R.drawable.tablero_debug,
+                categoria = CategoriaCosmetico.SERPIENTE,
                 skinActual = skinSerpienteActual,
                 opciones = skinsSerpiente,
                 onSeleccion = { skinId ->
-                    onCosmeticoSeleccionado(
-                        CategoriaCosmetico.SERPIENTE,
-                        skinId
-                    )
+                    onCosmeticoSeleccionado(CategoriaCosmetico.SERPIENTE, skinId)
                 }
             )
             CosmeticoItem(
                 label = "Fichas",
-                imagenRes = R.drawable.tablero_debug,
+                categoria = CategoriaCosmetico.FICHA,
                 skinActual = skinFichaActual,
                 opciones = skinsFicha,
                 onSeleccion = { skinId ->
-                    onCosmeticoSeleccionado(
-                        CategoriaCosmetico.FICHA,
-                        skinId
-                    )
+                    onCosmeticoSeleccionado(CategoriaCosmetico.FICHA, skinId)
                 }
             )
         }
@@ -420,7 +403,7 @@ fun SeccionCosmeticos(
 @Composable
 fun CosmeticoItem(
     label: String,
-    imagenRes: Int,
+    categoria: CategoriaCosmetico,
     skinActual: String,
     opciones: List<String>,
     onSeleccion: (String) -> Unit
@@ -430,6 +413,7 @@ fun CosmeticoItem(
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = label, style = SETextTypes.grande, color = color_text)
         Spacer(modifier = Modifier.height(4.dp))
+
         Box(contentAlignment = Alignment.Center) {
             Surface(
                 modifier = Modifier
@@ -439,12 +423,16 @@ fun CosmeticoItem(
                 shape = RoundedCornerShape(4.dp)
             ) {
                 Image(
-                    painter = painterResource(id = imagenRes),
+                    painter = painterResource(id = obtenerImagenCosmetico(skinActual, categoria)),
                     contentDescription = label,
                     modifier = Modifier.padding(8.dp),
                     contentScale = ContentScale.Crop,
                     colorFilter = ColorFilter.tint(Color.Black.copy(alpha = 0.4f), BlendMode.Darken)
                 )
+            }
+
+            // Box ancla para el DropdownMenu — fuera del Surface para evitar el clip
+            Box {
                 IconButton(
                     onClick = { mostrarMenu = true },
                     modifier = Modifier.size(60.dp)
@@ -456,26 +444,71 @@ fun CosmeticoItem(
                         modifier = Modifier.size(60.dp)
                     )
                 }
-            }
-            DropdownMenu(
-                expanded = mostrarMenu,
-                onDismissRequest = { mostrarMenu = false }
-            ) {
-                opciones.forEach { skinId ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = skinId,
-                                color = if (skinId == skinActual) color_primary else color_text
+                DropdownMenu(
+                    expanded = mostrarMenu,
+                    onDismissRequest = { mostrarMenu = false }
+                ) {
+                    if (opciones.isEmpty()) {
+                        DropdownMenuItem(
+                            text = { Text("Sin skins disponibles", color = color_text) },
+                            onClick = { mostrarMenu = false }
+                        )
+                    } else {
+                        opciones.forEach { skinId ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = skinId
+                                            .replace("escalera_", "")
+                                            .replace("serpiente_", "")
+                                            .replace("ficha_", "")
+                                            .replace("icono_", "")
+                                            .replace("_", " "),
+                                        color = if (skinId == skinActual) color_primary else color_text
+                                    )
+                                },
+                                onClick = {
+                                    mostrarMenu = false
+                                    onSeleccion(skinId)
+                                }
                             )
-                        },
-                        onClick = {
-                            mostrarMenu = false
-                            onSeleccion(skinId)
                         }
-                    )
+                    }
                 }
             }
+        }
+    }
+}
+
+fun obtenerImagenCosmetico(id: String, cat: CategoriaCosmetico): Int {
+    return when (id) {
+        "icono_nerd"         -> R.drawable.icono_jugador_nerd
+        "icono_completista"  -> R.drawable.icono_jugador_completista
+        "icono_platino"      -> R.drawable.icono_jugador_platino
+        "icono_default"      -> R.drawable.icono_jugador_default
+        "icono_L"            -> R.drawable.icono_jugador_default  // sustituir por el drawable correcto
+        "icono_W"            -> R.drawable.icono_jugador_default  // sustituir por el drawable correcto
+        "icono_cofre"        -> R.drawable.icono_jugador_default  // sustituir por el drawable correcto
+        "serpiente_calcetin" -> R.drawable.serpiente_calcetin
+        "serpiente_futuro"   -> R.drawable.serpiente_futuro
+        "serpiente_tribal"   -> R.drawable.serpiente              // sustituir por el drawable correcto
+        "serpiente_default"  -> R.drawable.serpiente
+        "ficha_totem"        -> R.drawable.jugador_azul_totem
+        "ficha_esqueleto"    -> R.drawable.jugador_verde_calavera
+        "ficha_aventurero"   -> R.drawable.jugador_rojo_totem     // sustituir por el drawable correcto
+        "ficha_moneda"       -> R.drawable.jugador_rojo_totem     // sustituir por el drawable correcto
+        "ficha_default"      -> R.drawable.jugador_rojo_totem
+        "escalera_default"   -> R.drawable.escalera
+        "escalera_estratega" -> R.drawable.escalera_estratega
+        "escalera_jungla"    -> R.drawable.escalera_jungla
+        "escalera_magnate"   -> R.drawable.escalera_magnate
+        "escalera"           -> R.drawable.escalera
+        "escalera2"          -> R.drawable.escalera2
+        else -> when (cat) {
+            CategoriaCosmetico.ICONO     -> R.drawable.icono_jugador_default
+            CategoriaCosmetico.SERPIENTE -> R.drawable.serpiente
+            CategoriaCosmetico.FICHA     -> R.drawable.jugador_rojo_totem
+            CategoriaCosmetico.ESCALERA  -> R.drawable.escalera
         }
     }
 }

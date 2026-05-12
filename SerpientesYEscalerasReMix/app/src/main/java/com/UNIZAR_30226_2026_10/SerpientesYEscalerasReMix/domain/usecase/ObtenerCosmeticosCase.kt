@@ -7,15 +7,28 @@ class ObtenerCosmeticosCase(
     private val email: StateFlow<String>,
     private val repo: PerfilRepository
 ) {
+    /**
+     * Obtiene el mapa completo de cosméticos disponibles para el usuario actual.
+     * Esta es la función recomendada para usar en el ViewModel para evitar múltiples llamadas.
+     */
+    suspend fun obtenerTodosLosCosmeticos(): Map<CategoriaCosmetico, List<String>> {
+        val emailActual = email.value
+        return if (emailActual.isNotEmpty()) {
+            repo.obtenerCosmeticosDisponibles(emailActual)
+        } else {
+            emptyMap()
+        }
+    }
+
     suspend fun obtenerSkinsEscalera(): List<String> =
-        repo.obtenerCosmeticosDisponibles(email.value)[CategoriaCosmetico.ESCALERA] ?: emptyList()
+        obtenerTodosLosCosmeticos()[CategoriaCosmetico.ESCALERA] ?: emptyList()
 
     suspend fun obtenerSkinsSerpiente(): List<String> =
-        repo.obtenerCosmeticosDisponibles(email.value)[CategoriaCosmetico.SERPIENTE] ?: emptyList()
+        obtenerTodosLosCosmeticos()[CategoriaCosmetico.SERPIENTE] ?: emptyList()
 
     suspend fun obtenerSkinsFicha(): List<String> =
-        repo.obtenerCosmeticosDisponibles(email.value)[CategoriaCosmetico.FICHA] ?: emptyList()
+        obtenerTodosLosCosmeticos()[CategoriaCosmetico.FICHA] ?: emptyList()
 
     suspend fun obtenerIconos(): List<String> =
-        repo.obtenerCosmeticosDisponibles(email.value)[CategoriaCosmetico.ICONO] ?: emptyList()
+        obtenerTodosLosCosmeticos()[CategoriaCosmetico.ICONO] ?: emptyList()
 }
