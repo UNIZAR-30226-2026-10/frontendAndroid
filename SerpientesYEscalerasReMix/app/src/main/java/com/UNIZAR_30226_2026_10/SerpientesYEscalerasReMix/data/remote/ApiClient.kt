@@ -9,11 +9,8 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.MazoDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.MazosResponseDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.ProductoDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.SaldoDto
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.*
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AceptarInvitacionRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarEscaleraRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarFichaRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarIconoRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarSerpienteRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AnadirBotRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AuthReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ChatRequest
@@ -259,9 +256,9 @@ interface ApiService {
 }
 
 object ApiClient {
-    private const val API_URL = "http://syeremix.switzerlandnorth.cloudapp.azure.com/api/"
+    //private const val API_URL = "http://syeremix.switzerlandnorth.cloudapp.azure.com/api/"
     //private const val API_URL = "http://192.168.1.36:3000/api/"
-
+    private const val API_URL = "http://10.0.2.2:3000/api/"
     private var _apiService: ApiService? = null
     private var _cookieJar: PersistentCookieJar? = null
 
