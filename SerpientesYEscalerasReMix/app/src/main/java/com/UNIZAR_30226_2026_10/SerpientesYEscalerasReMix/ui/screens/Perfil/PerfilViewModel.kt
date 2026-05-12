@@ -115,23 +115,18 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
     }
 
     fun actualizarCosmetico(categoria: CategoriaCosmetico, skinId: String) {
-        println("DEBUG: Intentando actualizar $categoria a $skinId") // Traza 1
         viewModelScope.launch {
             try {
                 val result = cF.actualizarSkinCase(categoria, skinId)
-                println("DEBUG: Resultado de la API: ${result.isSuccess}") // Traza 2
-
                 if (result.isSuccess) {
-                    if (perfil == null) println("DEBUG: El perfil es NULO, no puedo actualizar la UI")
+                    // En lugar de solo hacer .copy(), pedimos los datos reales
                     cargarPerfil()
-                    val perfilActual = perfil ?: return@launch
-                    // ... resto del código
-                    println("DEBUG: UI actualizada localmente a $skinId")
+                    cargarCosmeticosDisponibles()
                 } else {
-                    println("DEBUG: Error API: ${result.exceptionOrNull()?.message}")
+                    errorMessage = "Error: ${result.exceptionOrNull()?.message}"
                 }
             } catch (e: Exception) {
-                println("DEBUG: Excepción lanzada: ${e.message}")
+                errorMessage = e.message
             }
         }
     }
