@@ -103,8 +103,17 @@ fun TarjetaLogro(logro: LogroUsuario, onReclamar: (String) -> Unit) {
             }
 
             Spacer(modifier = Modifier.width(8.dp))
-            Column(modifier = Modifier.width(80.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "Recompensa", style = SETextTypes.seleccionable)
+
+            // --- BLOQUE DE RECOMPENSA CORREGIDO ---
+            Column(
+                modifier = Modifier.width(100.dp), // Aumentado un poco para que quepa bien el texto
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "Recompensa", style = SETextTypes.seleccionable, modifier = Modifier.padding(8.dp))
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // 1. Mostramos la IMAGEN (Corona, Carta o Escalera)
                 if (logro.imagen != 0) {
                     Box(
                         modifier = Modifier
@@ -119,14 +128,20 @@ fun TarjetaLogro(logro: LogroUsuario, onReclamar: (String) -> Unit) {
                             contentScale = ContentScale.Fit
                         )
                     }
-                } else if (logro.valorRecompensa.isNotEmpty() && logro.valorRecompensa != "null") {
-                    Box(modifier = Modifier.height(80.dp), contentAlignment = Alignment.Center) {
-                        Text(text = "${logro.valorRecompensa} Sep", style = SETextTypes.plano)
-                    }
-                } else {
-                    Box(modifier = Modifier.height(80.dp), contentAlignment = Alignment.Center) {
-                        Text(text = "Carta", style = SETextTypes.plano)
-                    }
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // 2. Mostramos el TEXTO debajo (si existe valorRecompensa como "200 SEP")
+                if (logro.valorRecompensa.isNotEmpty() && logro.valorRecompensa != "null") {
+                    Text(
+                        text = logro.valorRecompensa, // Aquí ya viene "200 SEP" desde el UseCase
+                        style = SETextTypes.plano,
+                        textAlign = TextAlign.Center
+                    )
+                } else if (logro.imagen == 0) {
+                    // Fallback por si no hay nada
+                    Text(text = "Carta", style = SETextTypes.plano)
                 }
             }
         }

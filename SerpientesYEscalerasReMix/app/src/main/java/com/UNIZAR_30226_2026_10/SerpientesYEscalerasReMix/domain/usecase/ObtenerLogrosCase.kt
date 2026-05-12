@@ -10,31 +10,75 @@ class ObtenerLogrosCase(
 ) {
     suspend operator fun invoke(): List<LogroUsuario> {
         val globalAchievements = repository.getAllAchievements()
-        val statsResponse      = repository.getUserStats(email.value)
-        val reclamados         = statsResponse.logrosCompletados.toSet()
+        val statsResponse = repository.getUserStats(email.value)
+        val reclamados = statsResponse.logrosCompletados.toSet()
 
         return globalAchievements.map { dto ->
             val progreso = when (dto.tipoRecompensa) {
-                "Victorias"           -> statsResponse.victorias
-                "Partidas"            -> statsResponse.partidasJugadas
-                "Derrotas"            -> statsResponse.derrotas
-                "SEP"                 -> statsResponse.sep
-                "CartasJugadas"       -> statsResponse.cartasJugadas
-                "CartasLegendarias"   -> statsResponse.cartasLegendarias
-                "NumeroAmigos"        -> statsResponse.numeroAmigos
+                "Victorias" -> statsResponse.victorias
+                "Partidas" -> statsResponse.partidasJugadas
+                "Derrotas" -> statsResponse.derrotas
+                "SEP" -> statsResponse.sep
+                "CartasJugadas" -> statsResponse.cartasJugadas
+                "CartasLegendarias" -> statsResponse.cartasLegendarias
+                "NumeroAmigos" -> statsResponse.numeroAmigos
                 "LogrosDesbloqueados" -> statsResponse.logrosCompletados.size
-                else                  -> 0
+                else -> 0
             }
+            android.util.Log.d("LOGROS", "id=${dto.id} tipo=${dto.tipoRecompensa} cartaID=${dto.cartaID}")
+            val esEscalera = dto.tipoRecompensa == "Escalera" || dto.id.contains("Escalera", ignoreCase = true)
+            // Lógica para el TEXTO de la recompensa
+            val textoRecompensa = when {
+                dto.tipoRecompensa == "SEP" -> {
+                    val cantidad = dto.valorRecompensa ?: dto.objetivo
+                    "$cantidad SEP"
+                }
+                dto.valorRecompensa != null && dto.valorRecompensa > 0 -> "${dto.valorRecompensa} Monedas"
+                dto.cartaID != null && dto.cartaID.isNotBlank() -> "Carta"
+                esEscalera -> "Skin"  // ← ahora cubre ambos casos
+                else -> "Skin"
+            }
+
+            // Determinación del recurso de imagen basado en la prioridad de recompensa
+            // ... dentro de globalAchievements.map { dto -> ... }
+
+// Determinación del recurso de imagen basada en la prioridad de recompensa
+            val recursoImagen = when {
+                // 1. Prioridad: Cartas (si tiene ID de carta, es una carta)
+                dto.cartaID != null && dto.cartaID.isNotBlank() -> imagenParaCarta(dto.cartaID)
+
+                // 2. Prioridad: Skins (Si el tipo es "Escalera" O es "Victorias", buscamos skin)
+                // Esto cubrirá los casos donde el servidor envía "Victorias" para los tableros
+                dto.tipoRecompensa == "Escalera" || dto.tipoRecompensa == "Victorias" -> {
+                    // Intentamos obtener la imagen de la escalera.
+                    // Si no encuentra una específica (ej. es una victoria normal de monedas),
+                    // la función imagenParaEscalera debería gestionar el fallback.
+                    val imagenEscalera = imagenParaEscalera(dto.id)
+
+                    // Si es un logro de victorias pero NO es un tablero (monedas), ponemos corona
+                    if (imagenEscalera == R.drawable.escalera_jungla && (dto.valorRecompensa ?: 0) > 0) {
+                        0
+                    } else {
+                        R.drawable.corona
+                    }
+                }
+
+                // 3. Recompensa monetaria genérica
+                dto.valorRecompensa != null && dto.valorRecompensa > 0 -> 0
+
+                else -> R.drawable.corona
+            }
+
             LogroUsuario(
-                id                  = dto.id,
-                nombre              = dto.nombre,
-                descripcion         = dto.descripcion,
-                progresoActual      = progreso,
-                progresoObjetivo    = dto.objetivo,
-                tipoRecompensa      = dto.tipoRecompensa,
-                valorRecompensa     = dto.valorRecompensa?.toString() ?: "",
-                imagen              = imagenParaCarta(dto.cartaID),
-                esCompletado        = progreso >= dto.objetivo,
+                id = dto.id,
+                nombre = dto.nombre,
+                descripcion = dto.descripcion,
+                progresoActual = progreso,
+                progresoObjetivo = dto.objetivo,
+                tipoRecompensa = dto.tipoRecompensa,
+                valorRecompensa = textoRecompensa,
+                imagen = recursoImagen,
+                esCompletado = progreso >= dto.objetivo,
                 recompensaReclamada = dto.id in reclamados
             )
         }
@@ -43,26 +87,38 @@ class ObtenerLogrosCase(
     private fun imagenParaCarta(cartaID: String?): Int {
         return when (cartaID) {
             "Serpiente en tu bota" -> R.drawable.cata_serpiente_en_tu_bota
-            "Wild Frank"           -> R.drawable.carta_wild_frank
-            "Moises"               -> R.drawable.carta_moises
-            "Noqueo"               -> R.drawable.carta_noqueo
-            "Parca"                -> R.drawable.carta_parca
+            "Wild Frank" -> R.drawable.carta_wild_frank
+            "Moises" -> R.drawable.carta_moises
+            "Noqueo" -> R.drawable.carta_noqueo
+            "Parca" -> R.drawable.carta_parca
             "Agujero de serpiente" -> R.drawable.carta_agujero_de_serpiente
-            "Antidoto"             -> R.drawable.carta_antidoto
-            "Cambiar de idea"      -> R.drawable.carta_cambiar_de_idea
-            "Dia de la marmota"    -> R.drawable.carta_dia_de_la_marmota
-            "Coleccionista"        -> R.drawable.carta_coleccionista
+            "Antidoto" -> R.drawable.carta_antidoto
+            "Cambiar de idea" -> R.drawable.carta_cambiar_de_idea
+            "Dia de la marmota" -> R.drawable.carta_dia_de_la_marmota
+            "Coleccionista" -> R.drawable.carta_coleccionista
             "Companerismo obligatorio" -> R.drawable.carta_companerismo_obligatorio
-            "Bolsillo roto"        -> R.drawable.carta_bolsillo_roto
-            "Pickpocket"           -> R.drawable.carta_pickpocket
-            "Carpintero"           -> R.drawable.carta_carpintero
-            "Mal de ojo"           -> R.drawable.carta_mal_de_ojo
-            "Robo de identidad"    -> R.drawable.carta_robo_de_identidad
-            "Salto de longitud"    -> R.drawable.carta_salto_de_longitud
-            "Exceso de medios"     -> R.drawable.carta_exceso_de_medios
-            "Dado dorado"          -> R.drawable.carta_dado_dorado
-            "Dado envenenado"      -> R.drawable.carta_dado_envenenado
-            else                   -> 0
+            "Bolsillo roto" -> R.drawable.carta_bolsillo_roto
+            "Pickpocket" -> R.drawable.carta_pickpocket
+            "Carpintero" -> R.drawable.carta_carpintero
+            "Mal de ojo" -> R.drawable.carta_mal_de_ojo
+            "Robo de identidad" -> R.drawable.carta_robo_de_identidad
+            "Salto de longitud" -> R.drawable.carta_salto_de_longitud
+            "Exceso de medios" -> R.drawable.carta_exceso_de_medios
+            "Dado dorado" -> R.drawable.carta_dado_dorado
+            "Dado envenenado" -> R.drawable.carta_dado_envenenado
+            else -> R.drawable.corona
+        }
+    }
+
+    // Nueva función para manejar las imágenes de las escaleras
+    private fun imagenParaEscalera(logroID: String): Int {
+        return when {
+            logroID.contains("Estratega", ignoreCase = true) -> R.drawable.escalera_estratega
+            logroID.contains("Jungla", ignoreCase = true) -> R.drawable.escalera_jungla
+            logroID.contains("Magnate", ignoreCase = true) -> R.drawable.escalera_magnate
+            // Si el logro simplemente se llama "Básico" o contiene "Escalera" genérica
+            logroID.contains("Basico", ignoreCase = true) || logroID.contains("Escalera", ignoreCase = true) -> R.drawable.escalera
+            else -> R.drawable.escalera
         }
     }
 }
