@@ -28,6 +28,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoB
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoChat
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoEscalera
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoIndicacionPartida
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoNoqueo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoPuntuacionDado
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DialogoVictoria
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ListaJugadores
@@ -225,6 +226,10 @@ fun PartidaScreen(
                         navController.goTo(Destinos.JUGAR_CREAR)
                     }
                 )
+            }
+
+            if (uiState.mostrarDialogoNoqueo) {
+                DialogoNoqueo(onEntendido = { viewModel.onAceptarNoqueo() })
             }
         }
     }

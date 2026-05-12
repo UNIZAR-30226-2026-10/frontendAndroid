@@ -5,8 +5,11 @@ import android.util.Log
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.ComprarProductoRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.ProductoDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.SaldoDto
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.*
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AceptarInvitacionRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarEscaleraRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarFichaRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarIconoRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarSerpienteRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AnadirBotRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AuthReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ChatRequest
@@ -23,8 +26,8 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_mo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LeaveOrExpelRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LobbyReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LoginRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PerfilUsuarioReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PartidaReply
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PerfilUsuarioReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PostInvitacionRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.RegisterRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.RollDiceReply
@@ -213,9 +216,9 @@ interface ApiService {
 }
 
 object ApiClient {
-    //private const val API_URL = "http://syeremix.switzerlandnorth.cloudapp.azure.com/api/"
+    private const val API_URL = "http://syeremix.switzerlandnorth.cloudapp.azure.com/api/"
     //private const val API_URL = "http://192.168.1.36:3000/api/"
-    private const val API_URL = "http://10.0.2.2:3000/api/"
+    //private const val API_URL = "http://10.0.2.2:3000/api/"
     private var _apiService: ApiService? = null
     private var _cookieJar: PersistentCookieJar? = null
 
@@ -260,7 +263,7 @@ object ApiClient {
 
         // Cliente OKHttp
         val okHttpClient = OkHttpClient.Builder()
-            // .protocols(listOf(okhttp3.Protocol.HTTP_1_1)) // TODO ELIMINAR ESTA LINEA CUANDO NO SE TRABAJE EN LOCAL 192.168.1.36
+            //.protocols(listOf(okhttp3.Protocol.HTTP_1_1)) // TODO ELIMINAR ESTA LINEA CUANDO NO SE TRABAJE EN LOCAL 192.168.1.36
             .addInterceptor(forceInsecureInterceptor)
             .addNetworkInterceptor(loggingInterceptor)
             .cookieJar(cookieJar)

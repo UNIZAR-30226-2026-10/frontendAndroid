@@ -40,6 +40,7 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
     private val _mano = MutableStateFlow<List<Carta?>>(emptyList())
     private val _chat = MutableStateFlow<List<MsgChat>>(emptyList())
     private val _ganador = MutableStateFlow("")
+    private val _noqueado = MutableStateFlow(false)
 
 
     override val matchId = _matchId.asStateFlow()
@@ -49,11 +50,12 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
     override val mano = _mano.asStateFlow()
     override val chat = _chat.asStateFlow()
     override val ganador = _ganador.asStateFlow()
+    override val noqueado = _noqueado.asStateFlow()
 
     private val playerColors = listOf(
-        color_fichas_rojas, 
-        color_fichas_azules, 
-        color_fichas_verdes, 
+        color_fichas_rojas,
+        color_fichas_azules,
+        color_fichas_verdes,
         color_fichas_amarillas
     )
 
@@ -78,7 +80,10 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
         }
     }
 
-    override suspend fun lanzarDado(matchId: String, username: String): Pair<Int, List<Movimiento>> {
+    override suspend fun lanzarDado(
+        matchId: String,
+        username: String
+    ): Pair<Int, List<Movimiento>> {
         val response = api.rollDice(matchId, username)
         if (response.isSuccessful && response.body() != null) {
             val reply = response.body()!!
@@ -97,15 +102,27 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
         destinoId: Int,
         pasosRestantes: Int?
     ) {
-        val response = api.updatePawn(matchId, username, UpdatePawnRequest(destinoId - 1, fichaId, pasosRestantes))
+        val response = api.updatePawn(
+            matchId,
+            username,
+            UpdatePawnRequest(destinoId - 1, fichaId, pasosRestantes)
+        )
         if (response.isSuccessful && response.body() != null) {
             val reply = response.body()!!
             updateState(reply, username)
         }
     }
 
-    override suspend fun jugarCarta(matchId: String, username: String, cartaId: String, target: String?, inicio: Int?, fin: Int?) {
-        val response = api.playCard(matchId, username, JugarCartaRequest(cartaId, target, inicio, fin))
+    override suspend fun jugarCarta(
+        matchId: String,
+        username: String,
+        cartaId: String,
+        target: String?,
+        inicio: Int?,
+        fin: Int?
+    ) {
+        val response =
+            api.playCard(matchId, username, JugarCartaRequest(cartaId, target, inicio, fin))
         if (response.isSuccessful && response.body() != null) {
             updateState(response.body()!!, username)
         }
@@ -127,7 +144,7 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
 
     private fun updateState(reply: PartidaReply, myUsername: String) {
         _tablero.value = reply.snapshotTablero.toDomain()
-        
+
         val snapshotJugadores = reply.snapshotJugadores.jugadores
         val partidaJugadores = reply.partidaJugadores
 
@@ -163,26 +180,28 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
             ronda = reply.snapshotJugadores.ronda,
             jugadores = jugadoresMapeados
         )
-        
+
         val allFichas = mutableListOf<FichaSnapshot>()
         snapshotJugadores.forEach { jug ->
             jug.fichas.forEach { f ->
-                allFichas.add(FichaSnapshot(
-                    idJugador = jug.username,
-                    id = f.id,
-                    casilla = f.casilla,
-                    meta = f.meta,
-                    esUsuario = jug.username == myUsername,
-                    idImg = skinMap[jug.username]?.first!!,
-                    color = skinMap[jug.username]?.second!!
-                ))
+                allFichas.add(
+                    FichaSnapshot(
+                        idJugador = jug.username,
+                        id = f.id,
+                        casilla = f.casilla,
+                        meta = f.meta,
+                        esUsuario = jug.username == myUsername,
+                        idImg = skinMap[jug.username]?.first!!,
+                        color = skinMap[jug.username]?.second!!
+                    )
+                )
             }
         }
         _fichas.value = allFichas
 
         // Actualizar mano y posible info extra del jugador local
         val localSnapshot = snapshotJugadores.find { it.username == myUsername }
-        _mano.value = localSnapshot?.mano?.map { 
+        _mano.value = localSnapshot?.mano?.map {
             Carta(
                 id = it.toIntOrNull(),
                 nombre = it,
@@ -192,6 +211,10 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
                 imagen = 0
             )
         } ?: emptyList()
+
+        _noqueado.value = localSnapshot?.efectosActivos?.any {
+            it is String && it == "Salto de turno"
+        } ?: false
 
         _chat.value = reply.chat.map { it.toDomain() }
 

@@ -50,6 +50,7 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
             launch { cF.mano.collect { data -> _uiState.update { it.copy(mano = data.toMutableList()) } } }
             launch { cF.chat.collect { data -> _uiState.update { it.copy(chat = data) } } }
             launch { cF.ganador.collect { data -> _uiState.update { it.copy(ganador = data, mostrarDialogoVictoria = data != "") } } }
+            launch { cF.noqueado.collect { data -> _uiState.update { it.copy(turnoNoqueado = data) } } }
         }
     }
 
@@ -110,7 +111,9 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
     // Funciones MOVER FICHAS
 
     fun onLanzarDado() {
-        if (!_uiState.value.bloquearDado) {
+        if (_uiState.value.turnoNoqueado) {
+            _uiState.update { it.copy(mostrarDialogoNoqueo = true) }
+        } else if (!_uiState.value.bloquearDado) {
             viewModelScope.launch {
                 val dadoPair = cF.lanzarDadoCase()
                 val puntuacionDado = dadoPair.first
@@ -334,7 +337,7 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
         coordinarDialogos("")
 
         when (carta.nombre) {
-            "Wild Frank", "Carpintero" -> {
+            "Wild Frank", "Carpintero", "Serpiente en tu bota", "Agujero de serpiente", "Día de la marmota", "Dia de la marmota", "Salto de longitud" -> {
                 _uiState.update {
                     it.copy(
                         seleccionCasillaCarta = true,
@@ -344,12 +347,12 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                         },
 
                         mostrarDialogoIndicacion = true,
-                        indicacion = "Seleccione casilla de INICIO"
+                        indicacion = "Seleccione una casilla"
                     )
                 }
             }
 
-            "Mal de ojo", "Pickpocket", "Dado envenenado", "Serpiente en tu bota", "Bolsillo roto", "Noqueo" -> {
+            "Mal de ojo", "Pickpocket", "Dado envenenado", "Bolsillo roto", "Noqueo" -> {
                 _uiState.update {
                     it.copy(
                         seleccionJugadorCarta = true,
@@ -403,22 +406,44 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
     }
 
     fun onSeleccionCasillaCarta(casillaId: Int) {
+        val cartaNombre = _uiState.value.cartaJugada?.nombre ?: return
 
         if (_uiState.value.casillaCartaIni == null) { // Primera selección (Inicio)
-            val cartaNombre = _uiState.value.cartaJugada?.nombre ?: return
 
             val casillasAux =
                 if (cartaNombre == "Wild Frank") _uiState.value.casillasAElegirCarta.filter { it < casillaId }
-                else _uiState.value.casillasAElegirCarta.filter { it > casillaId }
+                else if (cartaNombre == "Carpintero") _uiState.value.casillasAElegirCarta.filter { it > casillaId }
+                else emptyList()
+
+            val indicacionAux =
+                if (cartaNombre == "Wild Frank" || cartaNombre == "Carpintero") "Seleccione otra casilla"
+                else ""
+
+            val mostrarDialogoIndicacionAux = cartaNombre == "Wild Frank" || cartaNombre == "Carpintero"
+            val seleccionCasillaCartaAux = cartaNombre == "Wild Frank" || cartaNombre == "Carpintero"
+
+            val casillaIdAux =
+                if (cartaNombre == "Wild Frank" || cartaNombre == "Carpintero") casillaId
+                else null
+
+
 
             _uiState.update {
                 it.copy(
-                    casillaCartaIni = casillaId,
-                    indicacion = "Seleccione casilla de FIN",
+                    mostrarDialogoIndicacion = mostrarDialogoIndicacionAux,
+                    indicacion = indicacionAux,
 
-                    casillasAElegirCarta = casillasAux
+                    seleccionCasillaCarta = seleccionCasillaCartaAux,
+                    casillaCartaIni = casillaIdAux,
+
+                    casillasAElegirCarta = casillasAux,
                 )
             }
+
+            if (cartaNombre != "Wild Frank" && cartaNombre != "Carpintero") {
+                ejecutarUsoCarta(inicio = casillaId, fin = null)
+            }
+
         } else { // Segunda selección (Fin) y ejecución
             ejecutarUsoCarta(inicio = _uiState.value.casillaCartaIni!!, fin = casillaId)
             _uiState.update {
@@ -443,6 +468,13 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
         viewModelScope.launch {
             cF.jugarCartaCase(cartaId, target, inicio, fin)
             _uiState.update { it.copy(cartaEnDetalle = null, mostrarDialogoIndicacion = false) }
+        }
+    }
+
+    fun onAceptarNoqueo() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(mostrarDialogoNoqueo = false, turnoNoqueado = false) }
+            cF.lanzarDadoCase()
         }
     }
 }
@@ -491,6 +523,9 @@ data class PartidaUiState(
 
     val mostrarDialogoVictoria: Boolean = false,
     val ganador: String = "",
+
+    val mostrarDialogoNoqueo: Boolean = false,
+    val turnoNoqueado: Boolean = false,
 
     // Control de cartas
     val cartaJugada: Carta? = null,

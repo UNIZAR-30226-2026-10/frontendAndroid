@@ -11,9 +11,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.Logi
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PartidaRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PerfilRepository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.TiendaRepository
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class CaseFacade(
 
@@ -119,6 +117,7 @@ class CaseFacade(
     val mano = partidaRepository.mano
     val chat = partidaRepository.chat
     val ganador = partidaRepository.ganador
+    val noqueado = partidaRepository.noqueado
 
     // Casos de uso de Partida
     val syncPartidaCase = SyncPartidaCase(partidaRepository, username, matchId)

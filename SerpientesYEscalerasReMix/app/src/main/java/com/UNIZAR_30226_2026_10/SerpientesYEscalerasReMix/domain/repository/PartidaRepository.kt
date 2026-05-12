@@ -17,6 +17,7 @@ interface PartidaRepository {
     val mano: StateFlow<List<Carta?>>
     val chat: StateFlow<List<MsgChat>>
     val ganador: StateFlow<String>
+    val noqueado: StateFlow<Boolean>
 
 
     // Modificar Flujos desde el exterior
