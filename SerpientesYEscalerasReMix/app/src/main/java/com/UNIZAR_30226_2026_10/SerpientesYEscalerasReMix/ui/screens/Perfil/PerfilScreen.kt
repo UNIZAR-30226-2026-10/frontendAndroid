@@ -497,16 +497,13 @@ fun obtenerImagenCosmetico(id: String, cat: CategoriaCosmetico): Int {
         "icono_completista"  -> R.drawable.icono_jugador_completista
         "icono_platino"      -> R.drawable.icono_jugador_platino
         "icono_default"      -> R.drawable.icono_jugador_default
-        "icono_L"            -> R.drawable.icono_jugador_default  // sustituir por el drawable correcto
-        "icono_W"            -> R.drawable.icono_jugador_default  // sustituir por el drawable correcto
-        "icono_cofre"        -> R.drawable.icono_jugador_default  // sustituir por el drawable correcto
         "serpiente_calcetin" -> R.drawable.serpiente_calcetin
         "serpiente_futuro"   -> R.drawable.serpiente_futuro
-        "serpiente_tribal"   -> R.drawable.serpiente              // sustituir por el drawable correcto
+        "serpiente_tribal"   -> R.drawable.serpiente_tribal              // sustituir por el drawable correcto
         "serpiente_default"  -> R.drawable.serpiente
         "ficha_totem"        -> R.drawable.jugador_azul_totem
         "ficha_esqueleto"    -> R.drawable.jugador_verde_calavera
-        "ficha_aventurero"   -> R.drawable.jugador_rojo_totem     // sustituir por el drawable correcto
+        "ficha_aventurero"   -> R.drawable.jugador_verde_explorador     // sustituir por el drawable correcto
         "ficha_moneda"       -> R.drawable.jugador_rojo_totem     // sustituir por el drawable correcto
         "ficha_default"      -> R.drawable.jugador_rojo_totem
         "escalera_default"   -> R.drawable.escalera

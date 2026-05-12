@@ -3,6 +3,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiService
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.LogroDTO
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.StatsDTO
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.LogrosRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -41,9 +42,15 @@ class LogrosRepositoryImpl(
     }
 
     override suspend fun postClaimAchievement(email: String, achievementId: String) = withContext(Dispatchers.IO) {
-        val response = apiService.claimAchievement(email, mapOf("achievement_id" to achievementId))
+        // Usar el apiService inyectado, igual que el resto de métodos
+        val body = mapOf("achievement_id" to achievementId)
+
+        android.util.Log.d("RECLAMAR", "POST users/$email/achievements body=$body")
+
+        val response = apiService.claimAchievement(email, body)
+
         if (!response.isSuccessful) {
-            throw Exception("Error al reclamar logro: ${response.code()} ${response.message()}")
+            throw Exception("Error ${response.code()}: ${response.message()}")
         }
     }
 }

@@ -24,20 +24,20 @@ data class EscalerasReply(
 
 // Body para PUT /api/users/{email}/icon
 data class ActualizarIconoRequest(
-    @SerializedName("icono") val icon: String
+    @SerializedName("icon") val icon: String
 )
 
 // Body para PUT /api/users/{email}/pawn
 data class ActualizarFichaRequest(
-    @SerializedName("ficha") val token: String
+    @SerializedName("pawn") val token: String
 )
 
 // Body para PUT /api/users/{email}/snake
 data class ActualizarSerpienteRequest(
-    @SerializedName("serpiente") val snake: String
+    @SerializedName("snake") val snake: String
 )
 
 // Body para PUT /api/users/{email}/stair
 data class ActualizarEscaleraRequest(
-    @SerializedName("escalera") val ladder: String
+    @SerializedName("stair") val ladder: String
 )

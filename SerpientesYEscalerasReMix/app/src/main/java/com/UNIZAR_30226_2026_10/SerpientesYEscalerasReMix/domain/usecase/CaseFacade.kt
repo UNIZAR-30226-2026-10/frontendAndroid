@@ -107,7 +107,6 @@ class CaseFacade(
     val obtenerPerfilCase     = ObtenerPerfilCase(email, perfilRepository)
     val actualizarNombreCase  = ActualizarNombreCase(email, perfilRepository)
     val actualizarSkinCase    = ActualizarSkinCase(email, perfilRepository)
-    val actualizarIconoCase   = ActualizarIconoCase(email, perfilRepository)
     val obtenerCosmeticosCase = ObtenerCosmeticosCase(email, perfilRepository) // ahora recibe email
 
     // TIENDA

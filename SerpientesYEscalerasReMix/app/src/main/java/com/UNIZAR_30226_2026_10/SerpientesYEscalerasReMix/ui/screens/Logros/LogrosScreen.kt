@@ -22,10 +22,30 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.LogroUs
 
 @Composable
 fun LogrosScreen(SEState: SENavHostController, viewModel: LogrosViewModel) {
-    // Observamos el estado real del ViewModel
     val listaDeLogros = viewModel.logros
     val estaCargando = viewModel.cargando
     val error = viewModel.errorMessage
+
+    // NUEVO: Observamos el error de reclamar
+    val errorReclamar = viewModel.errorReclamar
+
+    // NUEVO: Mostramos un pop-up si hay error al reclamar
+    if (errorReclamar != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.limpiarErrorReclamar() },
+            title = { Text(text = "Fallo al reclamar", style = SETextTypes.titulo, color = color_primary) },
+            text = { Text(text = errorReclamar, style = SETextTypes.plano, color = color_text) },
+            confirmButton = {
+                Button(
+                    onClick = { viewModel.limpiarErrorReclamar() },
+                    colors = ButtonDefaults.buttonColors(containerColor = color_primary)
+                ) {
+                    Text("Aceptar", color = color_secondary)
+                }
+            },
+            containerColor = color_bg
+        )
+    }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
         Text(
@@ -96,7 +116,7 @@ fun TarjetaLogro(logro: LogroUsuario, onReclamar: (String) -> Unit) {
                     Button(
                         onClick = { onReclamar(logro.id) },
                         colors = ButtonDefaults.buttonColors(containerColor = color_primary)
-                    ) {
+                    ){
                         Text("Reclamar", color = color_secondary)
                     }
                 }
