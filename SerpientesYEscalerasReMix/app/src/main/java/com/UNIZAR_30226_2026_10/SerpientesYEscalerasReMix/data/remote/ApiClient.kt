@@ -5,15 +5,12 @@ import android.util.Log
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.ComprarProductoRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.ProductoDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.SaldoDto
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.*
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.LogroDTO
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.StatsDTO
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.LogrosReclamadosDTO
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.LogrosReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AceptarInvitacionRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarEscaleraRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarFichaRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarIconoRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarSerpienteRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AnadirBotRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AuthReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ChatRequest
@@ -31,7 +28,6 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_mo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LobbyReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LoginRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PartidaReply
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PerfilUsuarioReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PostInvitacionRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.RegisterRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.RollDiceReply
@@ -145,7 +141,6 @@ interface ApiService {
     suspend fun getMatches(@Path("email", encoded = true) email: String): Response<GetPartidasReply>
 
     // FUNCIONES PARTIDA
-
     @POST("matches")
     suspend fun startMatch(@Body body: IniciarPartidaRequest): Response<PartidaReply>
 
@@ -167,16 +162,22 @@ interface ApiService {
     @POST("matches/{matchId}/pawn/{username}")
     suspend fun updatePawn(@Path("matchId") matchId: String, @Path("username") username: String, @Body request: UpdatePawnRequest): Response<PartidaReply>
 
-    // FUNCIONES TIENDA
+    // FUNCIONES TIENDA FIXME MIRAR LO DE LAS REPLYS
+    @GET("cosmetics/store/{email}") //FIXME
+    suspend fun getProductos(
+        @Path("email") email: String
+    ): Response<List<ProductoDto>>
 
-    @GET("cosmetics/store/{email}")
-    suspend fun getProductos(@Path("email") email: String): Response<List<ProductoDto>>
-
-    @POST("cosmetics/store/{email}")
-    suspend fun comprarProducto(@Path("email") email: String, @Body cosmetic_name: ComprarProductoRequest): Response<Unit>
+    @POST("cosmetics/store/{email}") //FIXME
+    suspend fun comprarProducto(
+        @Path("email") email: String,
+        @Body cosmetic_name: ComprarProductoRequest
+    ): Response<Unit>
 
     @GET("users/{email}/SEP")
-    suspend fun getSaldo(@Path("email") email: String): Response<SaldoDto>
+    suspend fun getSaldo(
+        @Path("email") email: String
+    ): Response<SaldoDto>
 
     // FUNCIONES PERFIL
 
@@ -186,6 +187,7 @@ interface ApiService {
     @PUT("users/{email}/username")
     suspend fun updateUsername(@Path("email") email: String, @Body body: Map<String, String>): Response<ResponseBody>
 
+    // Actualizar cosméticos — endpoint separado por tipo según la API
     @PUT("users/{email}/icon")
     suspend fun updateIcon(@Path("email") email: String, @Body body: ActualizarIconoRequest): Response<ResponseBody>
 
@@ -198,6 +200,7 @@ interface ApiService {
     @PUT("users/{email}/stair")
     suspend fun updateStair(@Path("email") email: String, @Body body: ActualizarEscaleraRequest): Response<ResponseBody>
 
+    // Obtener cosméticos disponibles del usuario — endpoint separado por tipo según la API
     @GET("users/{email}/icons")
     suspend fun getUserIcons(@Path("email") email: String): Response<IconosReply>
 
@@ -227,29 +230,34 @@ interface ApiService {
 
 object ApiClient {
     //private const val API_URL = "http://syeremix.switzerlandnorth.cloudapp.azure.com/api/"
+    //private const val API_URL = "http://192.168.1.36:3000/api/"
     private const val API_URL = "http://10.0.2.2:3000/api/"
-
     private var _apiService: ApiService? = null
     private var _cookieJar: PersistentCookieJar? = null
 
+    // Inicializa el cliente -> MainActivity onCreate
     fun init(context: Context) {
-        if (_apiService != null) return
+        if (_apiService != null) return // Evitar re-inicializar
 
+        // Cookies Persistentes
         val cookieJar = PersistentCookieJar(
             SetCookieCache(),
             SharedPrefsCookiePersistor(context)
         )
         _cookieJar = cookieJar
 
+        // LOGING
         val loggingInterceptor = HttpLoggingInterceptor { message ->
             Log.d("API_LOG", "RETROFIT: $message")
         }.apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
+        //COOKIE
         val forceInsecureInterceptor = Interceptor { chain ->
             val response = chain.proceed(chain.request())
             val cookieHeaders = response.headers("Set-Cookie")
+
             if (cookieHeaders.isNotEmpty()) {
                 val modifiedResponse = response.newBuilder()
                 modifiedResponse.removeHeader("Set-Cookie")
@@ -257,6 +265,7 @@ object ApiClient {
                     val insecureHeader = header
                         .replace(Regex("(?i);\\s*secure"), "")
                         .replace(Regex("(?i);\\s*SameSite=[a-z]+"), "")
+
                     modifiedResponse.addHeader("Set-Cookie", insecureHeader)
                 }
                 modifiedResponse.build()
@@ -265,12 +274,15 @@ object ApiClient {
             }
         }
 
+        // Cliente OKHttp
         val okHttpClient = OkHttpClient.Builder()
+            // .protocols(listOf(okhttp3.Protocol.HTTP_1_1)) // TODO ELIMINAR ESTA LINEA CUANDO NO SE TRABAJE EN LOCAL 192.168.1.36
             .addInterceptor(forceInsecureInterceptor)
             .addNetworkInterceptor(loggingInterceptor)
             .cookieJar(cookieJar)
             .build()
 
+        // Retrofit
         _apiService = Retrofit.Builder()
             .baseUrl(API_URL)
             .client(okHttpClient)
@@ -279,6 +291,7 @@ object ApiClient {
             .create(ApiService::class.java)
     }
 
+    // Utilizable desde el resto de paquetes
     val apiService: ApiService
         get() = _apiService
             ?: throw IllegalStateException("Debes llamar a ApiClient.init(context) primero")
