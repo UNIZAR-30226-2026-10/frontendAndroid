@@ -256,9 +256,9 @@ interface ApiService {
 }
 
 object ApiClient {
-    //private const val API_URL = "http://syeremix.switzerlandnorth.cloudapp.azure.com/api/"
+    private const val API_URL = "http://syeremix.switzerlandnorth.cloudapp.azure.com/api/"
     //private const val API_URL = "http://192.168.1.36:3000/api/"
-    private const val API_URL = "http://10.0.2.2:3000/api/"
+    //private const val API_URL = "http://10.0.2.2:3000/api/"
     private var _apiService: ApiService? = null
     private var _cookieJar: PersistentCookieJar? = null
 
