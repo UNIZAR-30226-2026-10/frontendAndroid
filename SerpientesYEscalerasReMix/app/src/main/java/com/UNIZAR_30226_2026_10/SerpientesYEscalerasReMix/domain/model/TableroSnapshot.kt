@@ -15,5 +15,7 @@ data class CasillaSnapshot(
 )
 
 data class TableroSnapshot(
-    val casillas: List<CasillaSnapshot>
+    val casillas: List<CasillaSnapshot>,
+    var skinEscalera: String,
+    var skinSerpiente: String
 )

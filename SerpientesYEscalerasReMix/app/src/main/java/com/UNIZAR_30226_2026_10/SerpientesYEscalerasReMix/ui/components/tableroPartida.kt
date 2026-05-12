@@ -21,7 +21,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,20 +34,22 @@ import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeFichasSnapshot
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.fakes.fakeTableroSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.FichaSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Movimiento
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TableroSnapshot
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.TipoCasilla
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarCabezaSerpienteR
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarColaSerpienteR
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarCuerpoSerpienteR
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarEscaleraR
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarIconoEfectoR
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.buscarIconoFichaR
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SerpientesYEscalerasReMixTheme
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
@@ -109,7 +110,8 @@ fun Tablero(
                                     seleccionCasilla && casillasAElegir.any { it.casillaId == numCasilla } ||
                                             seleccionCasillaCarta && casillasAElegirCarta.any { it == numCasilla }
 
-                                val debeOscurecer = (seleccionCasilla || seleccionCasillaCarta) && !esCasillaElegible
+                                val debeOscurecer =
+                                    (seleccionCasilla || seleccionCasillaCarta) && !esCasillaElegible
 
                                 Box(
                                     modifier = Modifier
@@ -147,6 +149,17 @@ fun Tablero(
                                             .rotate(casilla.rotacion.toFloat()) // Valor del snapshot
                                     )
 
+                                    // Efectos
+                                    if (casilla.efecto != null) {
+                                        val efecto = casilla.efecto
+
+                                        Image(
+                                            painter = painterResource(id = buscarIconoEfectoR(efecto)),
+                                            contentDescription = "imagen de ${efecto}",
+                                            modifier = Modifier.fillMaxSize(1f)
+                                        )
+                                    }
+
                                     Text(
                                         text = numCasilla.toString(),
                                         style = SETextTypes.plano.copy(fontSize = 10.sp),
@@ -157,7 +170,7 @@ fun Tablero(
 
                                     // Fichas
                                     val fichasCasilla =
-                                        fichasState.filter { it.casilla == numCasilla }
+                                        fichasState.filter { it.casilla == numCasilla - 1 }
 
                                     FichasStackSnapshot(
                                         fichas = fichasCasilla,
@@ -190,10 +203,18 @@ fun Tablero(
 
 @Composable
 fun ColocarSerpientesEscaleras(tableroState: TableroSnapshot, casillaPx: Float) {
-    val bmpSerpienteCabeza = ImageBitmap.imageResource(id = R.drawable.serpiente_base_cabeza)
-    val bmpSerpienteCuerpo = ImageBitmap.imageResource(id = R.drawable.serpiente_base_cuerpo)
-    val bmpSerpienteCola = ImageBitmap.imageResource(id = R.drawable.serpiente_base_cola)
-    val bmpEscalera = ImageBitmap.imageResource(id = R.drawable.escalera)
+    val skinEscalera = tableroState.skinEscalera
+    val skinSerpiente = tableroState.skinSerpiente
+
+    val idREscalera = buscarEscaleraR(skinEscalera)
+    val idRSerpienteCabeza = buscarCabezaSerpienteR(skinSerpiente)
+    val idRSerpienteCuerpo = buscarCuerpoSerpienteR(skinSerpiente)
+    val idRSerpienteCola = buscarColaSerpienteR(skinSerpiente)
+
+    val bmpSerpienteCabeza = ImageBitmap.imageResource(id = idRSerpienteCabeza)
+    val bmpSerpienteCuerpo = ImageBitmap.imageResource(id = idRSerpienteCuerpo)
+    val bmpSerpienteCola = ImageBitmap.imageResource(id = idRSerpienteCola)
+    val bmpEscalera = ImageBitmap.imageResource(id = idREscalera)
 
     Canvas(
         modifier = Modifier
@@ -375,33 +396,31 @@ fun FichasStackSnapshot(
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                if (ficha.idImg != null) {
 
-                    Box(modifier = Modifier.fillMaxSize(0.9f)) {
-                        // Imagen de la ficha
-                        Image(
-                            painter = painterResource(id = ficha.idImg),
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxSize()
-                        )
+                Box(modifier = Modifier.fillMaxSize(0.9f)) {
+                    // Imagen de la ficha
+                    Image(
+                        painter = painterResource(id = buscarIconoFichaR(ficha.idImg, ficha.color)),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize()
+                    )
 
-                        // Cuenta de fichas por jugador en la pantlla inicial y bloqueos
-                        if (cuenta > 1) {
-                            Box(
-                                modifier = Modifier
-                                    .offset(y = (-5).dp, x = 2.dp)
-                                    .align(Alignment.TopEnd)
-                                    .fillMaxSize(0.5f) // El badge ocupa el 50% de la ficha
-                                    .background(color_bg, CircleShape)
-                                    .border(1.dp, color_fg, CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = cuenta.toString(),
-                                    fontSize = 6.sp,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
+                    // Cuenta de fichas por jugador en la pantlla inicial y bloqueos
+                    if (cuenta > 1) {
+                        Box(
+                            modifier = Modifier
+                                .offset(y = (-5).dp, x = 2.dp)
+                                .align(Alignment.TopEnd)
+                                .fillMaxSize(0.5f) // El badge ocupa el 50% de la ficha
+                                .background(color_bg, CircleShape)
+                                .border(1.dp, color_fg, CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = cuenta.toString(),
+                                fontSize = 6.sp,
+                                textAlign = TextAlign.Center
+                            )
                         }
                     }
                 }
@@ -418,45 +437,3 @@ fun getCenterOfCasilla(numCasilla: Int, casillaPx: Float): Offset {
     return Offset(x, y)
 }
 
-@Preview(showBackground = true, device = "spec:width=411dp,height=891dp,orientation=landscape")
-@Composable
-fun TableroPreview() {
-
-    SerpientesYEscalerasReMixTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = color_bg
-        ) {
-            val movimientos = listOf<Movimiento>(
-                Movimiento(
-                    fichaId = 1,
-                    casillaId = 2,
-                    esBifurcacion = false,
-                    pasosRestantes = 0
-                ),
-
-                Movimiento(
-                    fichaId = 1,
-                    casillaId = 8,
-                    esBifurcacion = false,
-                    pasosRestantes = 0
-                )
-            )
-
-            Tablero(
-                fakeTableroSnapshot,
-                fakeFichasSnapshot,
-                false,
-                { ficha -> },
-                false,
-                movimientos,
-                { casilla -> },
-                false,
-                { ficha -> },
-                false,
-                { casilla -> },
-                listOf(1, 2, 3, 4, 5, 6)
-            )
-        }
-    }
-}

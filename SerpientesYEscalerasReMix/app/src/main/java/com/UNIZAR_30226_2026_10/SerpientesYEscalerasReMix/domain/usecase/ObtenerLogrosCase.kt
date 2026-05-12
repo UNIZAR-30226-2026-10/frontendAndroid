@@ -8,33 +8,29 @@ class ObtenerLogrosCase(
     private val repository: LogrosRepository
 ) {
     suspend operator fun invoke(): List<LogroUsuario> {
-        try {
-            // 1. Obtenemos la lista global de logros desde el repositorio
-            val globalAchievements = repository.getAllAchievements()
 
-            // 2. Obtenemos las estadísticas del usuario para calcular el progreso
-            val statsResponse = repository.getUserStats(email.value)
+        // 1. Obtenemos la lista global de logros y los ya reclamados en paralelo
+        val globalAchievements  = repository.getAllAchievements()
+        val statsResponse       = repository.getUserStats(email.value)
+        // FIX: obtenemos los IDs de logros ya reclamados para marcar recompensaReclamada
+        val reclamados          = repository.getClaimedAchievements(email.value).toSet()
 
-            // 3. Mapeamos los DTOs de la API a nuestro modelo de dominio LogroUsuario
-            return globalAchievements.map { dto ->
-                // Extraemos el valor de la estadística correspondiente al logro
-                val progreso = statsResponse.stats[dto.claveMetrica] ?: 0
-
-                LogroUsuario(
-                    id = dto.id,
-                    nombre = dto.nombre,
-                    descripcion = dto.descripcion,
-                    progresoActual = progreso,
-                    progresoObjetivo = dto.objetivo,
-                    tipoRecompensa = dto.tipoRecompensa,
-                    valorRecompensa = dto.valorRecompensa,
-                    esCompletado = progreso >= dto.objetivo,
-                    recompensaReclamada = false // Esto se actualizará según la lógica de la API
-                )
-            }
-        } catch (e: Exception) {
-            // En caso de error de red, devolvemos una lista vacía para evitar el crash
-            return emptyList()
+        // 2. Mapeamos los DTOs al modelo de dominio LogroUsuario
+        return globalAchievements.map { dto ->
+            val progreso = statsResponse.stats[dto.claveMetrica] ?: 0
+            LogroUsuario(
+                id                 = dto.id,
+                nombre             = dto.nombre,
+                descripcion        = dto.descripcion,
+                progresoActual     = progreso,
+                progresoObjetivo   = dto.objetivo,
+                tipoRecompensa     = dto.tipoRecompensa,
+                valorRecompensa    = dto.valorRecompensa,
+                imagen             = dto.imagen,
+                esCompletado       = progreso >= dto.objetivo,
+                // FIX: antes siempre era false; ahora refleja el estado real del servidor
+                recompensaReclamada = dto.id in reclamados
+            )
         }
     }
 }

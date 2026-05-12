@@ -15,9 +15,8 @@ data class EfectoActivo(
 
 data class JugadorEstado(
     val esLider: Boolean = false,
-    val email: String,
-    val nombre: String,
-    val icono: Int,
+    val username: String,
+    val icono: String = "default",
     val fase: FaseJuego,
     val ultimaTirada: Int? = null,
     val mazo: String,

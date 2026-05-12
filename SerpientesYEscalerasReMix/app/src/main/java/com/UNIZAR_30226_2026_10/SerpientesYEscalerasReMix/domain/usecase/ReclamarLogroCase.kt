@@ -7,20 +7,12 @@ class ReclamarLogroCase(
     private val email: StateFlow<String>,
     private val repository: LogrosRepository
 ) {
-    /**
-     * Ejecuta la acción de reclamar un logro enviando el ID al servidor.
-     * @param achievementId Identificador único del logro que el usuario desea reclamar.
-     */
+    // FIX: eliminado el try/catch que capturaba y relanzaba sin hacer nada útil.
+    // Las excepciones se propagan directamente al ViewModel.
     suspend operator fun invoke(achievementId: String) {
-        try {
-            // Realizamos la llamada al repositorio pasando el email actual y el ID del logro
-            repository.postClaimAchievement(
-                email = email.value,
-                achievementId = achievementId
-            )
-        } catch (e: Exception) {
-            // Aquí podrías lanzar una excepción personalizada o loguear el error
-            throw e
-        }
+        repository.postClaimAchievement(
+            email         = email.value,
+            achievementId = achievementId
+        )
     }
 }

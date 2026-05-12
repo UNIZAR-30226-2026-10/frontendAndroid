@@ -1,6 +1,5 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components
 
-import android.content.pm.ActivityInfo
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -16,27 +15,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.prepararOrientacion
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_negative
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @Composable
 fun LogoutBoton(
-    scope: CoroutineScope,
-    SEState: SENavHostController,
-    cF: CaseFacade,
-    texto: String = "Amigos"
+    onClick: () -> Unit
 ) {
     Surface(
         color = color_negative,
         shape = RoundedCornerShape(16.dp),
-        onClick = { logoutBotonAccion(scope, SEState, cF) }
+        onClick = onClick
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(4.dp)) {
             Icon(
@@ -48,16 +38,8 @@ fun LogoutBoton(
                     .align(Alignment.CenterVertically)
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Text(texto, style = SETextTypes.plano)
+            Text("Cerrar Sesión", style = SETextTypes.plano)
             Spacer(modifier = Modifier.width(8.dp))
         }
-    }
-}
-
-fun logoutBotonAccion(scope: CoroutineScope, SEState: SENavHostController, cF: CaseFacade) {
-    scope.launch {
-        cF.loginRegisterCase.cerrarSesion()
-        prepararOrientacion(SEState, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-        SEState.goTo(Destinos.LOGIN)
     }
 }

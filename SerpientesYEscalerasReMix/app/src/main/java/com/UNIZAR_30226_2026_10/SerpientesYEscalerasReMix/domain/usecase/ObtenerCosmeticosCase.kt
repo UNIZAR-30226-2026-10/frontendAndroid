@@ -1,20 +1,21 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase
 
-class ObtenerCosmeticosCase {
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository.PerfilRepository
+import kotlinx.coroutines.flow.StateFlow
 
-    suspend fun obtenerSkinsEscalera(): List<String> {
-        return listOf("escalera_default", "escalera_dorada", "escalera_madera")
-    }
+class ObtenerCosmeticosCase(
+    private val email: StateFlow<String>,
+    private val repo: PerfilRepository
+) {
+    suspend fun obtenerSkinsEscalera(): List<String> =
+        repo.obtenerCosmeticosDisponibles(email.value)[CategoriaCosmetico.ESCALERA] ?: emptyList()
 
-    suspend fun obtenerSkinsSerpiente(): List<String> {
-        return listOf("serpiente_default", "serpiente_dorada", "serpiente_pixel")
-    }
+    suspend fun obtenerSkinsSerpiente(): List<String> =
+        repo.obtenerCosmeticosDisponibles(email.value)[CategoriaCosmetico.SERPIENTE] ?: emptyList()
 
-    suspend fun obtenerSkinsFicha(): List<String> {
-        return listOf("ficha_default", "ficha_dorada", "ficha_madera")
-    }
+    suspend fun obtenerSkinsFicha(): List<String> =
+        repo.obtenerCosmeticosDisponibles(email.value)[CategoriaCosmetico.FICHA] ?: emptyList()
 
-    suspend fun obtenerIconos(): List<String> {
-        return listOf("icono_default", "icono_serpiente", "icono_escalera")
-    }
+    suspend fun obtenerIconos(): List<String> =
+        repo.obtenerCosmeticosDisponibles(email.value)[CategoriaCosmetico.ICONO] ?: emptyList()
 }

@@ -19,10 +19,17 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.NavHost
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.local.LocalStorage
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.ApiClient
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.AmigosRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.ConexionRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.JugarContinuarRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.JugarCrearRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.LoginRegisterRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.LogrosRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PartidaRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PerfilRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.TiendaRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.MenuTopBar
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
@@ -38,14 +45,25 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Inicialización de data.remote, Retrofit
+        ApiClient.init(applicationContext)
         val apiService = ApiClient.apiService
+
+        // Inicialización de data.local
+        val localStorage = LocalStorage(applicationContext)
 
         // Inicialización de los casos de uso
         val caseFacade = CaseFacade(
-            context = applicationContext,
-            pruebaConexionRepository = ConexionRepositoryImpl(apiService),
-            partidaRepository = PartidaRepositoryImpl(),
-            logrosRepo = LogrosRepositoryImpl(apiService)
+            pruebaConexionRepository =  ConexionRepositoryImpl(apiService),
+            loginRegisterRepository = LoginRegisterRepositoryImpl(apiService, localStorage),
+            partidaRepository =  PartidaRepositoryImpl(apiService),
+            jugarCrearRepository = JugarCrearRepositoryImpl(apiService),
+            amigosRepository = AmigosRepositoryImpl(apiService),
+            jugarContinuarRepository = JugarContinuarRepositoryImpl(apiService),
+            tiendaRepository = TiendaRepositoryImpl(apiService),
+            perfilRepository = PerfilRepositoryImpl(apiService),
+            logrosRepository = LogrosRepositoryImpl(apiService)
+            //applicationContext // TODO elminar e instanciarComo Retrofit
+
         )
 
         setContent {
@@ -72,11 +90,12 @@ fun MainScreen(cF: CaseFacade) {
     val SEState = rememberSEAppState()
 
     val email = runBlocking {
-        cF.loginRegisterCase.comprobarLogin()
+        cF.comprobarLoginCase.invoke()
     }
 
     // Prueba de Conectividad Logging/Debug
     LaunchedEffect(Unit) {
+
         val isConnected = cF.pruebaConexionCase()
         if (isConnected) {
             Log.d("RETROFIT_TEST", "✅ Conexión exitosa y GSON configurado")

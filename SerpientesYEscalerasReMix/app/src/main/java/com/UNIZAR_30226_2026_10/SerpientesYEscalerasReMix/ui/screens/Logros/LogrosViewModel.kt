@@ -31,16 +31,28 @@ class LogrosViewModel(private val cF: CaseFacade) : ViewModel() {
     var errorMessage by mutableStateOf<String?>(null)
         private set
 
+    // FIX: estado separado para el error de reclamar, para no mezclar con el error
+    // de carga inicial (que bloquea toda la pantalla en LogrosScreen)
+    var errorReclamar by mutableStateOf<String?>(null)
+        private set
+
     init {
-        cargarLogros()
+        // FIX: esperamos a que el email esté listo antes de cargar,
+        // igual que en PerfilViewModel
+        viewModelScope.launch {
+            cF.email.collect { email ->
+                if (email.isNotEmpty()) cargarLogros()
+            }
+        }
     }
 
     fun cargarLogros() {
+        // FIX: guardia para evitar llamada con email vacío si se llama manualmente
+        if (cF.email.value.isEmpty()) return
         viewModelScope.launch {
             cargando = true
             errorMessage = null
             try {
-                // Invocación al caso de uso de obtención
                 logros = cF.obtenerLogrosCase()
             } catch (e: Exception) {
                 errorMessage = "Error al cargar logros: ${e.message}"
@@ -52,16 +64,23 @@ class LogrosViewModel(private val cF: CaseFacade) : ViewModel() {
 
     fun reclamarLogro(achievementId: String) {
         viewModelScope.launch {
+            errorReclamar = null
             try {
-                // Invocación al caso de uso de reclamar (POST API)
                 cF.reclamarLogroCase(achievementId)
+                // Actualizamos el estado local optimistamente sin recargar toda la lista
                 logros = logros.map { logro ->
                     if (logro.id == achievementId) logro.copy(recompensaReclamada = true)
                     else logro
                 }
             } catch (e: Exception) {
-                errorMessage = "Error al reclamar: ${e.message}"
+                // FIX: usamos errorReclamar en lugar de errorMessage para no
+                // bloquear la pantalla entera con el error de un solo logro
+                errorReclamar = "Error al reclamar: ${e.message}"
             }
         }
+    }
+
+    fun limpiarErrorReclamar() {
+        errorReclamar = null
     }
 }

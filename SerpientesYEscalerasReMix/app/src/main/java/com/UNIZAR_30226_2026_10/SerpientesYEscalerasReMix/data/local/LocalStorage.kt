@@ -18,20 +18,10 @@ class LocalStorage(private val context: Context) {
     private val emailKey = stringPreferencesKey("email")
     private val passwdKey = stringPreferencesKey("passwd")
 
-    suspend fun getLogin(): Boolean {
-        val preferences = context.dataLocal.data.first()
-        return preferences[logKey] ?: false // En el caso de que no lo encuentre: false
-    }
-
     suspend fun setLogin(loggedIn: Boolean) {
         context.dataLocal.edit { preferences ->
             preferences[logKey] = loggedIn
         }
-    }
-
-    suspend fun getEmail(): String {
-        val preferences = context.dataLocal.data.first()
-        return preferences[emailKey] ?: "" // En el caso de que no lo encuentre: ""
     }
 
     suspend fun setEmail(email: String) {
@@ -40,22 +30,10 @@ class LocalStorage(private val context: Context) {
         }
     }
 
-    suspend fun getPasswd(): String {
-        val preferences = context.dataLocal.data.first()
-        return preferences[passwdKey] ?: "" // En el caso de que no lo encuentre: ""
-    }
-
-    suspend fun setPasswd(passwd: String) {
-        context.dataLocal.edit { preferences ->
-            preferences[passwdKey] = passwd
-        }
-    }
-
     suspend fun clearLogin() {
         context.dataLocal.edit { preferences ->
             preferences.remove(emailKey)
             preferences.remove(logKey)
-            preferences.remove(passwdKey)
         }
     }
 }
