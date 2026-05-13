@@ -100,16 +100,31 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
         username: String,
         fichaId: Int,
         destinoId: Int,
-        pasosRestantes: Int?
-    ) {
+        pasosRestantes: Int?,
+        esBifurcacion: Boolean
+    ) : Boolean {
+        val casillaDestino = _tablero.value.casillas.getOrNull(destinoId - 1)
+        val destinoFinal = if (casillaDestino?.tipo == TipoCasilla.Serpiente && casillaDestino.saltoA != null) {
+            casillaDestino.saltoA - 1
+        } else {
+            destinoId - 1
+        }
+
         val response = api.updatePawn(
             matchId,
             username,
-            UpdatePawnRequest(destinoId - 1, fichaId, pasosRestantes)
+            UpdatePawnRequest(destinoFinal, fichaId, pasosRestantes)
         )
         if (response.isSuccessful && response.body() != null) {
             val reply = response.body()!!
             updateState(reply, username)
+            val fichaActualizada = _fichas.value.find { it.id == fichaId && it.esUsuario }
+            val enEscalera = fichaActualizada?.let {
+                _tablero.value.casillas.getOrNull(it.casilla)?.tipo == TipoCasilla.Escalera
+            } ?: false
+            return esBifurcacion && enEscalera
+        } else {
+            return false
         }
     }
 
@@ -121,8 +136,16 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
         inicio: Int?,
         fin: Int?
     ) {
+        val inicioAux =
+            if(inicio == null) null
+            else inicio - 1
+
+        val finAux =
+            if(fin == null) null
+            else fin - 1
+
         val response =
-            api.playCard(matchId, username, JugarCartaRequest(cartaId, target, inicio, fin))
+            api.playCard(matchId, username, JugarCartaRequest(cartaId, target, inicioAux, finAux))
         if (response.isSuccessful && response.body() != null) {
             updateState(response.body()!!, username)
         }
@@ -203,7 +226,6 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
         val localSnapshot = snapshotJugadores.find { it.username == myUsername }
         _mano.value = localSnapshot?.mano?.map {
             Carta(
-                //FIXME CREO Q NO NECESARIO
                 id = it.toIntOrNull(),
                 nombre = it,
                 descripcion = "Carta de mazo ${localSnapshot.mazo}",
@@ -214,7 +236,8 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
         } ?: emptyList()
 
         _noqueado.value = localSnapshot?.efectosActivos?.any {
-            it is String && it == "Salto de turno"
+            val efecto = it as? Map<*, *>
+            efecto?.get("resumenEfecto") == "Salto de turno"
         } ?: false
 
         _chat.value = reply.chat.map { it.toDomain() }
@@ -239,7 +262,8 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
             efecto = this.efecto,
             tipo = mapTipoCasilla(this.tipo),
             siguientes = this.siguientes,
-            saltoA = this.saltoA
+            saltoA = if(this.saltoA == null) null
+                     else this.saltoA!! + 1
         )
     }
 

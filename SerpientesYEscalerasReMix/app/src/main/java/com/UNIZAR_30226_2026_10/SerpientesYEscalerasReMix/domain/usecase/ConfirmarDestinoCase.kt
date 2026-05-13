@@ -17,20 +17,36 @@ class ConfirmarDestinoCase(
             username = username.value,
             fichaId = movimiento.fichaId,
             destinoId = movimiento.casillaId,
+            esBifurcacion = false,
             pasosRestantes = if (movimiento.pasosRestantes == 0) null
                              else movimiento.pasosRestantes
         )
     }
 
-    suspend operator fun invoke(movimiento: Movimiento, casillaDir: Int) {
+    suspend operator fun invoke(movimiento: Movimiento, casillaDir: Int, onEscalera: () -> Unit) {
         // Confirmar movimiento
         repository.confirmarMovimiento(
             matchId = matchId.value,
             username = username.value,
             fichaId = movimiento.fichaId,
-            destinoId = casillaDir,
+            destinoId = movimiento.casillaId,
+            esBifurcacion = false,
             pasosRestantes = if (movimiento.pasosRestantes == 0) null
                              else movimiento.pasosRestantes
         )
+
+        val hayEscalera = repository.confirmarMovimiento(
+            matchId = matchId.value,
+            username = username.value,
+            fichaId = movimiento.fichaId,
+            destinoId = casillaDir,
+            esBifurcacion = true,
+            pasosRestantes = if (movimiento.pasosRestantes == 0) null
+            else movimiento.pasosRestantes
+        )
+
+        if (hayEscalera) {
+            onEscalera()
+        }
     }
 }

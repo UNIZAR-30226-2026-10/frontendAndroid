@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.StateFlow
 class CaseFacade(
 
     // Repositorios
-    // TODO ir añadiendo aqui las interfaces que se vayan creando, fuera seran instanciadas como toquen
 
     // Prueba Inicial Retrofit
     private val pruebaConexionRepository: ConexionRepository,
@@ -42,6 +41,7 @@ class CaseFacade(
 
     // Mazos
     private val mazoRepository: MazosRepository,
+
     // Partida
     private val partidaRepository: PartidaRepository,
 
@@ -65,9 +65,11 @@ class CaseFacade(
     // TEST/LOG
 
     // Caso de uso de prueba ping con API/Retrofit
+
     val pruebaConexionCase = PruebaConexionCase(pruebaConexionRepository)
 
     // LOGIN/REGISTER
+
     val comprobarLoginCase = ComprobarLoginCase(loginRegisterRepository)
     val inciarSesionCase = IniciarSesionCase(loginRegisterRepository)
     val registrarseCase = RegistrarseCase(loginRegisterRepository)
@@ -76,9 +78,11 @@ class CaseFacade(
     // JUGAR CREAR
 
     // Exposición de flujos del repositorio de Jugar Crear
+
     val lobby = jugarCrearRepository.lobbyActual
 
     // Casos de uso de Jugar Crear
+
     val anadirBotCase = AnadirBotCase(jugarCrearRepository, username)
     val cambiarPreparadoCase = CambiarPreparadoCase(jugarCrearRepository, username)
     val seleccionarMazoCase = SeleccionarMazoCase(jugarCrearRepository, username)
@@ -91,9 +95,11 @@ class CaseFacade(
     // AMIGOS
 
     // Exposición de flujos del repositorio de Amigos
+
     val amigos = amigosRepository.amigos
 
     // Casos de uso de Amigos
+
     val obtenerAmigosCase = ObtenerAmigosCase(amigosRepository, email)
     val anadirAmigoCase = AnadirAmigoCase(amigosRepository, email)
     val eliminarAmigoCase = EliminarAmigoCase(amigosRepository, email)
@@ -102,13 +108,16 @@ class CaseFacade(
     val responderInvitacionCase = ResponderInvitacionCase(amigosRepository, jugarCrearRepository, username)
 
     // JUGAR CONTINUAR
+
     val obtenerRegistroPartidasCase = ObtenerRegistroPartidasCase(jugarContinuarRepository, email)
     val continuarPartidaCase = ContinuarPartidaCase(partidaRepository)
 
     // PERFIL
+
     val obtenerPerfilCase     = ObtenerPerfilCase(email, perfilRepository)
     val actualizarNombreCase  = ActualizarNombreCase(email, perfilRepository)
     val actualizarSkinCase    = ActualizarSkinCase(email, perfilRepository)
+    val actualizarIconoCase   = ActualizarIconoCase(email, perfilRepository)
     val obtenerCosmeticosCase = ObtenerCosmeticosCase(email, perfilRepository) // ahora recibe email
 
     // TIENDA
@@ -117,7 +126,9 @@ class CaseFacade(
     val getSaldoCase = GetSaldoCase(tiendaRepository, email)
 
     // MAZOS
+
     // Casos de uso de Mazos
+
     val obtenerMazosCase = GetMazosCase(mazoRepository, email)
     val obternerCartasMazo = GetCartasMazoCase(mazoRepository, email)
     val crearMazoCase = CrearMazoCase(mazoRepository, email)
@@ -145,7 +156,10 @@ class CaseFacade(
     val chatCase = ChatCase(partidaRepository, matchId, username)
     val jugarCartaCase = JugarCartaCase(partidaRepository, username, matchId)
 
-    //Casos de uso de Logros
+    // LOGROS
+
+    // Casos de uso de Logros
+
     val obtenerLogrosCase = ObtenerLogrosCase(email, logrosRepository)
     val reclamarLogroCase = ReclamarLogroCase(email, logrosRepository)
 

@@ -88,160 +88,89 @@ interface ApiService {
     // FUNCIONES AUTH
 
     @POST("auth/login")
-    suspend fun login(
-        @Body request: LoginRequest
-    ): Response<AuthReply>
+    suspend fun login(@Body request: LoginRequest): Response<AuthReply>
 
     @POST("auth/cookie_login")
-    suspend fun cookieLogin(
-        @Body body: Map<String, String> = emptyMap()
-    ): Response<AuthReply>
+    suspend fun cookieLogin(@Body body: Map<String, String> = emptyMap()): Response<AuthReply>
 
     @POST("auth/new_users")
-    suspend fun register(
-        @Body body: RegisterRequest
-    ): Response<ResponseBody>
+    suspend fun register(@Body body: RegisterRequest): Response<ResponseBody>
 
     // FUNCIONES JUGAR_CREAR
 
     @POST("lobbies")
-    suspend fun createLobby(
-        @Body request: CrearLobbyRequest
-    ): Response<LobbyReply>
+    suspend fun createLobby(@Body request: CrearLobbyRequest): Response<LobbyReply>
 
     @GET("lobbies/by-player/{username}")
-    suspend fun getLobbyByPlayer(
-        @Path("username") username: String
-    ): Response<LobbyReply>
+    suspend fun getLobbyByPlayer(@Path("username") username: String): Response<LobbyReply>
 
     @GET("lobbies/{lobbyId}")
-    suspend fun getLobby(@Path(
-        "lobbyId") lobbyId: String
-    ): Response<LobbyReply>
+    suspend fun getLobby(@Path("lobbyId") lobbyId: String): Response<LobbyReply>
 
     @POST("lobbies/{lobbyId}/bots")
-    suspend fun addBot(
-        @Path("lobbyId") lobbyId: String,
-        @Body request: AnadirBotRequest
-    ): Response<ResponseBody>
+    suspend fun addBot(@Path("lobbyId") lobbyId: String, @Body request: AnadirBotRequest): Response<ResponseBody>
 
     @GET("boards")
     suspend fun getAllBoards(): Response<List<String>>
 
     @PUT("lobbies/{lobbyId}/board")
-    suspend fun setBoard(
-        @Path("lobbyId") lobbyId: String,
-        @Body body: SetBoardRequest
-    ): Response<ResponseBody>
+    suspend fun setBoard(@Path("lobbyId") lobbyId: String, @Body body: SetBoardRequest): Response<ResponseBody>
 
     @PUT("lobbies/{lobbyId}/players/{username}/deck")
-    suspend fun selectDeck(
-        @Path("lobbyId") lobbyId: String,
-        @Path("username") username: String,
-        @Body request: SeleccionMazoRequest
-    ): Response<ResponseBody>
+    suspend fun selectDeck(@Path("lobbyId") lobbyId: String, @Path("username") username: String, @Body request: SeleccionMazoRequest): Response<ResponseBody>
 
     @PUT("lobbies/{lobbyId}/players/{username}/ready")
-    suspend fun setReady(
-        @Path("lobbyId") lobbyId: String,
-        @Path("username") username: String,
-        @Body body: SetReadyRequest
-    ): Response<ResponseBody>
+    suspend fun setReady(@Path("lobbyId") lobbyId: String, @Path("username") username: String, @Body body: SetReadyRequest): Response<ResponseBody>
 
     @HTTP(method = "DELETE", path = "lobbies/{lobbyId}/players/{username}", hasBody = true)
-    suspend fun leaveOrExpel(
-        @Path("lobbyId") lobbyId: String,
-        @Path("username") username: String,
-        @Body body: LeaveOrExpelRequest
-    ): Response<ResponseBody>
+    suspend fun leaveOrExpel(@Path("lobbyId") lobbyId: String, @Path("username") username: String, @Body body: LeaveOrExpelRequest): Response<ResponseBody>
 
     // FUNCIONES JUGAR-AMIGOS
 
     @POST("lobbies/{lobbyId}/invitations")
-    suspend fun sendInvitation(
-        @Path("lobbyId") lobbyId: String,
-        @Body request: PostInvitacionRequest
-    ): Response<ResponseBody>
+    suspend fun sendInvitation(@Path("lobbyId") lobbyId: String, @Body request: PostInvitacionRequest): Response<ResponseBody>
 
     @PUT("lobbies/{lobbyId}/invitations")
-    suspend fun respondInvitation(
-        @Path("lobbyId") lobbyId: String,
-        @Body request: AceptarInvitacionRequest
-    ): Response<LobbyReply>
+    suspend fun respondInvitation(@Path("lobbyId") lobbyId: String, @Body request: AceptarInvitacionRequest): Response<LobbyReply>
 
     @GET("users/{username}/invites")
-    suspend fun getInvitations(
-        @Path("username") username: String
-    ): Response<GetInvitacionesReply>
+    suspend fun getInvitations(@Path("username") username: String): Response<GetInvitacionesReply>
 
     @POST("users/{email}/{friendUsername}/invites")
-    suspend fun addFriend(
-        @Path("email") email: String,
-        @Path("friendUsername") friendUsername: String
-    ): Response<ResponseBody>
+    suspend fun addFriend(@Path("email") email: String, @Path("friendUsername") friendUsername: String): Response<ResponseBody>
 
     @HTTP(method = "DELETE", path = "users/{email}/friends/{friendUsername}", hasBody = true)
-    suspend fun removeFriend(
-        @Path("email") email: String,
-        @Path("friendUsername") friendUsername: String,
-        @Body body: Map<String, String>
-    ): Response<ResponseBody>
+    suspend fun removeFriend(@Path("email") email: String, @Path("friendUsername") friendUsername: String, @Body body: Map<String, String>): Response<ResponseBody>
 
     @GET("users/{email}/friends")
-    suspend fun getFriends(
-        @Path("email") email: String
-    ): Response<GetAmigosReply>
+    suspend fun getFriends(@Path("email") email: String): Response<GetAmigosReply>
 
     // FUNCIONES JUGAR-CONTINUAR
 
     @GET("users/{email}/matches")
-    suspend fun getMatches(
-        @Path("email", encoded = true) email: String
-    ): Response<GetPartidasReply>
+    suspend fun getMatches(@Path("email", encoded = true) email: String): Response<GetPartidasReply>
 
     // FUNCIONES PARTIDA
     @POST("matches")
-    suspend fun startMatch(
-        @Body body: IniciarPartidaRequest
-    ): Response<PartidaReply>
+    suspend fun startMatch(@Body body: IniciarPartidaRequest): Response<PartidaReply>
 
     @POST("matches/{matchId}/chat/{username}")
-    suspend fun sendChatMessage(
-        @Path("matchId") matchId: String,
-        @Path("username") username: String,
-        @Body request: ChatRequest
-    ): Response<GetChatReply>
+    suspend fun sendChatMessage(@Path("matchId") matchId: String, @Path("username") username: String, @Body request: ChatRequest): Response<GetChatReply>
 
     @GET("matches/{matchId}/chat/{username}")
-    suspend fun getChat(
-        @Path("matchId") matchId: String,
-        @Path("username") username: String
-    ): Response<GetChatReply>
+    suspend fun getChat(@Path("matchId") matchId: String, @Path("username") username: String): Response<GetChatReply>
 
     @GET("matches/{matchId}/{username}")
-    suspend fun getMatchStatus(
-        @Path("matchId") matchId: String,
-        @Path("username") username: String
-    ): Response<PartidaReply>
+    suspend fun getMatchStatus(@Path("matchId") matchId: String, @Path("username") username: String): Response<PartidaReply>
 
     @POST("matches/{matchId}/cards/{username}")
-    suspend fun playCard(
-        @Path("matchId") matchId: String,
-        @Path("username") username: String,
-        @Body request: JugarCartaRequest
-    ): Response<PartidaReply>
+    suspend fun playCard(@Path("matchId") matchId: String, @Path("username") username: String, @Body request: JugarCartaRequest): Response<PartidaReply>
 
     @POST("matches/{matchId}/dice/{username}")
-    suspend fun rollDice(
-        @Path("matchId") matchId: String,
-        @Path("username") username: String
-    ): Response<RollDiceReply>
+    suspend fun rollDice(@Path("matchId") matchId: String, @Path("username") username: String): Response<RollDiceReply>
 
     @POST("matches/{matchId}/pawn/{username}")
-    suspend fun updatePawn(
-        @Path("matchId") matchId: String,
-        @Path("username") username: String,
-        @Body request: UpdatePawnRequest): Response<PartidaReply>
+    suspend fun updatePawn(@Path("matchId") matchId: String, @Path("username") username: String, @Body request: UpdatePawnRequest): Response<PartidaReply>
 
     // FUNCIONES TIENDA FIXME MIRAR LO DE LAS REPLYS
     @GET("cosmetics/store/{email}") //FIXME
@@ -299,56 +228,33 @@ interface ApiService {
     // FUNCIONES PERFIL
 
     @GET("users/{email}/profile")
-    suspend fun getUserProfile(
-        @Path("email") email: String
-    ): Response<PerfilUsuarioReply>
+    suspend fun getUserProfile(@Path("email") email: String): Response<PerfilUsuarioReply>
 
     @PUT("users/{email}/username")
-    suspend fun updateUsername(
-        @Path("email") email: String,
-        @Body body: Map<String, String>
-    ): Response<ResponseBody>
+    suspend fun updateUsername(@Path("email") email: String, @Body body: Map<String, String>): Response<ResponseBody>
 
     // Actualizar cosméticos — endpoint separado por tipo según la API
     @PUT("users/{email}/icon")
-    suspend fun updateIcon(
-        @Path("email") email: String,
-        @Body body: ActualizarIconoRequest
-    ): Response<ResponseBody>
+    suspend fun updateIcon(@Path("email") email: String, @Body body: ActualizarIconoRequest): Response<ResponseBody>
 
     @PUT("users/{email}/pawn")
-    suspend fun updatePawn(
-        @Path("email") email: String,
-        @Body body: ActualizarFichaRequest
-    ): Response<ResponseBody>
+    suspend fun updatePawn(@Path("email") email: String, @Body body: ActualizarFichaRequest): Response<ResponseBody>
 
     @PUT("users/{email}/snake")
-    suspend fun updateSnake(
-        @Path("email") email: String,
-        @Body body: ActualizarSerpienteRequest
-    ): Response<ResponseBody>
+    suspend fun updateSnake(@Path("email") email: String, @Body body: ActualizarSerpienteRequest): Response<ResponseBody>
 
     @PUT("users/{email}/stair")
-    suspend fun updateStair(
-        @Path("email") email: String,
-        @Body body: ActualizarEscaleraRequest
-    ): Response<ResponseBody>
+    suspend fun updateStair(@Path("email") email: String, @Body body: ActualizarEscaleraRequest): Response<ResponseBody>
 
     // Obtener cosméticos disponibles del usuario — endpoint separado por tipo según la API
     @GET("users/{email}/icons")
-    suspend fun getUserIcons(
-        @Path("email") email: String
-    ): Response<IconosReply>
+    suspend fun getUserIcons(@Path("email") email: String): Response<IconosReply>
 
     @GET("users/{email}/pawns")
-    suspend fun getUserPawns(
-        @Path("email") email: String
-    ): Response<FichasReply>
+    suspend fun getUserPawns(@Path("email") email: String): Response<FichasReply>
 
     @GET("users/{email}/snakes")
-    suspend fun getUserSnakes(
-        @Path("email") email: String
-    ): Response<SerpientesReply>
+    suspend fun getUserSnakes(@Path("email") email: String): Response<SerpientesReply>
 
     @GET("users/{email}/stairs")
     suspend fun getUserStairs(
@@ -418,7 +324,7 @@ object ApiClient {
 
         // Cliente OKHttp
         val okHttpClient = OkHttpClient.Builder()
-            //.protocols(listOf(okhttp3.Protocol.HTTP_1_1)) // TODO ELIMINAR ESTA LINEA CUANDO NO SE TRABAJE EN LOCAL 192.168.1.36
+            // .protocols(listOf(okhttp3.Protocol.HTTP_1_1)) // TODO ELIMINAR ESTA LINEA CUANDO NO SE TRABAJE EN LOCAL 192.168.1.36
             .addInterceptor(forceInsecureInterceptor)
             .addNetworkInterceptor(loggingInterceptor)
             .cookieJar(cookieJar)
