@@ -104,10 +104,10 @@ fun TiendaContent(
             .distinct()
             .sortedWith(compareBy { tipo ->
                 when (tipo) {
-                    Tipo_Producto.Ficha -> 4
-                    Tipo_Producto.Serpiente -> 3
+                    Tipo_Producto.Ficha -> 3
+                    Tipo_Producto.Serpiente -> 1
                     Tipo_Producto.Escalera -> 2
-                    Tipo_Producto.Icono -> 1
+                    Tipo_Producto.Icono -> 4
                     else -> 0
                 }
             })

@@ -24,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -36,6 +38,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_online
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Producto
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Tipo_Producto
 
 @Composable
 fun DetalleProductoTienda(
@@ -75,13 +78,27 @@ fun DetalleProductoTienda(
                             .padding(8.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Image(
-                            painter = painterResource(producto.imageResId ?: R.drawable.corona),
-                            contentDescription = producto.nombreAMostrar,
+                        val esIcono = producto.tipo == Tipo_Producto.Icono
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(150.dp)
-                        )
+                                .height(150.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(producto.imageResId ?: R.drawable.corona),
+                                contentDescription = producto.nombreAMostrar,
+                                contentScale = if (esIcono) ContentScale.Crop else ContentScale.Fit,
+                                modifier = Modifier
+                                    .then(
+                                        if (esIcono) {
+                                            Modifier.size(120.dp).clip(CircleShape)
+                                        } else {
+                                            Modifier.fillMaxWidth().height(150.dp)
+                                        }
+                                    )
+                            )
+                        }
                     }
                 }
 

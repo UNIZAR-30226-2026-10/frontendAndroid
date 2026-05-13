@@ -46,8 +46,12 @@ fun ProductoDto.toDomain(): Producto {
 }
 
 private val PRODUCTO_IMAGE_MAP = mapOf(
-    "icono_nerd" to R.drawable.icono_nerd,
-    "icono_cofre" to R.drawable.icono_cofre,
+    "icono_nerd" to R.drawable.icono_jugador_nerd,
+    "icono_cofre" to R.drawable.icono_jugador_cofre,
+    "icono_completista" to R.drawable.icono_jugador_completista,
+    "icono_platino" to R.drawable.icono_jugador_platino,
+    "icono_l" to R.drawable.icono_jugador_l,
+    "icono_w" to R.drawable.icono_jugador_w,
     "ficha_totem" to R.drawable.ficha_totem,
     "ficha_aventurero" to R.drawable.ficha_aventurero,
     "ficha_esqueleto" to R.drawable.ficha_esqueleto,
@@ -55,5 +59,7 @@ private val PRODUCTO_IMAGE_MAP = mapOf(
     "serpiente_calcetin" to R.drawable.serpiente_calcetin,
     "serpiente_tribal" to R.drawable.serpiente_tribal,
     "serpiente_futuro" to R.drawable.serpiente_futuro,
-    "escalera_jungla" to R.drawable.escalera_jungla
+    "escalera_jungla" to R.drawable.escalera_jungla,
+    "escalera_estratega" to R.drawable.escalera_estratega,
+    "escalera_magnate" to R.drawable.escalera_magnate
 )
