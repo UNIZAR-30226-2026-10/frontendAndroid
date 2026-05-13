@@ -1,4 +1,4 @@
-package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase
+package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model
 
 data class PerfilUsuario(
     val nombre: String?,
