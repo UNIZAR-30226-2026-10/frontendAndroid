@@ -18,7 +18,8 @@ data class Carta (
     val descripcion: String,
     val tipo: Tipo_Carta,
     val calidad: Calidad,
+    val imagen: Int? = null,
+    //FIXME TEMP PARA QUE NO DE ERRORES; SI FUNCIONA BORRA TODAS LAS REFERENCIAS A ESTOS ATRIB
     val id: Int? = null,
-    val efecto: String? = null,
-    val imagen: Int? = null
+    val efecto: String? = null
 )

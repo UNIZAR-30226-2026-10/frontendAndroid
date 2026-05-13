@@ -184,6 +184,7 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
         val localSnapshot = snapshotJugadores.find { it.username == myUsername }
         _mano.value = localSnapshot?.mano?.map { 
             Carta(
+                //FIXME CREO Q NO NECESARIO
                 id = it.toIntOrNull(),
                 nombre = it,
                 descripcion = "Carta de mazo ${localSnapshot.mazo}",

@@ -2,6 +2,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Mazos
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,37 +22,127 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.fakes.listaDeMazosDePrueba
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonCategoriaCustom
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fondoTienda
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
 import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.fakes.mazoVacio
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonEditarMazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonNuevoMazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.BotonEliminarMazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_offline
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.CartaImagen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.longPressAfter
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Mazo
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DetallesCarta
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.AvisoJuego
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ConfirmacionJuego
 
 @Composable
-fun MazosScreen(SEState: SENavHostController){
+fun MazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
 
-    //FIXME mazos temporal hasta que se implemente el ViewModel y se conecte con la base de datos
-    val mazos = listaDeMazosDePrueba
+    val state by viewModel.mazosUiState.collectAsState()
+    var mostrarMazoEnUso by remember { mutableStateOf(false) }
+    var mostrarMazoEnUsoEliminar by remember { mutableStateOf(false) }
+    var mostrarConfirmacionEliminar by remember { mutableStateOf(false) }
 
-    var mazoSeleccionado by remember { mutableStateOf(mazos.firstOrNull()) }
+    when (val s = state) {
+        is MazosUiState.Loading -> {
+            // TODO Mostrar pantalla de carga
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Cargando mazos...")
+            }
+        }
+        is MazosUiState.Success -> {
+            // TODO Mostrar los mazos
+            MazosContent(
+                mazos = viewModel.mazos,
+                mazoSeleccionado = viewModel.mazoSeleccionado,
+                onSeleccionarMazo = viewModel::seleccionarMazo,
+                onCrearNuevoMazo = {
+                    val creado = viewModel.crearNuevoMazo()
+                    if (creado) {
+                        navController.navController.navigate(Destinos.EDITAR_MAZOS)
+                    }
+                },
+                onEditarMazo = {
+                    viewModel.comprobarMazoEditable(viewModel.mazoSeleccionado) { editable ->
+                        if (editable) {
+                            navController.navController.navigate(Destinos.EDITAR_MAZOS)
+                        } else {
+                            mostrarMazoEnUso = true
+                        }
+                    }
+                },
+                onEliminarMazoSeleccionado = {
+                    mostrarConfirmacionEliminar = true
+                }
+            )
+        }
+        is MazosUiState.Error -> {
+            // TODO Mostrar mensaje de error
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Error al cargar los mazos: ${s.message}")
+            }
+        }
+    }
 
-    if (mazoSeleccionado == null) { mazoSeleccionado = mazoVacio }
+    if (mostrarMazoEnUso) {
+        AvisoJuego(
+            titulo = "Mazo en uso",
+            mensaje = "No puedes editar un mazo activo en una partida",
+            onCerrar = { mostrarMazoEnUso = false }
+        )
+    }
+    if (mostrarMazoEnUsoEliminar) {
+        AvisoJuego(
+            titulo = "Mazo en uso",
+            mensaje = "No puedes eliminar un mazo activo en una partida",
+            onCerrar = { mostrarMazoEnUsoEliminar = false }
+        )
+    }
+    if (mostrarConfirmacionEliminar) {
+        val nombreMazo = viewModel.mazoSeleccionado.nombre
+        ConfirmacionJuego(
+            titulo = "Eliminar mazo",
+            mensaje = "Vas a eliminar el mazo $nombreMazo, esta accion no se puede deshacer",
+            textoCancelar = "Cancelar",
+            textoAceptar = "Aceptar",
+            onCancelar = { mostrarConfirmacionEliminar = false },
+            onAceptar = {
+                mostrarConfirmacionEliminar = false
+                viewModel.eliminarMazoSeleccionado { eliminado ->
+                    if (!eliminado) {
+                        mostrarMazoEnUsoEliminar = true
+                    }
+                }
+            }
+        )
+    }
 
+}
+@Composable
+fun MazosContent(
+    mazos: List<Mazo>,
+    mazoSeleccionado: Mazo,
+    onSeleccionarMazo: (Mazo) -> Unit,
+    onCrearNuevoMazo: () -> Unit,
+    onEditarMazo: () -> Unit,
+    onEliminarMazoSeleccionado: () -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -81,8 +172,7 @@ fun MazosScreen(SEState: SENavHostController){
                         estaSeleccionado = mazoSeleccionado == mazo,
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            // TODO cambiar de mazo seleccionado
-                            mazoSeleccionado = mazo
+                            onSeleccionarMazo(mazo)
                         }
                     )
                 }
@@ -96,8 +186,10 @@ fun MazosScreen(SEState: SENavHostController){
                     .fillMaxSize()
                     .padding(start = 16.dp, end = 16.dp, top = 4.dp)
             ) {
+                var cartaDetalle by remember { mutableStateOf<com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Carta?>(null) }
+
                 Text(
-                    text = mazoSeleccionado?.nombre ?: "Mazo 1",
+                    text = mazoSeleccionado.nombre,
                     style = SETextTypes.nombreMazo,
                     color = color_text,
                     modifier = Modifier
@@ -117,17 +209,22 @@ fun MazosScreen(SEState: SENavHostController){
                         .fillMaxSize()
                         .weight(1f)
                 ) {
-                    items(mazoSeleccionado!!.cartas) { carta ->
-                        // TODO mostrar carta
-                        Box (
+                    items(mazoSeleccionado.cartas) { carta ->
+                        CartaImagen(
+                            carta = carta,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(0.7f)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(color_offline, RoundedCornerShape(4.dp))
-                                .border(1.dp, color_sf.copy(alpha = 0.5f), RoundedCornerShape(4.dp)),
+                                .longPressAfter(1000L) { cartaDetalle = carta }
                         )
                     }
+                }
+
+                cartaDetalle?.let { carta ->
+                    DetallesCarta(
+                        carta = carta,
+                        onDismiss = { cartaDetalle = null }
+                    )
                 }
             }
         }
@@ -142,9 +239,7 @@ fun MazosScreen(SEState: SENavHostController){
         ) {
             // BOTON PARA CREAR NUEVO MAZO
             BotonNuevoMazo(
-                onClick = {
-                    // TODO crear nuevo mazo
-                },
+                onClick = onCrearNuevoMazo,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
@@ -152,9 +247,7 @@ fun MazosScreen(SEState: SENavHostController){
 
             // BOTON PARA EDITAR MAZO SELECCIONADO
             BotonEditarMazo(
-                onClick = {
-                    // TODO editar mazo seleccionado
-                },
+                onClick = onEditarMazo,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
@@ -163,9 +256,7 @@ fun MazosScreen(SEState: SENavHostController){
 
             // BOTON PARA ELIMINAR MAZO SELECCIONADO
             BotonEliminarMazo(
-                onClick = {
-                    // TODO eliminar mazo seleccionado
-                },
+                onClick = onEliminarMazoSeleccionado,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)

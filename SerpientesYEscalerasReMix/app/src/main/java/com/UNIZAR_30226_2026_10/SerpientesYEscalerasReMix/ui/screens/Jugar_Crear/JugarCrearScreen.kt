@@ -66,6 +66,7 @@ fun JugarCrearScreen(navController: SENavHostController, viewModel: JugarCrearVi
         onEmpezarPartida = { viewModel.onEmpezarPartida { navController.goTo(Destinos.PARTIDA) } },
         onElegirTablero = { tablero -> viewModel.onSeleccionarTablero(tablero) },
         onElegirMazo = { mazo -> viewModel.onSeleccionarMazo(mazo) },
+        onRefreshMazos = { viewModel.refreshMazos() },
         tableroSeleccionado = uiState.seleccionTablero
     )
 }
@@ -83,6 +84,7 @@ fun JugarCrearContent(
     onEmpezarPartida: () -> Unit,
     onElegirTablero: (String) -> Unit,
     onElegirMazo: (String) -> Unit,
+    onRefreshMazos: () -> Unit,
     tableroSeleccionado: String
 ) {
     Column(
@@ -119,6 +121,7 @@ fun JugarCrearContent(
                 onEmpezarPartida = onEmpezarPartida,
                 onElegirTablero = onElegirTablero,
                 onElegirMazo = onElegirMazo,
+                onRefreshMazos = onRefreshMazos,
                 tableroSeleccionado = tableroSeleccionado
             )
         }
@@ -138,6 +141,7 @@ fun LobbyElementos(
     onEmpezarPartida: () -> Unit,
     onElegirTablero: (String) -> Unit,
     onElegirMazo: (String) -> Unit,
+    onRefreshMazos: () -> Unit,
     tableroSeleccionado: String
 ) {
     val vistaLider = uiState.vistaLider
@@ -183,7 +187,12 @@ fun LobbyElementos(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(sepVerticalBotones)
         ) {
-            MazoElegirBoton(seleccionMazo, onClick = onElegirMazo)
+            MazoElegirBoton(
+                mazos = uiState.mazos,
+                nombreMazoFlow = seleccionMazo,
+                onClick = onElegirMazo,
+                onOpen = onRefreshMazos
+            )
             
             if (vistaLider) {
                 ElegirTableroBoton(
@@ -268,6 +277,7 @@ fun JugarCrearScreenPreview() {
         onEmpezarPartida = {},
         onElegirTablero = {},
         onElegirMazo = {},
+        onRefreshMazos = {},
         tableroSeleccionado = "Estándar"
     )
 }

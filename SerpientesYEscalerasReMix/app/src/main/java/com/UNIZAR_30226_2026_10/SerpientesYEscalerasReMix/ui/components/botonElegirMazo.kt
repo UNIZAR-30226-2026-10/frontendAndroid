@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Mazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
@@ -41,7 +42,12 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 import kotlinx.coroutines.flow.Flow
 
 @Composable
-fun MazoElegirBoton(nombreMazoFlow: Flow<String>, onClick: (String) -> Unit) {
+fun MazoElegirBoton(
+    mazos: List<Mazo>,
+    nombreMazoFlow: Flow<String>,
+    onClick: (String) -> Unit,
+    onOpen: () -> Unit
+) {
     var showDialog by remember { mutableStateOf(false) }
     val nombreMazo by nombreMazoFlow.collectAsState(initial = "")
 
@@ -66,27 +72,25 @@ fun MazoElegirBoton(nombreMazoFlow: Flow<String>, onClick: (String) -> Unit) {
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
-                    val mazos = listOf("Medios Escamosos") //TODO cambiar por los mazos disponibles
-
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.weight(1f)
                     ) {
-                        items(mazos) { mazo ->
+                        items(mazos, key = { it.nombre }) { mazo ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(color_bg)
                                     .clickable {
-                                        onClick(mazo)
+                                        onClick(mazo.nombre)
                                         showDialog = false
                                     }
                                     .padding(8.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = mazo,
+                                    text = mazo.nombre,
                                     style = SETextTypes.plano,
                                     color = color_text
                                 )
@@ -106,7 +110,10 @@ fun MazoElegirBoton(nombreMazoFlow: Flow<String>, onClick: (String) -> Unit) {
         shape = RoundedCornerShape(10.dp),
         border = BorderStroke(2.dp, color_primary), // Borde amarillo grueso
         shadowElevation = 8.dp,
-        onClick = { showDialog = true }
+        onClick = {
+            onOpen()
+            showDialog = true
+        }
     ) {
         Box(
             modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),

@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 
 
-class TiendaViewModel (private val cf: CaseFacade) : ViewModel() {
+class TiendaViewModel (private val cF: CaseFacade) : ViewModel() {
 
     // Estado privado
     private val _uiState = MutableStateFlow<TiendaUiState>(TiendaUiState.Loading)
@@ -21,12 +21,12 @@ class TiendaViewModel (private val cf: CaseFacade) : ViewModel() {
     val uiState: StateFlow<TiendaUiState> = _uiState
 
     companion object {
-        fun factory(cf: CaseFacade): ViewModelProvider.Factory =
+        fun factory(cF: CaseFacade): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     if (modelClass.isAssignableFrom(TiendaViewModel::class.java)) {
-                        return TiendaViewModel(cf) as T
+                        return TiendaViewModel(cF) as T
                     }
                     throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
@@ -35,7 +35,7 @@ class TiendaViewModel (private val cf: CaseFacade) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            cf.email.collectLatest { email ->
+            cF.email.collectLatest { email ->
                 if (email.isNotBlank()) {
                     fetchProductos()
                 }
@@ -44,19 +44,19 @@ class TiendaViewModel (private val cf: CaseFacade) : ViewModel() {
     }
 
     suspend fun fetchProductos() {
-        if (cf.email.value.isBlank()) {
+        if (cF.email.value.isBlank()) {
             return
         }
         _uiState.value = TiendaUiState.Loading
         try {
             val lista = try {
-                cf.getProductosCase()
+                cF.getProductosCase()
             } catch (e: Exception) {
                 Log.e("TiendaViewModel", "Error al obtener productos, usando lista vacía: ${e.message}")
                 emptyList<Producto>()
             }
             val saldo = try {
-                cf.getSaldoCase()
+                cF.getSaldoCase()
             } catch (e: Exception) {
                 val fallback = obtenerSaldoActual() ?: 0
                 Log.e("TiendaViewModel", "Error al obtener el saldo, usando saldo actual: $fallback")
@@ -71,11 +71,21 @@ class TiendaViewModel (private val cf: CaseFacade) : ViewModel() {
     fun comprarProducto(producto: Producto) {
         viewModelScope.launch {
             try{
-                if (cf.email.value.isBlank()) {
+                if (cF.email.value.isBlank()) {
                     _uiState.value = TiendaUiState.Error("Usuario no ha iniciado sesión")
                     return@launch
                 }
-                val exito = cf.comprarProductoCase(producto)
+                val saldoActual = obtenerSaldoActual() ?: 0
+                if (saldoActual < producto.precio) {
+                    val estado = _uiState.value
+                    if (estado is TiendaUiState.Success) {
+                        _uiState.value = estado.copy(
+                            aviso = "Saldo insuficiente"
+                        )
+                    }
+                    return@launch
+                }
+                val exito = cF.comprarProductoCase(producto)
                 if (exito) {
                     // Refrescar la lista de productos y el saldo después de una compra exitosa
                     // FIXME quizas se podria hacer q se marcara como comprado el producto en vez de volver a cargar todo
@@ -86,6 +96,13 @@ class TiendaViewModel (private val cf: CaseFacade) : ViewModel() {
                 _uiState.value = TiendaUiState.Error("Error al comprar el producto")
             }
 
+        }
+    }
+
+    fun limpiarAviso() {
+        val estado = _uiState.value
+        if (estado is TiendaUiState.Success && estado.aviso != null) {
+            _uiState.value = estado.copy(aviso = null)
         }
     }
 
