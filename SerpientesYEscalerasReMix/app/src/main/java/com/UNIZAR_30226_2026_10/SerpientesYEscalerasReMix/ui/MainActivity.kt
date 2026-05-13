@@ -26,6 +26,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.Conexi
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.JugarContinuarRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.JugarCrearRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.LoginRegisterRepositoryImpl
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.LogrosRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PartidaRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.PerfilRepositoryImpl
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.repository.TiendaRepositoryImpl
@@ -59,7 +60,8 @@ class MainActivity : ComponentActivity() {
             amigosRepository = AmigosRepositoryImpl(apiService),
             jugarContinuarRepository = JugarContinuarRepositoryImpl(apiService),
             tiendaRepository = TiendaRepositoryImpl(apiService),
-            perfilRepository = PerfilRepositoryImpl(apiService)
+            perfilRepository = PerfilRepositoryImpl(apiService),
+            logrosRepository = LogrosRepositoryImpl(apiService)
             //applicationContext // TODO elminar e instanciarComo Retrofit
 
         )

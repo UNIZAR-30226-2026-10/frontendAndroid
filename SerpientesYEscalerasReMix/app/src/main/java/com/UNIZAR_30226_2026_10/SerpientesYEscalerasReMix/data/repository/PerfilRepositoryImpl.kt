@@ -70,27 +70,22 @@ class PerfilRepositoryImpl(
         }
     }
 
+    // REEMPLAZA TU FUNCIÓN POR ESTA (He quitado el .string() del log)
     override suspend fun obtenerCosmeticosDisponibles(
         email: String
     ): Map<CategoriaCosmetico, List<String>> = withContext(Dispatchers.IO) {
-        // Lanzamos las peticiones
         val iconosDeferred     = async { apiService.getUserIcons(email) }
         val fichasDeferred     = async { apiService.getUserPawns(email) }
         val serpientesDeferred = async { apiService.getUserSnakes(email) }
         val escalerasDeferred  = async { apiService.getUserStairs(email) }
 
-        // Esperamos los resultados
         val iconosResp     = iconosDeferred.await()
-        Log.d("PERFIL_DEBUG", "Icons raw: ${iconosResp.errorBody()?.string() ?: "sin error body"}")
         val fichasResp     = fichasDeferred.await()
         val serpientesResp = serpientesDeferred.await()
         val escalerasResp  = escalerasDeferred.await()
 
-        Log.d("PERFIL_DEBUG", "Icons code: ${iconosResp.code()} body: ${iconosResp.body()}")
-        Log.d("PERFIL_DEBUG", "Fichas code: ${fichasResp.code()} body: ${fichasResp.body()}")
-        Log.d("PERFIL_DEBUG", "Serpientes code: ${serpientesResp.code()} body: ${serpientesResp.body()}")
-        Log.d("PERFIL_DEBUG", "Escaleras code: ${escalerasResp.code()} body: ${escalerasResp.body()}")
-
+        // LOGS SEGUROS (Sin consumir el stream)
+        Log.d("PERFIL_DEBUG", "Iconos OK: ${iconosResp.isSuccessful} Código: ${iconosResp.code()}")
 
         mapOf(
             CategoriaCosmetico.ICONO     to (iconosResp.body()?.iconos         ?: emptyList()),

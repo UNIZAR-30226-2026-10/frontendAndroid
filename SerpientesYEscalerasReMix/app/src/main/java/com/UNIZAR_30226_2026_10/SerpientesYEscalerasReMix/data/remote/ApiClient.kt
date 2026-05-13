@@ -6,6 +6,10 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.ComprarProd
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.ProductoDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.SaldoDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.*
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.LogroDTO
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.StatsDTO
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.LogrosReclamadosDTO
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.LogrosReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AceptarInvitacionRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AnadirBotRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AuthReply
@@ -23,7 +27,6 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_mo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LeaveOrExpelRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LobbyReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.LoginRequest
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PerfilUsuarioReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PartidaReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.PostInvitacionRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.RegisterRequest
@@ -210,12 +213,25 @@ interface ApiService {
     @GET("users/{email}/stairs")
     suspend fun getUserStairs(@Path("email") email: String): Response<EscalerasReply>
 
+    // FUNCIONES LOGROS
+
+    @GET("achievements")
+    suspend fun getAllAchievements(): Response<LogrosReply>
+
+    @GET("users/{email}/stats")
+    suspend fun getUserStats(@Path("email") email: String): Response<StatsDTO>
+
+    @GET("users/{email}/achievements")
+    suspend fun getClaimedAchievements(@Path("email") email: String): Response<LogrosReclamadosDTO>
+
+    @POST("users/{email}/achievements")
+    suspend fun claimAchievement(@Path("email") email: String, @Body body: Map<String, String>): Response<Unit>
 }
 
 object ApiClient {
-    //private const val API_URL = "http://syeremix.switzerlandnorth.cloudapp.azure.com/api/"
+    private const val API_URL = "http://syeremix.switzerlandnorth.cloudapp.azure.com/api/"
     //private const val API_URL = "http://192.168.1.36:3000/api/"
-    private const val API_URL = "http://10.0.2.2:3000/api/"
+    //private const val API_URL = "http://10.0.2.2:3000/api/"
     private var _apiService: ApiService? = null
     private var _cookieJar: PersistentCookieJar? = null
 

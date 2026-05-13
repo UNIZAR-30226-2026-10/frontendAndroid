@@ -78,11 +78,11 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
         viewModelScope.launch {
             try {
                 val mapa = cF.obtenerCosmeticosCase.obtenerTodosLosCosmeticos()
-                val sE = mapa[CategoriaCosmetico.ESCALERA]  ?: emptyList()
-                val sS = mapa[CategoriaCosmetico.SERPIENTE] ?: emptyList()
-                val sF = mapa[CategoriaCosmetico.FICHA]     ?: emptyList()
-                val ic = mapa[CategoriaCosmetico.ICONO]     ?: emptyList()
-
+                val sE  = listOf("escalera_default") + (mapa[CategoriaCosmetico.ESCALERA] ?: emptyList())
+                val sS  = listOf("serpiente_default") + (mapa[CategoriaCosmetico.SERPIENTE] ?: emptyList())
+                val sF = listOf("ficha_default") + (mapa[CategoriaCosmetico.FICHA]     ?: emptyList())
+                val ic = listOf("icono_default") + (mapa[CategoriaCosmetico.ICONO]     ?: emptyList())
+                println("DEBUG: Escaleras recibidas: ${sE.size}")
                 // Sobreescribimos siempre para reflejar el estado real del servidor,
                 // incluso si viene vacío (el usuario no tiene cosméticos de esa categoría)
                 skinsEscalera  = sE
@@ -117,20 +117,16 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
     fun actualizarCosmetico(categoria: CategoriaCosmetico, skinId: String) {
         viewModelScope.launch {
             try {
-                val result: Result<Unit> = cF.actualizarSkinCase(categoria, skinId)
+                val result = cF.actualizarSkinCase(categoria, skinId)
                 if (result.isSuccess) {
-                    val perfilActual = perfil ?: return@launch
-                    perfil = when (categoria) {
-                        CategoriaCosmetico.ESCALERA  -> perfilActual.copy(skinEscaleraActual  = skinId)
-                        CategoriaCosmetico.SERPIENTE -> perfilActual.copy(skinSerpienteActual = skinId)
-                        CategoriaCosmetico.FICHA     -> perfilActual.copy(skinFichaActual     = skinId)
-                        CategoriaCosmetico.ICONO     -> perfilActual.copy(iconoActual         = skinId)
-                    }
+                    // En lugar de solo hacer .copy(), pedimos los datos reales
+                    cargarPerfil()
+                    cargarCosmeticosDisponibles()
                 } else {
-                    errorMessage = "Error al actualizar cosmético: ${result.exceptionOrNull()?.message}"
+                    errorMessage = "Error: ${result.exceptionOrNull()?.message}"
                 }
             } catch (e: Exception) {
-                errorMessage = "Error al actualizar cosmético: ${e.message}"
+                errorMessage = e.message
             }
         }
     }
