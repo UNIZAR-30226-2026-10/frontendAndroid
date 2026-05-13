@@ -183,7 +183,7 @@ fun LobbyElementos(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(sepVerticalBotones)
         ) {
-            MazoElegirBoton(seleccionMazo, onClick = onElegirMazo)
+            MazoElegirBoton(mazos = uiState.mazos, nombreMazoFlow = seleccionMazo, onClick = onElegirMazo)
             
             if (vistaLider) {
                 ElegirTableroBoton(

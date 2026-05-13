@@ -6,6 +6,5 @@ import retrofit2.http.Body
 
 data class EditarMazoRequest (
     @SerializedName("nombre") val nuevoNombre: String?,
-    @SerializedName("cartaAñadir") val nuevasCartas: List<CartaDto>?,
-    @SerializedName("cartaEliminar") val eliminarCartas: List<CartaDto>?
+    @SerializedName("cartas") val cartas: List<CartaDto>?
 )

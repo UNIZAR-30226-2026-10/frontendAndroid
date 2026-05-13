@@ -63,8 +63,7 @@ class MainActivity : ComponentActivity() {
             tiendaRepository = TiendaRepositoryImpl(apiService),
             perfilRepository = PerfilRepositoryImpl(apiService),
             logrosRepository = LogrosRepositoryImpl(apiService),
-            mazoRepository = MazosRepositoryImpl(apiService),
-            perfilRepository = PerfilRepositoryImpl(apiService)
+            mazoRepository = MazosRepositoryImpl(apiService)
             //applicationContext // TODO elminar e instanciarComo Retrofit
 
         )
