@@ -7,7 +7,6 @@ class GetCartasMazoCase(
     private val mazosRepository: MazosRepository,
     private val email: StateFlow<String>
 ) {
-    suspend operator fun invoke(id: String) {
-        mazosRepository.getCartasMazo(email.value, id)
-    }
+    suspend operator fun invoke(id: String) = mazosRepository.getCartasMazo(email.value, id)
+
 }

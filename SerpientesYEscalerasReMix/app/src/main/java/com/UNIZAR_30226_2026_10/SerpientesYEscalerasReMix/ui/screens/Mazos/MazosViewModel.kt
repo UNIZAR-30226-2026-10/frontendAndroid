@@ -143,6 +143,11 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
 
     fun seleccionarMazo(mazo: Mazo) {
         mazoSeleccionado = mazo
+        // Al seleccionar un mazo existente, resetear esNuevoMazo a false
+        val current = _editarMazoUiState.value
+        if (current is EditarMazoUiState.Success) {
+            _editarMazoUiState.value = current.copy(esNuevoMazo = false)
+        }
     }
 
     fun actualizarNombreMazoSeleccionado(nombre: String) {
@@ -163,13 +168,21 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
                 saveSuccess = false,
                 saving = false
             )
-            Log.d("MazosViewModel", "fijarMazoOriginalActual -> esNuevoMazo=${mazoSeleccionado == mazoVacio} mazo=${mazoSeleccionado.nombre}")
+            Log.d("MazosViewModel", "fijarMazoOriginalActual -> esNuevoMazo=${current.esNuevoMazo} mazo=${mazoSeleccionado.nombre}")
         }
     }
 
-    fun cancelarEdicion(mazoOriginal: Mazo) {
-        mazoSeleccionado = mazoOriginal.copy(cartas = mazoOriginal.cartas.toList())
-        actualizarMazoEnLista(mazoSeleccionado)
+    fun cancelarEdicion(mazoOriginal: Mazo, esNuevoMazo: Boolean) {
+        if (esNuevoMazo) {
+            // Si es un mazo nuevo que no se guardo, eliminarlo de la lista
+            mazos = mazos.filterNot { it.nombre == mazoOriginal.nombre }
+            mazoSeleccionado = mazos.firstOrNull() ?: mazoVacio
+            Log.d("MazosViewModel", "cancelarEdicion -> eliminado mazo nuevo no guardado: ${mazoOriginal.nombre}")
+        } else {
+            // Si es un mazo existente, restaurar los valores originales
+            mazoSeleccionado = mazoOriginal.copy(cartas = mazoOriginal.cartas.toList())
+            actualizarMazoEnLista(mazoSeleccionado)
+        }
         val current = _editarMazoUiState.value
         if (current is EditarMazoUiState.Success) {
             _editarMazoUiState.value = current.copy(
@@ -180,7 +193,7 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
                 saveSuccess = false,
                 saving = false
             )
-            Log.d("MazosViewModel", "cancelarEdicion -> esNuevoMazo=${mazoSeleccionado == mazoVacio} mazo=${mazoSeleccionado.nombre}")
+            Log.d("MazosViewModel", "cancelarEdicion -> esNuevoMazo=${esNuevoMazo} mazo=${mazoSeleccionado.nombre}")
         }
     }
 
@@ -209,8 +222,8 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
         marcarCambios()
     }
 
-    fun crearNuevoMazo() {
-        if (mazos.size >= 8) return
+    fun crearNuevoMazo(): Boolean {
+        if (mazos.size >= 8) return false
         val nuevoMazo = mazoVacio.copy(nombre = "Mazo ${mazos.size + 1}")
         mazos = mazos + nuevoMazo
         mazoSeleccionado = nuevoMazo
@@ -227,6 +240,7 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
             )
             Log.d("MazosViewModel", "crearNuevoMazo -> set esNuevoMazo=true")
         }
+        return true
     }
 
     fun eliminarMazoSeleccionado(onResult: (Boolean) -> Unit) {
@@ -279,6 +293,7 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
                 }
                 Log.d("MazosViewModel", "Guardando cambios del mazo: ${mazoAntiguo.nombre} -> ${mazoNuevo.nombre}")
                 actualizarEstadoGuardando(true)
+
                 val esNuevo = (_editarMazoUiState.value as? EditarMazoUiState.Success)?.esNuevoMazo == true
                 Log.d("MazosViewModel", "guardarCambios -> esNuevoMazo=$esNuevo")
                 val exito = if (esNuevo) {
@@ -331,9 +346,9 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
         val current = _editarMazoUiState.value
         if (current is EditarMazoUiState.Success) {
             _editarMazoUiState.value = current.copy(
-                mazoOriginal = current.mazoOriginal.copy(
-                    cartas = current.mazoOriginal.cartas.toList()
-                ),
+                mazoOriginal = mazoSeleccionado.copy(cartas = mazoSeleccionado.cartas.toList()),
+                mazo = mazoSeleccionado,
+                esNuevoMazo = false,
                 hasChanges = false,
                 saveSuccess = true,
                 saving = false

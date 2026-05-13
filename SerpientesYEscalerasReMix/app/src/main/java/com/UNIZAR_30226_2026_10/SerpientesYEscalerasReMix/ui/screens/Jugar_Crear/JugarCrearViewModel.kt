@@ -88,6 +88,7 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
 
     private fun fetchMazos() {
         viewModelScope.launch {
+            if (_uiState.value.username.isBlank()) return@launch
             val mazos = try {
                 cF.obtenerMazosCase()
             } catch (e: Exception) {

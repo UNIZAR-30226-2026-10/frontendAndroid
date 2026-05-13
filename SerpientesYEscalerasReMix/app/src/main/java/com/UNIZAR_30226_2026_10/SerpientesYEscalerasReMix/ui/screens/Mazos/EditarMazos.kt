@@ -62,6 +62,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DetallesCarta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.CartaImagen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.longPressAfter
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.AvisoJuego
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Mazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
@@ -81,35 +82,49 @@ fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewMo
         }
 
         is EditarMazoUiState.Success -> {
+            var mostrarMazoIncompleto by remember { mutableStateOf(false) }
+            
             androidx.compose.runtime.LaunchedEffect(s.mazo) {
                 Log.d("EditarMazos", "LaunchedEffect mazo=${s.mazo.nombre} esNuevoMazo=${s.esNuevoMazo}")
                 viewModel.fijarMazoOriginalActual()
             }
             // Mostrar los mazos
-            EditarMazoContent(
-                mazoAntiguo = s.mazoOriginal,
-                mazoAEditar = viewModel.mazoSeleccionado,
-                cartasDisponibles = viewModel.cartasDisponibles,
-                editarState = s,
-                onGuardarCambios = { mazoAntiguo, mazoAEditar ->
-                    // guardar cambios en el servidor
-                    viewModel.guardarCambios(mazoAntiguo, mazoAEditar)
-
-                },
-                onSalir = {
-                    viewModel.cancelarEdicion(s.mazoOriginal)
-                    navController.navController.popBackStack()
-                },
-                onActualizarNombre = { nuevoNombre ->
-                    viewModel.actualizarNombreMazoSeleccionado(nuevoNombre)
-                },
-                onAnadirCarta = { carta ->
-                    viewModel.anadirCartaAMazoSeleccionado(carta)
-                },
-                onEliminarCarta = { indice ->
-                    viewModel.eliminarCartaAMazoSeleccionado(indice)
+            Box(modifier = Modifier.fillMaxSize()) {
+                EditarMazoContent(
+                    mazoAntiguo = s.mazoOriginal,
+                    mazoAEditar = viewModel.mazoSeleccionado,
+                    cartasDisponibles = viewModel.cartasDisponibles,
+                    editarState = s,
+                    onGuardarCambios = { mazoAntiguo, mazoAEditar ->
+                        if (mazoAEditar.cartas.size == 10) {
+                            viewModel.guardarCambios(mazoAntiguo, mazoAEditar)
+                        } else {
+                            mostrarMazoIncompleto = true
+                        }
+                    },
+                    onSalir = {
+                        viewModel.cancelarEdicion(s.mazoOriginal, s.esNuevoMazo)
+                        navController.navController.popBackStack()
+                    },
+                    onActualizarNombre = { nuevoNombre ->
+                        viewModel.actualizarNombreMazoSeleccionado(nuevoNombre)
+                    },
+                    onAnadirCarta = { carta ->
+                        viewModel.anadirCartaAMazoSeleccionado(carta)
+                    },
+                    onEliminarCarta = { indice ->
+                        viewModel.eliminarCartaAMazoSeleccionado(indice)
+                    }
+                )
+                
+                if (mostrarMazoIncompleto) {
+                    AvisoJuego(
+                        titulo = "Mazo incompleto",
+                        mensaje = "Necesitas seleccionar 10 cartas",
+                        onCerrar = { mostrarMazoIncompleto = false }
+                    )
                 }
-            )
+            }
         }
 
         is EditarMazoUiState.Error -> {
@@ -193,7 +208,9 @@ fun EditarMazoContent(
                             .background(color_online, RoundedCornerShape(6.dp))
                             .padding(horizontal = 12.dp, vertical = 6.dp)
                             .border(1.dp, color_online, RoundedCornerShape(6.dp))
-                            .clickable { onGuardarCambios(mazoAntiguo, mazoAEditar) }
+                            .clickable {
+                                onGuardarCambios(mazoAntiguo, mazoAEditar)
+                            }
                     )
                 }
             }
@@ -340,7 +357,7 @@ fun EditarMazoContent(
             val separacion = 24.dp
             val itemWidth = (maxWidth - separacion * 4) / 5 * 0.8f
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                cartasDisponibles.chunked(6).forEach { fila ->
+                cartasDisponibles.chunked(5).forEach { fila ->
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(separacion),
                         modifier = Modifier.fillMaxWidth()

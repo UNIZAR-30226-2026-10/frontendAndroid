@@ -73,8 +73,10 @@ fun MazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
                 mazoSeleccionado = viewModel.mazoSeleccionado,
                 onSeleccionarMazo = viewModel::seleccionarMazo,
                 onCrearNuevoMazo = {
-                    viewModel.crearNuevoMazo()
-                    navController.navController.navigate(Destinos.EDITAR_MAZOS)
+                    val creado = viewModel.crearNuevoMazo()
+                    if (creado) {
+                        navController.navController.navigate(Destinos.EDITAR_MAZOS)
+                    }
                 },
                 onEditarMazo = {
                     viewModel.comprobarMazoEditable(viewModel.mazoSeleccionado) { editable ->
