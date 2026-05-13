@@ -137,9 +137,8 @@ fun TarjetaLogro(logro: LogroUsuario, onReclamar: (String) -> Unit) {
                 if (logro.imagen != 0) {
                     Box(
                         modifier = Modifier
-                            .width(60.dp)
-                            .aspectRatio(3f / 4f)
-                            .background(color_selectedText)
+                            .width(90.dp)
+                            .aspectRatio(1f)
                     ) {
                         Image(
                             painter = painterResource(id = logro.imagen),
@@ -159,8 +158,7 @@ fun TarjetaLogro(logro: LogroUsuario, onReclamar: (String) -> Unit) {
                         style = SETextTypes.plano,
                         textAlign = TextAlign.Center
                     )
-                } else if (logro.imagen == 0) {
-                    // Fallback por si no hay nada
+                } else if (logro.imagen == 0 && logro.tipoRecompensa == "Carta") {
                     Text(text = "Carta", style = SETextTypes.plano)
                 }
             }

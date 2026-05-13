@@ -26,12 +26,19 @@ class ObtenerLogrosCase(
                 else -> 0
             }
 
+            // Mapeo de los logros porque recibimos cartaID=null incluso cuando es una carta la recompensa
             val cartaIDReal = when (dto.id) {
                 "Primeros pasos" -> "Serpiente en tu bota"
                 "Imparable" -> "Wild Frank"
                 "Derrotado" -> "Pickpocket"
                 "Negado" -> "Carpintero"
                 "Completista" -> "Mal de ojo"
+                "Platino" -> "icono_jugador_platino"
+                "En racha" -> "icono_jugador_w"
+                "Resiliente" -> "icono_jugador_l"
+                "Coleccionista" -> "icono_jugador_completista"
+                "Manos a la obra" -> "escalera_estratega"
+                "Estratega" -> "escalera_magnate"
                 else -> null
             }
 
@@ -44,13 +51,23 @@ class ObtenerLogrosCase(
                     val cantidad = dto.valorRecompensa ?: dto.objetivo
                     "$cantidad SEP"
                 }
+                cartaIDReal == "icono_jugador_platino" || cartaIDReal == "icono_jugador_w"
+                        || cartaIDReal == "icono_jugador_l" || cartaIDReal == "icono_jugador_completista" -> "Icono"
+                cartaIDReal == "escalera_magnate" || cartaIDReal == "escalera_estratega" -> "Skin"
                 cartaIDReal != null && cartaIDReal.isNotBlank() -> "Carta"
-                // Para todo lo demás (Skins, Iconos, Fichas o nulos), enviamos vacío
+                // Para todo lo demás (Skins, Fichas o nulos), enviamos vacío
                 else -> ""
             }
 
             // 3. DETERMINACIÓN DEL RECURSO DE IMAGEN
             val recursoImagen = when {
+                cartaIDReal == "icono_jugador_platino" -> R.drawable.icono_jugador_platino
+                cartaIDReal == "icono_jugador_w"       -> R.drawable.icono_jugador_w
+                cartaIDReal == "icono_jugador_l"       -> R.drawable.icono_jugador_l
+                cartaIDReal == "icono_jugador_completista" -> R.drawable.icono_jugador_completista
+                cartaIDReal == "escalera_estratega" -> R.drawable.escalera_estratega
+                cartaIDReal == "escalera_magnate"       -> R.drawable.escalera_magnate
+
                 // Si es Carta: Usamos el mapeo de imágenes
                 cartaIDReal != null && cartaIDReal.isNotBlank() -> imagenParaCarta(cartaIDReal)
 
