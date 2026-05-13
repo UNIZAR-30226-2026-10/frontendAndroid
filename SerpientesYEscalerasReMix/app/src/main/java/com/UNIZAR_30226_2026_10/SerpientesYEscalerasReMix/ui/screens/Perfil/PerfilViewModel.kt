@@ -8,8 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CategoriaCosmetico
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.PerfilUsuario
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.CategoriaCosmetico
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.PerfilUsuario
 import kotlinx.coroutines.launch
 
 class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
@@ -57,7 +57,6 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
     }
 
     fun cargarPerfil() {
-        // FIX: guardia para evitar llamada de red si el email aún no está listo
         if (cF.email.value.isEmpty()) return
         viewModelScope.launch {
             cargando = true
@@ -73,25 +72,18 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
     }
 
     private fun cargarCosmeticosDisponibles() {
-        // FIX: una sola llamada que devuelve el mapa completo (4 peticiones en paralelo)
-        // en lugar de 4 llamadas individuales que internamente hacían 4 peticiones cada una (16 total)
         viewModelScope.launch {
             try {
                 val mapa = cF.obtenerCosmeticosCase.obtenerTodosLosCosmeticos()
-                val sE = mapa[CategoriaCosmetico.ESCALERA]  ?: emptyList()
-                val sS = mapa[CategoriaCosmetico.SERPIENTE] ?: emptyList()
+                val sE  = mapa[CategoriaCosmetico.ESCALERA] ?: emptyList()
+                val sS  = mapa[CategoriaCosmetico.SERPIENTE] ?: emptyList()
                 val sF = mapa[CategoriaCosmetico.FICHA]     ?: emptyList()
                 val ic = mapa[CategoriaCosmetico.ICONO]     ?: emptyList()
-
-                // Sobreescribimos siempre para reflejar el estado real del servidor,
-                // incluso si viene vacío (el usuario no tiene cosméticos de esa categoría)
                 skinsEscalera  = sE
                 skinsSerpiente = sS
                 skinsFicha     = sF
                 iconos         = ic
             } catch (e: Exception) {
-                // FIX: no sobreescribimos errorMessage si el perfil ya cargó bien,
-                // para no bloquear la pantalla por un fallo secundario de cosméticos
                 if (perfil == null) {
                     errorMessage = "Error al cargar cosméticos: ${e.message}"
                 }
@@ -117,20 +109,15 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
     fun actualizarCosmetico(categoria: CategoriaCosmetico, skinId: String) {
         viewModelScope.launch {
             try {
-                val result: Result<Unit> = cF.actualizarSkinCase(categoria, skinId)
+                val result = cF.actualizarSkinCase(categoria, skinId)
                 if (result.isSuccess) {
-                    val perfilActual = perfil ?: return@launch
-                    perfil = when (categoria) {
-                        CategoriaCosmetico.ESCALERA  -> perfilActual.copy(skinEscaleraActual  = skinId)
-                        CategoriaCosmetico.SERPIENTE -> perfilActual.copy(skinSerpienteActual = skinId)
-                        CategoriaCosmetico.FICHA     -> perfilActual.copy(skinFichaActual     = skinId)
-                        CategoriaCosmetico.ICONO     -> perfilActual.copy(iconoActual         = skinId)
-                    }
+                    cargarPerfil()
+                    cargarCosmeticosDisponibles()
                 } else {
-                    errorMessage = "Error al actualizar cosmético: ${result.exceptionOrNull()?.message}"
+                    errorMessage = "Error: ${result.exceptionOrNull()?.message}"
                 }
             } catch (e: Exception) {
-                errorMessage = "Error al actualizar cosmético: ${e.message}"
+                errorMessage = e.message
             }
         }
     }

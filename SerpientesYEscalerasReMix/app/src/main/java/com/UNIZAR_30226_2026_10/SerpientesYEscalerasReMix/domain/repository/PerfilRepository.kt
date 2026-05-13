@@ -1,7 +1,7 @@
 package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.repository
 
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CategoriaCosmetico
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.PerfilUsuario
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.CategoriaCosmetico
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.PerfilUsuario
 
 interface PerfilRepository {
 

@@ -4,22 +4,22 @@ import com.google.gson.annotations.SerializedName
 
 // GET /api/users/{email}/icons
 data class IconosReply(
-    @SerializedName("icons") val iconos: List<String>
+    @SerializedName("iconos") val iconos: List<String>
 )
 
 // GET /api/users/{email}/pawns
 data class FichasReply(
-    @SerializedName("tokens") val fichas: List<String>
+    @SerializedName("fichas") val fichas: List<String>
 )
 
 // GET /api/users/{email}/snakes
 data class SerpientesReply(
-    @SerializedName("snakes") val serpientes: List<String>
+    @SerializedName("serpientes") val serpientes: List<String>
 )
 
 // GET /api/users/{email}/stairs
 data class EscalerasReply(
-    @SerializedName("ladders") val escaleras: List<String>
+    @SerializedName("escaleras") val escaleras: List<String>
 )
 
 // Body para PUT /api/users/{email}/icon
@@ -29,7 +29,7 @@ data class ActualizarIconoRequest(
 
 // Body para PUT /api/users/{email}/pawn
 data class ActualizarFichaRequest(
-    @SerializedName("token") val token: String
+    @SerializedName("pawn") val token: String
 )
 
 // Body para PUT /api/users/{email}/snake
@@ -39,5 +39,5 @@ data class ActualizarSerpienteRequest(
 
 // Body para PUT /api/users/{email}/stair
 data class ActualizarEscaleraRequest(
-    @SerializedName("ladder") val ladder: String
+    @SerializedName("stair") val ladder: String
 )

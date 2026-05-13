@@ -50,7 +50,7 @@ import androidx.compose.ui.graphics.Color
 
 
 @Composable
-fun TiendaScreen(SEState: SENavHostController, viewModel: TiendaViewModel) {
+fun TiendaScreen(navController: SENavHostController, viewModel: TiendaViewModel) {
 
     val state by viewModel.uiState.collectAsState()
 
@@ -66,6 +66,8 @@ fun TiendaScreen(SEState: SENavHostController, viewModel: TiendaViewModel) {
             TiendaContent(
                 sep = s.saldo,
                 productos = s.productos,
+                aviso = s.aviso,
+                onCerrarAviso = { viewModel.limpiarAviso() },
                 onComprarProducto = { producto ->
                     viewModel.comprarProducto(producto)
                 }
@@ -86,6 +88,8 @@ fun TiendaScreen(SEState: SENavHostController, viewModel: TiendaViewModel) {
 fun TiendaContent(
     sep: Int,
     productos: List<Producto>,
+    aviso: String?,
+    onCerrarAviso: () -> Unit,
     onComprarProducto: (Producto) -> Unit
 ) {
 
@@ -100,10 +104,10 @@ fun TiendaContent(
             .distinct()
             .sortedWith(compareBy { tipo ->
                 when (tipo) {
-                    Tipo_Producto.Ficha -> 4
-                    Tipo_Producto.Serpiente -> 3
+                    Tipo_Producto.Ficha -> 3
+                    Tipo_Producto.Serpiente -> 1
                     Tipo_Producto.Escalera -> 2
-                    Tipo_Producto.Icono -> 1
+                    Tipo_Producto.Icono -> 4
                     else -> 0
                 }
             })
@@ -166,6 +170,35 @@ fun TiendaContent(
                     BotonGenerico(
                         texto = "Cerrar",
                         onClick = { avisoProductoEnPosesion = false },
+                        modifier = Modifier.padding(top = 12.dp),
+                        colorPrincipal = color_online,
+                        habilitado = true
+                    )
+                }
+            }
+        }
+    }
+    if (!aviso.isNullOrBlank()) {
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = { onCerrarAviso() }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .background(color_bg, RoundedCornerShape(12.dp))
+                    .border(2.dp, color_sf, RoundedCornerShape(12.dp))
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = aviso,
+                        style = SETextTypes.plano,
+                        color = color_text
+                    )
+                    BotonGenerico(
+                        texto = "Cerrar",
+                        onClick = { onCerrarAviso() },
                         modifier = Modifier.padding(top = 12.dp),
                         colorPrincipal = color_online,
                         habilitado = true
