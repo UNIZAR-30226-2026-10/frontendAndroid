@@ -71,8 +71,7 @@ fun PerfilScreen(navHost: SENavHostController, viewModel: PerfilViewModel) {
         return
     }
 
-    // FIX: El error de cosméticos no bloquea toda la pantalla.
-    // Se muestra el perfil igualmente y el error aparece solo si no hay perfil cargado.
+
     if (errorMessage != null && perfil == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(text = errorMessage, color = Color.Red, style = SETextTypes.plano)
@@ -206,11 +205,11 @@ fun AvatarUsuario(
     var mostrarMenu by remember { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier.size(95.dp), // ← 10dp más que el Surface (85dp)
+        modifier = Modifier.size(95.dp),
         contentAlignment = Alignment.BottomEnd
     ) {
         Surface(
-            modifier = Modifier.size(85.dp).align(Alignment.TopStart), // ← anclado arriba-izquierda
+            modifier = Modifier.size(85.dp).align(Alignment.TopStart),
             shape = CircleShape,
             color = color_text,
             border = BorderStroke(2.dp, color_primary)
@@ -231,7 +230,7 @@ fun AvatarUsuario(
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Cambiar avatar",
-                    tint = color_primary, // ← cambiado a color_primary para que se vea mejor
+                    tint = color_primary,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -496,16 +495,18 @@ fun obtenerImagenCosmetico(id: String, cat: CategoriaCosmetico): Int {
         "icono_nerd"         -> R.drawable.icono_jugador_nerd
         "icono_completista"  -> R.drawable.icono_jugador_completista
         "icono_platino"      -> R.drawable.icono_jugador_platino
+        "icono_W"            -> R.drawable.icono_jugador_w
+        "icono_L"            -> R.drawable.icono_jugador_l
         "icono_default"      -> R.drawable.icono_jugador_default
         "icono_cofre"        -> R.drawable.icono_cofre
         "serpiente_calcetin" -> R.drawable.serpiente_calcetin
         "serpiente_futuro"   -> R.drawable.serpiente_futuro
-        "serpiente_tribal"   -> R.drawable.serpiente_tribal              // sustituir por el drawable correcto
+        "serpiente_tribal"   -> R.drawable.serpiente_tribal
         "serpiente_default"  -> R.drawable.serpiente
         "ficha_totem"        -> R.drawable.jugador_azul_totem
         "ficha_esqueleto"    -> R.drawable.jugador_verde_calavera
-        "ficha_aventurero"   -> R.drawable.jugador_verde_explorador     // sustituir por el drawable correcto
-        "ficha_moneda"       -> R.drawable.jugador_rojo_totem     // sustituir por el drawable correcto
+        "ficha_aventurero"   -> R.drawable.jugador_verde_explorador
+        "ficha_moneda"       -> R.drawable.jugador_rojo_totem
         "ficha_default"      -> R.drawable.jugador_rojo_totem
         "escalera_default"   -> R.drawable.escalera
         "escalera_estratega" -> R.drawable.escalera_estratega
