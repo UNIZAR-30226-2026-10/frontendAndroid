@@ -132,16 +132,22 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
                 delay(1000)
 
-                // Eleccion de ficha
                 _uiState.update {
-                    it.copy(
-                        mostrarDialogoPuntuacion = false,
-                        mostrarDialogoIndicacion = true,
-                        indicacion = "Seleccione una ficha a mover",
+                    it.copy(mostrarDialogoPuntuacion = false)
+                }
 
-                        seleccionFichas = true,
-                        casillasAElegir = casillasPosibles
-                    )
+                if (puntuacionDado > 0 ) {
+
+                    // Eleccion de ficha
+                    _uiState.update {
+                        it.copy(
+                            mostrarDialogoIndicacion = true,
+                            indicacion = "Seleccione una ficha a mover",
+
+                            seleccionFichas = true,
+                            casillasAElegir = casillasPosibles
+                        )
+                    }
                 }
             }
         }
@@ -176,11 +182,12 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
             // Obtener movimiento correspondiente
             val movDestino = _uiState.value.casillasAElegir.find { it.casillaId == casillaId }!!
 
-            if (_uiState.value.tablero.casillas[casillaId].tipo == TipoCasilla.Escalera) {
+            if (_uiState.value.tablero.casillas[casillaId - 1].tipo == TipoCasilla.Escalera) {
                 _uiState.update {
                     it.copy(
                         casillaEscaleraIni = casillaId,
-                        casillaEscaleraFin = _uiState.value.tablero.casillas[casillaId].saltoA!!
+                        casillaEscaleraFin = _uiState.value.tablero.casillas[casillaId - 1].saltoA!! + 1,
+                        movCancelarEscalera = movDestino
                     )
                 }
                 coordinarDialogos("Escalera")
@@ -188,8 +195,9 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                 _uiState.update {
                     it.copy(
                         casillaBifurcacionIni = casillaId,
-                        casillaA = _uiState.value.tablero.casillas[casillaId].siguientes[0],
-                        casillaB = _uiState.value.tablero.casillas[casillaId].siguientes[1]
+                        casillaA = _uiState.value.tablero.casillas[casillaId - 1].siguientes[0] + 1,
+                        casillaB = _uiState.value.tablero.casillas[casillaId - 1].siguientes[1] + 1,
+                        movDestinoBifurcacion = movDestino
                     )
                 }
                 coordinarDialogos("Bifurcacion")
@@ -217,6 +225,7 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
         viewModelScope.launch {
             val casillaIniAux = _uiState.value.casillaEscaleraIni
+            val movAux = _uiState.value.movCancelarEscalera!!
             _uiState.update {
                 it.copy(
                     mostrarDialogoIndicacion = false,
@@ -229,15 +238,15 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                     casillasAElegir = emptyList(),
 
                     bloquearDado = false,
-                    puedeSalir = true
+                    puedeSalir = true,
+
+                    movCancelarEscalera = null
                 )
             }
 
             coordinarDialogos("")
 
-            val movDestino = _uiState.value.casillasAElegir.find { it.casillaId == casillaIniAux }!!
-
-            cF.confirmarDestinoCase(movDestino)
+            cF.confirmarDestinoCase(movAux)
         }
     }
 
@@ -246,7 +255,7 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
         viewModelScope.launch {
             val movAux = Movimiento(
                 fichaId = _uiState.value.fichaSeleccionada,
-                casillaId = _uiState.value.casillaEscaleraFin,
+                casillaId = _uiState.value.casillaEscaleraFin - 1,
                 // Siempre que llegues aqui no te quedan movs
                 esBifurcacion = false,
                 pasosRestantes = 0
@@ -264,7 +273,9 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                     casillasAElegir = emptyList(),
 
                     bloquearDado = false,
-                    puedeSalir = true
+                    puedeSalir = true,
+
+                    movCancelarEscalera = null
                 )
             }
 
@@ -278,6 +289,7 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
 
         viewModelScope.launch {
             val anteriorCasilla = _uiState.value.casillaBifurcacionIni
+            val movAux = _uiState.value.movDestinoBifurcacion!!
             _uiState.update {
                 it.copy(
                     mostrarDialogoIndicacion = false,
@@ -291,14 +303,23 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                     casillasAElegir = emptyList(),
 
                     bloquearDado = false,
-                    puedeSalir = true
+                    puedeSalir = true,
+
+                    movDestinoBifurcacion = null
                 )
             }
 
             coordinarDialogos("")
 
-            val movDestino = _uiState.value.casillasAElegir.find { it.casillaId == anteriorCasilla }!!
-            cF.confirmarDestinoCase(movDestino, casillaId)
+            cF.confirmarDestinoCase(movAux, casillaId) {
+                _uiState.update {
+                    it.copy(
+                        casillaEscaleraIni = casillaId,
+                        casillaEscaleraFin = _uiState.value.tablero.casillas[casillaId - 1].saltoA!! + 1,
+                    )
+                }
+                coordinarDialogos("Escalera")
+            }
         }
     }
 
@@ -507,12 +528,13 @@ data class PartidaUiState(
     val mostrarDialogoEscalera: Boolean = false,
     val casillaEscaleraIni: Int = 0,
     val casillaEscaleraFin: Int = 0,
+    val movCancelarEscalera: Movimiento? = null,
 
     val mostrarDialogoBifurcacion: Boolean = false,
     val casillaBifurcacionIni: Int = 0,
     val casillaA: Int = 0,
     val casillaB: Int = 0,
-
+    val movDestinoBifurcacion: Movimiento? = null,
 
     val mostrarDialogoPuntuacion: Boolean = false,
     val bloquearDado: Boolean = false,
