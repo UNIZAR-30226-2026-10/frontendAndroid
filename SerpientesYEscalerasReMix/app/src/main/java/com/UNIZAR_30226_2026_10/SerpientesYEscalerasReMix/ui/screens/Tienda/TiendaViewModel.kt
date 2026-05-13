@@ -75,6 +75,16 @@ class TiendaViewModel (private val cF: CaseFacade) : ViewModel() {
                     _uiState.value = TiendaUiState.Error("Usuario no ha iniciado sesión")
                     return@launch
                 }
+                val saldoActual = obtenerSaldoActual() ?: 0
+                if (saldoActual < producto.precio) {
+                    val estado = _uiState.value
+                    if (estado is TiendaUiState.Success) {
+                        _uiState.value = estado.copy(
+                            aviso = "Saldo insuficiente"
+                        )
+                    }
+                    return@launch
+                }
                 val exito = cF.comprarProductoCase(producto)
                 if (exito) {
                     // Refrescar la lista de productos y el saldo después de una compra exitosa
@@ -86,6 +96,13 @@ class TiendaViewModel (private val cF: CaseFacade) : ViewModel() {
                 _uiState.value = TiendaUiState.Error("Error al comprar el producto")
             }
 
+        }
+    }
+
+    fun limpiarAviso() {
+        val estado = _uiState.value
+        if (estado is TiendaUiState.Success && estado.aviso != null) {
+            _uiState.value = estado.copy(aviso = null)
         }
     }
 

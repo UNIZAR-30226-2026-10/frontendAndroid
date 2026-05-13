@@ -198,7 +198,13 @@ fun EditarMazoContent(
             }
 
             IconButton(
-                onClick = { mostrarSalida = true },
+                onClick = {
+                    if (editarState.hasChanges) {
+                        mostrarSalida = true
+                    } else {
+                        onSalir()
+                    }
+                },
                 modifier = Modifier
                     .offset(x = (-4).dp, y = 4.dp)
                     .size(36.dp)
@@ -215,7 +221,7 @@ fun EditarMazoContent(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        if (mostrarSalida) {
+        if (mostrarSalida && editarState.hasChanges) {
             AlertDialog(
                 onDismissRequest = { mostrarSalida = false },
                 title = {

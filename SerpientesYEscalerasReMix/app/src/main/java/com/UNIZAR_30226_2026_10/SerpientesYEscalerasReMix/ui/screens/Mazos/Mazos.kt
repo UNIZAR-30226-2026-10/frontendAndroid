@@ -2,6 +2,7 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Mazos
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +33,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_bg
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fondoTienda
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_sf
 import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.SETextTypes
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 import androidx.compose.foundation.lazy.grid.items
@@ -46,11 +48,16 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.longPres
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Mazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.DetallesCarta
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.AvisoJuego
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.ConfirmacionJuego
 
 @Composable
 fun MazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
 
     val state by viewModel.mazosUiState.collectAsState()
+    var mostrarMazoEnUso by remember { mutableStateOf(false) }
+    var mostrarMazoEnUsoEliminar by remember { mutableStateOf(false) }
+    var mostrarConfirmacionEliminar by remember { mutableStateOf(false) }
 
     when (val s = state) {
         is MazosUiState.Loading -> {
@@ -70,9 +77,17 @@ fun MazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
                     navController.navController.navigate(Destinos.EDITAR_MAZOS)
                 },
                 onEditarMazo = {
-                    navController.navController.navigate(Destinos.EDITAR_MAZOS)
+                    viewModel.comprobarMazoEditable(viewModel.mazoSeleccionado) { editable ->
+                        if (editable) {
+                            navController.navController.navigate(Destinos.EDITAR_MAZOS)
+                        } else {
+                            mostrarMazoEnUso = true
+                        }
+                    }
                 },
-                onEliminarMazoSeleccionado = viewModel::eliminarMazoSeleccionado
+                onEliminarMazoSeleccionado = {
+                    mostrarConfirmacionEliminar = true
+                }
             )
         }
         is MazosUiState.Error -> {
@@ -83,6 +98,38 @@ fun MazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
         }
     }
 
+    if (mostrarMazoEnUso) {
+        AvisoJuego(
+            titulo = "Mazo en uso",
+            mensaje = "No puedes editar un mazo activo en una partida",
+            onCerrar = { mostrarMazoEnUso = false }
+        )
+    }
+    if (mostrarMazoEnUsoEliminar) {
+        AvisoJuego(
+            titulo = "Mazo en uso",
+            mensaje = "No puedes eliminar un mazo activo en una partida",
+            onCerrar = { mostrarMazoEnUsoEliminar = false }
+        )
+    }
+    if (mostrarConfirmacionEliminar) {
+        val nombreMazo = viewModel.mazoSeleccionado.nombre
+        ConfirmacionJuego(
+            titulo = "Eliminar mazo",
+            mensaje = "Vas a eliminar el mazo $nombreMazo, esta accion no se puede deshacer",
+            textoCancelar = "Cancelar",
+            textoAceptar = "Aceptar",
+            onCancelar = { mostrarConfirmacionEliminar = false },
+            onAceptar = {
+                mostrarConfirmacionEliminar = false
+                viewModel.eliminarMazoSeleccionado { eliminado ->
+                    if (!eliminado) {
+                        mostrarMazoEnUsoEliminar = true
+                    }
+                }
+            }
+        )
+    }
 
 }
 @Composable

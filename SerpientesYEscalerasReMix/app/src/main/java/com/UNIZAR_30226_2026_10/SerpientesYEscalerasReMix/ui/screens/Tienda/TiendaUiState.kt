@@ -9,7 +9,8 @@ sealed class TiendaUiState {
     // Cuando los datos llegan correctamente
     data class Success(
         val productos: List<Producto>,
-        val saldo: Int
+        val saldo: Int,
+        val aviso: String? = null
     ) : TiendaUiState()
 
     // Si hay un error al cargar los datos

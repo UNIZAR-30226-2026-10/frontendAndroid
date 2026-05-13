@@ -227,14 +227,45 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
         }
     }
 
-    fun eliminarMazoSeleccionado() {
+    fun eliminarMazoSeleccionado(onResult: (Boolean) -> Unit) {
         if (mazos.isEmpty()) {
             mazoSeleccionado = mazoVacio
             return
         }
+        viewModelScope.launch {
+            try {
+                if (cF.email.value.isBlank()) {
+                    onResult(false)
+                    return@launch
+                }
+                val eliminado = cF.eliminarMazoCase(mazoSeleccionado.nombre)
+                if (eliminado) {
+                    mazos = mazos.filterNot { it == mazoSeleccionado }
+                    mazoSeleccionado = mazos.firstOrNull() ?: mazoVacio
+                    _mazoUiState.value = MazosUiState.Success(mazos)
+                    onResult(true)
+                } else {
+                    onResult(false)
+                }
+            } catch (e: Exception) {
+                onResult(false)
+            }
+        }
+    }
 
-        mazos = mazos.filterNot { it == mazoSeleccionado }
-        mazoSeleccionado = mazos.firstOrNull() ?: mazoVacio
+    fun comprobarMazoEditable(mazo: Mazo, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                if (cF.email.value.isBlank()) {
+                    onResult(false)
+                    return@launch
+                }
+                val exito = cF.editarMazoCase(mazo.nombre, mazo.nombre, mazo.cartas)
+                onResult(exito)
+            } catch (e: Exception) {
+                onResult(false)
+            }
+        }
     }
 
     fun guardarCambios(mazoAntiguo: Mazo, mazoNuevo: Mazo) {

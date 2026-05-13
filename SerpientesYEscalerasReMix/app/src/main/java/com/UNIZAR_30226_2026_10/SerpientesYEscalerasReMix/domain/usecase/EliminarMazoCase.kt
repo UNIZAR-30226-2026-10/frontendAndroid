@@ -7,7 +7,7 @@ class EliminarMazoCase(
     private val mazosRepository: MazosRepository,
     private val email: StateFlow<String>
 ) {
-    suspend operator fun invoke(id: String) {
-        mazosRepository.eliminarMazo(email.value, id)
+    suspend operator fun invoke(id: String): Boolean {
+        return mazosRepository.eliminarMazo(email.value, id)
     }
 }
