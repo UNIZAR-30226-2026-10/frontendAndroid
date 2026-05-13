@@ -46,10 +46,19 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
             launch { cF.username.collect { data -> _uiState.update { it.copy(username = data) } } }
             launch { cF.tablero.collect { data -> _uiState.update { it.copy(tablero = data) } } }
             launch { cF.fichas.collect { data -> _uiState.update { it.copy(fichas = data) } } }
-            launch { cF.jugadores.collect { data -> _uiState.update { it.copy( jugadores = data) } } }
+            launch { cF.jugadores.collect { data -> _uiState.update { it.copy(jugadores = data) } } }
             launch { cF.mano.collect { data -> _uiState.update { it.copy(mano = data.toMutableList()) } } }
             launch { cF.chat.collect { data -> _uiState.update { it.copy(chat = data) } } }
-            launch { cF.ganador.collect { data -> _uiState.update { it.copy(ganador = data, mostrarDialogoVictoria = data != "") } } }
+            launch {
+                cF.ganador.collect { data ->
+                    _uiState.update {
+                        it.copy(
+                            ganador = data,
+                            mostrarDialogoVictoria = data != ""
+                        )
+                    }
+                }
+            }
             launch { cF.noqueado.collect { data -> _uiState.update { it.copy(turnoNoqueado = data) } } }
         }
     }
@@ -72,14 +81,18 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                         val indiceTurno = estadoActual.jugadores.turno
 
                         // Comprobamos si el índice es válido para la lista actual
-                        val esRealmenteMiTurno = if (lista.isNotEmpty() && indiceTurno in lista.indices) {
-                            lista[indiceTurno].username == uiState.value.username
+                        val esRealmenteMiTurno =
+                            if (lista.isNotEmpty() && indiceTurno in lista.indices) {
+                                lista[indiceTurno].username == uiState.value.username
 
-                        } else {
-                            false
-                        }
+                            } else {
+                                false
+                            }
 
-                        estadoActual.copy(esMiTurno = esRealmenteMiTurno, bloquearDado = !esRealmenteMiTurno)
+                        estadoActual.copy(
+                            esMiTurno = esRealmenteMiTurno,
+                            bloquearDado = !esRealmenteMiTurno
+                        )
                     }
                 } catch (e: Exception) {
                     // Evita que el polling se rompa por un error de red
@@ -136,7 +149,7 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                     it.copy(mostrarDialogoPuntuacion = false)
                 }
 
-                if (puntuacionDado > 0 ) {
+                if (puntuacionDado > 0) {
 
                     // Eleccion de ficha
                     _uiState.update {
@@ -157,18 +170,31 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
     fun onSeleccionFicha(fichaId: Int) {
         viewModelScope.launch {
             // Eleccion de casilla
-            _uiState.update {
-                it.copy(
-                    mostrarDialogoIndicacion = true,
-                    indicacion = "Seleccione una casilla",
-                    seleccionFichas = false,
+            val casillasAElegirAux = cF.lanzarDadoCase(_uiState.value.casillasAElegir, fichaId)
 
-                    fichaSeleccionada = fichaId,
+            if (casillasAElegirAux.isEmpty()) {
+                _uiState.update {
+                    it.copy(
+                        mostrarDialogoIndicacion = true,
+                        indicacion = "Seleccione una ficha a mover",
 
-                    // Mostrar solo las casillas desde la ficha
-                    casillasAElegir = cF.lanzarDadoCase(it.casillasAElegir, fichaId),
-                    seleccionCasilla = true
-                )
+                        seleccionFichas = true
+                    )
+                }
+            } else {
+                _uiState.update {
+                    it.copy(
+                        mostrarDialogoIndicacion = true,
+                        indicacion = "Seleccione una casilla",
+                        seleccionFichas = false,
+
+                        fichaSeleccionada = fichaId,
+
+                        // Mostrar solo las casillas desde la ficha
+                        casillasAElegir = casillasAElegirAux,
+                        seleccionCasilla = true
+                    )
+                }
             }
         }
     }
@@ -440,8 +466,10 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                 if (cartaNombre == "Wild Frank" || cartaNombre == "Carpintero") "Seleccione otra casilla"
                 else ""
 
-            val mostrarDialogoIndicacionAux = cartaNombre == "Wild Frank" || cartaNombre == "Carpintero"
-            val seleccionCasillaCartaAux = cartaNombre == "Wild Frank" || cartaNombre == "Carpintero"
+            val mostrarDialogoIndicacionAux =
+                cartaNombre == "Wild Frank" || cartaNombre == "Carpintero"
+            val seleccionCasillaCartaAux =
+                cartaNombre == "Wild Frank" || cartaNombre == "Carpintero"
 
             val casillaIdAux =
                 if (cartaNombre == "Wild Frank" || cartaNombre == "Carpintero") casillaId
