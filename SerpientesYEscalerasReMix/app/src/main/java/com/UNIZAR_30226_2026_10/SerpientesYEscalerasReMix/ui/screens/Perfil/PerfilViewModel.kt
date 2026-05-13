@@ -57,7 +57,6 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
     }
 
     fun cargarPerfil() {
-        // FIX: guardia para evitar llamada de red si el email aún no está listo
         if (cF.email.value.isEmpty()) return
         viewModelScope.launch {
             cargando = true
@@ -73,25 +72,18 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
     }
 
     private fun cargarCosmeticosDisponibles() {
-        // FIX: una sola llamada que devuelve el mapa completo (4 peticiones en paralelo)
-        // en lugar de 4 llamadas individuales que internamente hacían 4 peticiones cada una (16 total)
         viewModelScope.launch {
             try {
                 val mapa = cF.obtenerCosmeticosCase.obtenerTodosLosCosmeticos()
-                val sE  = listOf("escalera_default") + (mapa[CategoriaCosmetico.ESCALERA] ?: emptyList())
-                val sS  = listOf("serpiente_default") + (mapa[CategoriaCosmetico.SERPIENTE] ?: emptyList())
-                val sF = listOf("ficha_default") + (mapa[CategoriaCosmetico.FICHA]     ?: emptyList())
-                val ic = listOf("icono_default") + (mapa[CategoriaCosmetico.ICONO]     ?: emptyList())
-                println("DEBUG: Escaleras recibidas: ${sE.size}")
-                // Sobreescribimos siempre para reflejar el estado real del servidor,
-                // incluso si viene vacío (el usuario no tiene cosméticos de esa categoría)
+                val sE  = mapa[CategoriaCosmetico.ESCALERA] ?: emptyList()
+                val sS  = mapa[CategoriaCosmetico.SERPIENTE] ?: emptyList()
+                val sF = mapa[CategoriaCosmetico.FICHA]     ?: emptyList()
+                val ic = mapa[CategoriaCosmetico.ICONO]     ?: emptyList()
                 skinsEscalera  = sE
                 skinsSerpiente = sS
                 skinsFicha     = sF
                 iconos         = ic
             } catch (e: Exception) {
-                // FIX: no sobreescribimos errorMessage si el perfil ya cargó bien,
-                // para no bloquear la pantalla por un fallo secundario de cosméticos
                 if (perfil == null) {
                     errorMessage = "Error al cargar cosméticos: ${e.message}"
                 }
@@ -119,7 +111,6 @@ class PerfilViewModel(val cF: CaseFacade) : ViewModel() {
             try {
                 val result = cF.actualizarSkinCase(categoria, skinId)
                 if (result.isSuccess) {
-                    // En lugar de solo hacer .copy(), pedimos los datos reales
                     cargarPerfil()
                     cargarCosmeticosDisponibles()
                 } else {
