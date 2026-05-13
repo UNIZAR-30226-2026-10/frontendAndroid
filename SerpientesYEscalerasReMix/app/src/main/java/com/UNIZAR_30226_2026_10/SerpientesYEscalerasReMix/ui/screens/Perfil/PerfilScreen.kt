@@ -44,7 +44,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CategoriaCosmetico
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.CategoriaCosmetico
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.LogoutBoton
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
@@ -503,11 +503,11 @@ fun obtenerImagenCosmetico(id: String, cat: CategoriaCosmetico): Int {
         "serpiente_futuro"   -> R.drawable.serpiente_futuro
         "serpiente_tribal"   -> R.drawable.serpiente_tribal
         "serpiente_default"  -> R.drawable.serpiente
-        "ficha_totem"        -> R.drawable.jugador_azul_totem
+        "ficha_totem"        -> R.drawable.jugador_verde_totem
         "ficha_esqueleto"    -> R.drawable.jugador_verde_calavera
         "ficha_aventurero"   -> R.drawable.jugador_verde_explorador
-        "ficha_moneda"       -> R.drawable.jugador_rojo_totem
-        "ficha_default"      -> R.drawable.jugador_rojo_totem
+        "ficha_moneda"       -> R.drawable.ficha_moneda
+        "ficha_default"      -> R.drawable.jugador_verde_explorador
         "escalera_default"   -> R.drawable.escalera
         "escalera_estratega" -> R.drawable.escalera_estratega
         "escalera_jungla"    -> R.drawable.escalera_jungla
@@ -517,7 +517,7 @@ fun obtenerImagenCosmetico(id: String, cat: CategoriaCosmetico): Int {
         else -> when (cat) {
             CategoriaCosmetico.ICONO     -> R.drawable.icono_jugador_default
             CategoriaCosmetico.SERPIENTE -> R.drawable.serpiente
-            CategoriaCosmetico.FICHA     -> R.drawable.jugador_rojo_totem
+            CategoriaCosmetico.FICHA     -> R.drawable.jugador_verde_explorador
             CategoriaCosmetico.ESCALERA  -> R.drawable.escalera
         }
     }
