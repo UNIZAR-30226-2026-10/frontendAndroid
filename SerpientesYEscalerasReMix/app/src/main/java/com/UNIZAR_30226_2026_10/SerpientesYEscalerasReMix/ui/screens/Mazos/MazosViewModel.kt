@@ -193,6 +193,8 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
 
     fun anadirCartaAMazoSeleccionado(carta: Carta) {
         if (mazoSeleccionado.cartas.size >= 10) return
+        val cartasIguales = mazoSeleccionado.cartas.count { it.nombre == carta.nombre }
+        if (cartasIguales >= 2) return
         val nuevasCartas = mazoSeleccionado.cartas + carta
         mazoSeleccionado = mazoSeleccionado.copy(cartas = nuevasCartas)
         actualizarMazoEnLista(mazoSeleccionado)
@@ -289,7 +291,7 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
                 Log.d("MazosViewModel", "Resultado de editarMazoCase: $exito")
                 if (exito) {
                     mazoSeleccionado = mazoNuevo.copy(cartas = mazoNuevo.cartas.toList())
-                    actualizarMazoEnLista(mazoSeleccionado)
+                    actualizarMazoEnListaPorNombre(mazoAntiguo.nombre, mazoSeleccionado)
                     actualizarEstadoGuardado()
                     if (esNuevo) {
                         fetchMazos()
@@ -340,6 +342,16 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
     }
     private fun actualizarMazoEnLista(mazo: Mazo) {
         mazos = mazos.map { if (it == mazoSeleccionado) mazo else it }
+    }
+
+    private fun actualizarMazoEnListaPorNombre(nombreAnterior: String, mazo: Mazo) {
+        mazos = mazos.map { actual ->
+            if (actual.nombre == nombreAnterior) {
+                mazo
+            } else {
+                actual
+            }
+        }
     }
 
 

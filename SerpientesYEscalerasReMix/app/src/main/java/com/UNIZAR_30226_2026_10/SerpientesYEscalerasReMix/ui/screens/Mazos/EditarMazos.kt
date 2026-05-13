@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -331,25 +332,32 @@ fun EditarMazoContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxWidth()
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 12.dp)
         ) {
-            cartasDisponibles.chunked(5).forEach { fila ->
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    fila.forEach { carta ->
-                        CartaDisponibleItem(
-                            carta = carta,
-                            habilitado = !mazoCompleto,
-                            onAdd = { onAnadirCarta(carta) },
-                            onLongPress = { cartaDetalle = carta }
-                        )
-                    }
-                    repeat(5 - fila.size) {
-                        Spacer(modifier = Modifier.width(80.dp))
+            val separacion = 24.dp
+            val itemWidth = (maxWidth - separacion * 4) / 5 * 0.8f
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                cartasDisponibles.chunked(6).forEach { fila ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(separacion),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        fila.forEach { carta ->
+                            val limiteDuplicadas = mazoAEditar.cartas.count { it.nombre == carta.nombre } >= 2
+                            CartaDisponibleItem(
+                                carta = carta,
+                                habilitado = !mazoCompleto && !limiteDuplicadas,
+                                onAdd = { onAnadirCarta(carta) },
+                                onLongPress = { cartaDetalle = carta },
+                                modifier = Modifier.width(itemWidth)
+                            )
+                        }
+                        repeat(5 - fila.size) {
+                            Spacer(modifier = Modifier.width(itemWidth))
+                        }
                     }
                 }
             }
@@ -416,13 +424,17 @@ private fun CartaDisponibleItem(
     carta: Carta,
     habilitado: Boolean,
     onAdd: () -> Unit,
-    onLongPress: () -> Unit
+    onLongPress: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         CartaImagen(
             carta = carta,
             modifier = Modifier
-                .width(80.dp)
+                .fillMaxWidth()
                 .aspectRatio(0.7f)
                 .longPressAfter(1000L, onLongPress)
         )
