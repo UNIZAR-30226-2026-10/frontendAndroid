@@ -15,6 +15,8 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Conti
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Crear.JugarCrearScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Jugar_Crear.JugarCrearViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Login.LoginScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Logros.LogrosScreen
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Logros.LogrosViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Login.LoginViewModel
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.LogrosScreen
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Mazos.MazosScreen
@@ -124,7 +126,10 @@ fun NavGraphBuilder.navGraph(navController: SENavHostController, snackHost: Snac
     }
 
     composable(Destinos.LOGROS) {
-        LogrosScreen(navController)
+        val logrosViewModel: LogrosViewModel = viewModel(
+            factory = LogrosViewModel.Factory(cF)
+        )
+        LogrosScreen(navController, logrosViewModel)
     }
 
     composable(Destinos.TIENDA) {
