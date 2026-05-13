@@ -97,6 +97,10 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
         }
     }
 
+    fun refreshMazos() {
+        fetchMazos()
+    }
+
     // Métodos de interacción con el Lobby
     fun onCambiarListo(listo: Boolean) {
         viewModelScope.launch {

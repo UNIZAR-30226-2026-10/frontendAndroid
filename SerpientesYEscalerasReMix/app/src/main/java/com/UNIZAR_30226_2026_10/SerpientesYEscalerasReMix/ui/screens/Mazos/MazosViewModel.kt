@@ -59,8 +59,12 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
         viewModelScope.launch {
             cF.email.collectLatest { email ->
                 if (email.isNotBlank()) {
-                    fetchMazos()
-                    fetchCartasDisponibles()
+                    if (mazos.isEmpty() || mazos == listaDeMazosDePrueba) {
+                        fetchMazos()
+                    }
+                    if (_editarMazoUiState.value is EditarMazoUiState.Loading) {
+                        fetchCartasDisponibles()
+                    }
                 }
             }
         }
@@ -79,10 +83,16 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
                 Log.e("TiendaViewModel", "Error al obtener mazos, usando lista de mazos vacía: ${e.message}")
                 emptyList<Mazo>()
             }
+            if (mazos.isEmpty()) {
+                this.mazos = emptyList()
+                mazoSeleccionado = mazoVacio
+                _mazoUiState.value = MazosUiState.Success(emptyList())
+                return
+            }
             this.mazos = mazos
             mazoSeleccionado = mazos.firstOrNull { it.nombre == nombreSeleccionado }
                 ?: mazos.firstOrNull()
-                        ?: mazoVacio
+                ?: mazoVacio
             _mazoUiState.value = MazosUiState.Success(mazos)
         } catch (e: Exception) {
             _mazoUiState.value = MazosUiState.Error("No se pudo conectar con el servidor")
@@ -107,10 +117,12 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
                 mazoOriginal = mazoOriginal,
                 mazo = mazoSeleccionado,
                 cartasDisponibles = cartasDisponibles,
+                esNuevoMazo = mazoSeleccionado == mazoVacio,
                 hasChanges = false,
                 saveSuccess = false,
                 saving = false
             )
+            Log.d("MazosViewModel", "fetchCartasDisponibles -> esNuevoMazo=${mazoSeleccionado == mazoVacio} mazo=${mazoSeleccionado.nombre}")
         } catch (e: Exception) {
             _editarMazoUiState.value = EditarMazoUiState.Error("No se pudo conectar con el servidor")
         }
@@ -146,10 +158,12 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
             _editarMazoUiState.value = current.copy(
                 mazoOriginal = original,
                 mazo = mazoSeleccionado,
+                esNuevoMazo = current.esNuevoMazo,
                 hasChanges = false,
                 saveSuccess = false,
                 saving = false
             )
+            Log.d("MazosViewModel", "fijarMazoOriginalActual -> esNuevoMazo=${mazoSeleccionado == mazoVacio} mazo=${mazoSeleccionado.nombre}")
         }
     }
 
@@ -161,10 +175,12 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
             _editarMazoUiState.value = current.copy(
                 mazoOriginal = mazoSeleccionado,
                 mazo = mazoSeleccionado,
+                esNuevoMazo = current.esNuevoMazo,
                 hasChanges = false,
                 saveSuccess = false,
                 saving = false
             )
+            Log.d("MazosViewModel", "cancelarEdicion -> esNuevoMazo=${mazoSeleccionado == mazoVacio} mazo=${mazoSeleccionado.nombre}")
         }
     }
 
@@ -196,6 +212,19 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
         val nuevoMazo = mazoVacio.copy(nombre = "Mazo ${mazos.size + 1}")
         mazos = mazos + nuevoMazo
         mazoSeleccionado = nuevoMazo
+        Log.d("MazosViewModel", "crearNuevoMazo -> nombre=${nuevoMazo.nombre} cartas=${nuevoMazo.cartas.size}")
+        val current = _editarMazoUiState.value
+        if (current is EditarMazoUiState.Success) {
+            _editarMazoUiState.value = current.copy(
+                mazoOriginal = nuevoMazo.copy(cartas = nuevoMazo.cartas.toList()),
+                mazo = nuevoMazo,
+                esNuevoMazo = true,
+                hasChanges = false,
+                saveSuccess = false,
+                saving = false
+            )
+            Log.d("MazosViewModel", "crearNuevoMazo -> set esNuevoMazo=true")
+        }
     }
 
     fun eliminarMazoSeleccionado() {
@@ -217,12 +246,23 @@ class MazosViewModel(private val cF: CaseFacade) : ViewModel() {
                 }
                 Log.d("MazosViewModel", "Guardando cambios del mazo: ${mazoAntiguo.nombre} -> ${mazoNuevo.nombre}")
                 actualizarEstadoGuardando(true)
-                val exito = cF.editarMazoCase(mazoAntiguo.nombre, mazoNuevo.nombre, mazoNuevo.cartas, mazoAntiguo.cartas)
+                val esNuevo = (_editarMazoUiState.value as? EditarMazoUiState.Success)?.esNuevoMazo == true
+                Log.d("MazosViewModel", "guardarCambios -> esNuevoMazo=$esNuevo")
+                val exito = if (esNuevo) {
+                    Log.d("MazosViewModel", "guardarCambios -> creando mazo")
+                    cF.crearMazoCase(mazoNuevo)
+                } else {
+                    Log.d("MazosViewModel", "guardarCambios -> editando mazo")
+                    cF.editarMazoCase(mazoAntiguo.nombre, mazoNuevo.nombre, mazoNuevo.cartas)
+                }
                 Log.d("MazosViewModel", "Resultado de editarMazoCase: $exito")
                 if (exito) {
-                    // Refrescar la lista de mazos después de una edición exitosa para asegurarnos de que se reflejen los cambios realizados
-                    fetchMazos()
+                    mazoSeleccionado = mazoNuevo.copy(cartas = mazoNuevo.cartas.toList())
+                    actualizarMazoEnLista(mazoSeleccionado)
                     actualizarEstadoGuardado()
+                    if (esNuevo) {
+                        fetchMazos()
+                    }
                 }
             } catch (e: Exception) {
                 _editarMazoUiState.value = EditarMazoUiState.Error("Error al guardar los cambios del mazo")

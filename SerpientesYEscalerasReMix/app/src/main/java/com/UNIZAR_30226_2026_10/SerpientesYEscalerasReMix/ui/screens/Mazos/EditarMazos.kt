@@ -64,6 +64,7 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.components.longPres
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Mazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_primary
+import android.util.Log
 
 @Composable
 fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewModel) {
@@ -80,6 +81,7 @@ fun EditarMazosScreen(navController: SENavHostController, viewModel: MazosViewMo
 
         is EditarMazoUiState.Success -> {
             androidx.compose.runtime.LaunchedEffect(s.mazo) {
+                Log.d("EditarMazos", "LaunchedEffect mazo=${s.mazo.nombre} esNuevoMazo=${s.esNuevoMazo}")
                 viewModel.fijarMazoOriginalActual()
             }
             // Mostrar los mazos
@@ -167,6 +169,7 @@ fun EditarMazoContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                Log.d("EditarMazos", "Render boton: esNuevoMazo=${editarState.esNuevoMazo} saving=${editarState.saving} hasChanges=${editarState.hasChanges} saveSuccess=${editarState.saveSuccess}")
                 if (editarState.saving) {
                     Text(
                         text = "Guardando...",
@@ -180,8 +183,9 @@ fun EditarMazoContent(
                         color = color_text
                     )
                 } else {
+                    val label = if (editarState.esNuevoMazo) "Guardar mazo" else "Guardar cambios"
                     Text(
-                        text = "Guardar cambios",
+                        text = label,
                         style = SETextTypes.plano,
                         color = Color.White,
                         modifier = Modifier

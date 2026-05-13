@@ -13,7 +13,7 @@ interface MazosRepository {
     // Elimina el mazo con el id dado, si no existe no hace nada
     suspend fun eliminarMazo(email: String, id: String) : Boolean
     // Edita el mazo con el id dado, cambiando su nombre y/o su lista de cartas, si no existe no hace nada
-    suspend fun editarMazo(email: String, id: String, nuevoNombre: String?, nuevasCartas: List<Carta>?, eliminarCartas: List<Carta>?): Boolean
+    suspend fun editarMazo(email: String, id: String, nuevoNombre: String?, cartas: List<Carta>?): Boolean
     // Devuelve la lista de cartas disponibles para añadir a los mazos
     suspend fun getCartasDisponibles(email: String) : List<Carta>
 }

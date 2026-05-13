@@ -8,7 +8,7 @@ class EditarMazoCase(
     private val mazosRepository: MazosRepository,
     private val email: StateFlow<String>
 ) {
-    suspend operator fun invoke(id: String, nuevoNombre: String?, nuevasCartas: List<Carta>?, eliminarCartas: List<Carta>?): Boolean {
-        return mazosRepository.editarMazo(email.value, id, nuevoNombre, nuevasCartas, eliminarCartas)
+    suspend operator fun invoke(id: String, nuevoNombre: String?, cartas: List<Carta>?): Boolean {
+        return mazosRepository.editarMazo(email.value, id, nuevoNombre, cartas)
     }
 }

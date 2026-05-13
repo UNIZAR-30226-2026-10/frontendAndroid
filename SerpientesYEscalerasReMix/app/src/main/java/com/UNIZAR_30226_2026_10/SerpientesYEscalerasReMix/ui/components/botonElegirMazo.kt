@@ -42,7 +42,12 @@ import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_text
 import kotlinx.coroutines.flow.Flow
 
 @Composable
-fun MazoElegirBoton(mazos: List<Mazo>, nombreMazoFlow: Flow<String>, onClick: (String) -> Unit) {
+fun MazoElegirBoton(
+    mazos: List<Mazo>,
+    nombreMazoFlow: Flow<String>,
+    onClick: (String) -> Unit,
+    onOpen: () -> Unit
+) {
     var showDialog by remember { mutableStateOf(false) }
     val nombreMazo by nombreMazoFlow.collectAsState(initial = "")
 
@@ -105,7 +110,10 @@ fun MazoElegirBoton(mazos: List<Mazo>, nombreMazoFlow: Flow<String>, onClick: (S
         shape = RoundedCornerShape(10.dp),
         border = BorderStroke(2.dp, color_primary), // Borde amarillo grueso
         shadowElevation = 8.dp,
-        onClick = { showDialog = true }
+        onClick = {
+            onOpen()
+            showDialog = true
+        }
     ) {
         Box(
             modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),

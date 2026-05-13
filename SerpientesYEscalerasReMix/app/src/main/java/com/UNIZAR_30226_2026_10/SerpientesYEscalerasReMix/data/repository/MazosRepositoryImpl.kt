@@ -75,12 +75,11 @@ class MazosRepositoryImpl(
         email: String,
         id: String,
         nuevoNombre: String?,
-        nuevasCartas: List<Carta>?,
-        eliminarCartas: List<Carta>?
+        cartas: List<Carta>?
     ): Boolean {
         // Llamada a la API para editar el mazo con el id dado, cambiando su nombre y/o su lista de cartas
-        Log.d("MazosRepositoryImpl", "Editar mazo: id=$id, nuevoNombre=$nuevoNombre, nuevasCartas=${nuevasCartas?.map { it.nombre }}, eliminarCartas=${eliminarCartas?.map { it.nombre }}")
-        val nuevasCartasDto = nuevasCartas?.map { carta ->
+        Log.d("MazosRepositoryImpl", "Editar mazo: id=$id, nuevoNombre=$nuevoNombre, cartas=${cartas?.map { it.nombre }}")
+        val cartasDto = cartas?.map { carta ->
             CartaDto(
                 nombre = carta.nombre,
                 calidad = carta.calidad.toString(),
@@ -88,16 +87,8 @@ class MazosRepositoryImpl(
                 descripcion = carta.descripcion
             )
         }
-        val eliminarCartasDto = eliminarCartas?.map { carta ->
-            CartaDto(
-                nombre = carta.nombre,
-                calidad = carta.calidad.toString(),
-                tipo = carta.tipo.toString(),
-                descripcion = carta.descripcion
-            )
-        }
-        Log.d("MazosRepositoryImpl", "email: ${email}, id: ${id}, nuevoNombre: ${nuevoNombre}, Nuevas cartas DTO: ${nuevasCartasDto?.map { it.nombre }}, Eliminar cartas DTO: ${eliminarCartasDto?.map { it.nombre }}")
-        val response = apiService.editarMazo(email, id, EditarMazoRequest(nuevoNombre, nuevasCartasDto, eliminarCartasDto))
+        Log.d("MazosRepositoryImpl", "email: ${email}, id: ${id}, nuevoNombre: ${nuevoNombre}, Cartas DTO: ${cartasDto?.map { it.nombre }}")
+        val response = apiService.editarMazo(email, id, EditarMazoRequest(nuevoNombre, cartasDto))
         Log.d("MazosRepositoryImpl", "Respuesta editarMazo: ${response.code()}, ${response.message()}")
         if (!response.isSuccessful) {
             throw IllegalStateException("Error editarMazo: ${response.code()}")

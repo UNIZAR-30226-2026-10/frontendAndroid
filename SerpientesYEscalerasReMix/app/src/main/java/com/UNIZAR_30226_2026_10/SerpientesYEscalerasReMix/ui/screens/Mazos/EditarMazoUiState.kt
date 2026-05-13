@@ -12,6 +12,7 @@ sealed class EditarMazoUiState {
         val mazoOriginal: Mazo,
         val mazo: Mazo,
         val cartasDisponibles: List<Carta>,
+        val esNuevoMazo: Boolean = false,
         val hasChanges: Boolean = false,
         val saveSuccess: Boolean = false,
         val saving: Boolean = false
