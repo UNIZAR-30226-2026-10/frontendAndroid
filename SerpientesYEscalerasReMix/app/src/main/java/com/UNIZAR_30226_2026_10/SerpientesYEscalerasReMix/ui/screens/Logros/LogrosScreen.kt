@@ -2,7 +2,6 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.screens.Logros
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -25,11 +25,8 @@ fun LogrosScreen(SEState: SENavHostController, viewModel: LogrosViewModel) {
     val listaDeLogros = viewModel.logros
     val estaCargando = viewModel.cargando
     val error = viewModel.errorMessage
-
-    // NUEVO: Observamos el error de reclamar
     val errorReclamar = viewModel.errorReclamar
 
-    // NUEVO: Mostramos un pop-up si hay error al reclamar
     if (errorReclamar != null) {
         AlertDialog(
             onDismissRequest = { viewModel.limpiarErrorReclamar() },
@@ -92,74 +89,98 @@ fun TarjetaLogro(logro: LogroUsuario, onReclamar: (String) -> Unit) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            verticalAlignment = Alignment.Top
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            // Columna izquierda — info del logro
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = if (logro.recompensaReclamada) "${logro.nombre} (Reclamado)" else logro.nombre,
+                    text = logro.nombre,
                     style = SETextTypes.titulo,
                     color = color_text
                 )
-
-                Text(text = "Descripción:", style = SETextTypes.seleccionable, modifier = Modifier.padding(vertical = 4.dp))
-                Text(text = logro.descripcion, style = SETextTypes.plano)
-
-                Text(text = "Progreso:", style = SETextTypes.seleccionable, modifier = Modifier.padding(vertical = 4.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "(${logro.progresoActual}/${logro.progresoObjetivo})",
-                    style = if (logro.esCompletado) SETextTypes.sombreado else SETextTypes.plano
+                    text = logro.descripcion,
+                    style = SETextTypes.plano,
+                    color = color_text
                 )
-
-                if (logro.esCompletado && !logro.recompensaReclamada) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(
-                        onClick = { onReclamar(logro.id) },
-                        colors = ButtonDefaults.buttonColors(containerColor = color_primary)
-                    ){
-                        Text("Reclamar", color = color_secondary)
-                    }
-                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Progreso: ${logro.progresoActual}/${logro.progresoObjetivo}",
+                    style = SETextTypes.plano,
+                    color = color_text
+                )
             }
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // --- BLOQUE DE RECOMPENSA CORREGIDO ---
-            Column(
-                modifier = Modifier.width(100.dp), // Aumentado un poco para que quepa bien el texto
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = "Recompensa", style = SETextTypes.seleccionable, modifier = Modifier.padding(8.dp))
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // 1. Mostramos la IMAGEN (Corona, Carta o Escalera)
-                if (logro.imagen != 0) {
-                    Box(
-                        modifier = Modifier
-                            .width(90.dp)
-                            .aspectRatio(1f)
-                    ) {
-                        Image(
-                            painter = painterResource(id = logro.imagen),
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Fit
+            // Columna derecha — estado/recompensa
+            Column(horizontalAlignment = Alignment.End) {
+                when {
+                    logro.recompensaReclamada -> {
+                        Text(
+                            text = "¡Reclamado!",
+                            style = SETextTypes.plano,
+                            color = color_fichas_verdes
                         )
                     }
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // 2. Mostramos el TEXTO debajo (si existe valorRecompensa como "200 SEP")
-                if (logro.valorRecompensa.isNotEmpty() && logro.valorRecompensa != "null") {
-                    Text(
-                        text = logro.valorRecompensa, // Aquí ya viene "200 SEP" desde el UseCase
-                        style = SETextTypes.plano,
-                        textAlign = TextAlign.Center
-                    )
-                } else if (logro.imagen == 0 && logro.tipoRecompensa == "Carta") {
-                    Text(text = "Carta", style = SETextTypes.plano)
+                    logro.esCompletado -> {
+                        // Imagen de recompensa si existe
+                        if (logro.imagen != 0) {
+                            Image(
+                                painter = painterResource(id = logro.imagen),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(70.dp)
+                                    .aspectRatio(1f),
+                                contentScale = ContentScale.Fit
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+                        // Texto de recompensa si existe (ej: "2000 SEP")
+                        if (logro.valorRecompensa.isNotEmpty()) {
+                            Text(
+                                text = logro.valorRecompensa,
+                                style = SETextTypes.plano,
+                                color = color_text,
+                                textAlign = TextAlign.End
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+                        Button(
+                            onClick = { onReclamar(logro.id) },
+                            colors = ButtonDefaults.buttonColors(containerColor = color_fichas_verdes)
+                        ) {
+                            Text("Reclamar", color = color_text)
+                        }
+                    }
+                    else -> {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            if (logro.imagen != 0) {
+                                Image(
+                                    painter = painterResource(id = logro.imagen),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(70.dp)
+                                        .aspectRatio(1f),
+                                    contentScale = ContentScale.Fit
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                            }
+                            if (logro.valorRecompensa.isNotEmpty()) {
+                                Text(
+                                    text = logro.valorRecompensa,
+                                    style = SETextTypes.plano,
+                                    color = color_text,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
