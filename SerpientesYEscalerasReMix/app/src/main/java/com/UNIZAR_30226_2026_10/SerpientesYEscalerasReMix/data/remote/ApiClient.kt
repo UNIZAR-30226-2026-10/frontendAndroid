@@ -2,9 +2,18 @@ package com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote
 
 import android.content.Context
 import android.util.Log
-import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.ComprarProductoRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.CartaDto
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.CartasDisponiblesResponseDto
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ComprarProductoRequest
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.MazoDto
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.MazosResponseDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.ProductoDto
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.SaldoDto
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.*
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.LogroDTO
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.StatsDTO
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.LogrosReclamadosDTO
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.model.LogrosReply
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.AceptarInvitacionRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarEscaleraRequest
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.data.remote.message_model.ActualizarFichaRequest
@@ -47,6 +56,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.HTTP
 import retrofit2.http.POST
@@ -179,6 +189,42 @@ interface ApiService {
         @Path("email") email: String
     ): Response<SaldoDto>
 
+    // FUNCIONES MAZOS
+    @GET("users/{email}/decks")
+    suspend fun getMazos(
+        @Path("email") email: String
+    ) : Response<MazosResponseDto>
+
+    @GET("users/{email}/decks/{id}/cards")
+    suspend fun getCartasMazo(
+        @Path("email") email: String,
+        @Path("id") id: String
+    ) : Response<List<CartaDto>>
+
+    @POST("users/{email}/decks")
+    suspend fun crearMazo(
+        @Path("email") email: String,
+        @Body nuevoMazo: MazoDto
+    ) : Response<Unit>
+
+    @DELETE("users/{email}/decks/{id}")
+    suspend fun eliminarMazo(
+        @Path("email") email: String,
+        @Path("id") id: String
+    ) : Response<Unit>
+
+    @PUT("users/{email}/decks/{id}")
+    suspend fun editarMazo(
+        @Path("email") email: String,
+        @Path("id") id: String,
+        @Body request: EditarMazoRequest
+    ) : Response<Unit>
+
+    @GET("users/{email}/cards")
+    suspend fun getCartasDisponibles(
+        @Path("email") email: String
+    ) : Response<CartasDisponiblesResponseDto>
+
     // FUNCIONES PERFIL
 
     @GET("users/{email}/profile")
@@ -211,8 +257,23 @@ interface ApiService {
     suspend fun getUserSnakes(@Path("email") email: String): Response<SerpientesReply>
 
     @GET("users/{email}/stairs")
-    suspend fun getUserStairs(@Path("email") email: String): Response<EscalerasReply>
+    suspend fun getUserStairs(
+        @Path("email") email: String
+    ): Response<EscalerasReply>
 
+    // FUNCIONES LOGROS
+
+    @GET("achievements")
+    suspend fun getAllAchievements(): Response<LogrosReply>
+
+    @GET("users/{email}/stats")
+    suspend fun getUserStats(@Path("email") email: String): Response<StatsDTO>
+
+    @GET("users/{email}/achievements")
+    suspend fun getClaimedAchievements(@Path("email") email: String): Response<LogrosReclamadosDTO>
+
+    @POST("users/{email}/achievements")
+    suspend fun claimAchievement(@Path("email") email: String, @Body body: Map<String, String>): Response<Unit>
 }
 
 object ApiClient {
@@ -263,7 +324,7 @@ object ApiClient {
 
         // Cliente OKHttp
         val okHttpClient = OkHttpClient.Builder()
-            //.protocols(listOf(okhttp3.Protocol.HTTP_1_1)) // TODO ELIMINAR ESTA LINEA CUANDO NO SE TRABAJE EN LOCAL 192.168.1.36
+            // .protocols(listOf(okhttp3.Protocol.HTTP_1_1)) // TODO ELIMINAR ESTA LINEA CUANDO NO SE TRABAJE EN LOCAL 192.168.1.36
             .addInterceptor(forceInsecureInterceptor)
             .addNetworkInterceptor(loggingInterceptor)
             .cookieJar(cookieJar)

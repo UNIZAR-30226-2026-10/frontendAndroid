@@ -57,7 +57,3 @@ private val PRODUCTO_IMAGE_MAP = mapOf(
     "serpiente_futuro" to R.drawable.serpiente_futuro,
     "escalera_jungla" to R.drawable.escalera_jungla
 )
-
-data class ComprarProductoRequest(
-    @SerializedName("cosmetic_name") val nombreCosmetico: String
-)

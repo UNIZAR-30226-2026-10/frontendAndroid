@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Lobby
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.Mazo
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.usecase.CaseFacade
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -47,6 +48,7 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
                     }
                 }
             }
+            launch { cF.email.collect { fetchMazos() } }
         }
         obtenerTableros()
     }
@@ -82,6 +84,21 @@ class JugarCrearViewModel(private val cF: CaseFacade) : ViewModel() {
             val boards = cF.obtenerTablerosCase()
             _uiState.update { it.copy(nombreTableros = boards) }
         }
+    }
+
+    private fun fetchMazos() {
+        viewModelScope.launch {
+            val mazos = try {
+                cF.obtenerMazosCase()
+            } catch (e: Exception) {
+                emptyList<Mazo>()
+            }
+            _uiState.update { it.copy(mazos = mazos) }
+        }
+    }
+
+    fun refreshMazos() {
+        fetchMazos()
     }
 
     // Métodos de interacción con el Lobby
@@ -140,5 +157,6 @@ data class JugarCrearUiState(
     val vistaLider: Boolean = false,
     val username: String = "",
     val seleccionTablero: String = "",
-    val nombreTableros: List<String> = emptyList()
+    val nombreTableros: List<String> = emptyList(),
+    val mazos: List<Mazo> = emptyList()
 )
