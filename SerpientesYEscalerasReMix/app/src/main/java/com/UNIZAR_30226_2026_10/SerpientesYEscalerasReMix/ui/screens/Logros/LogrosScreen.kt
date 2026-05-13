@@ -118,44 +118,48 @@ fun TarjetaLogro(logro: LogroUsuario, onReclamar: (String) -> Unit) {
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Columna derecha — estado/recompensa
-            Column(horizontalAlignment = Alignment.End) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.width(150.dp)) {
                 when {
                     logro.recompensaReclamada -> {
-                        Text(
-                            text = "¡Reclamado!",
-                            style = SETextTypes.plano,
-                            color = color_fichas_verdes
-                        )
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = "¡Reclamado!",
+                                style = SETextTypes.plano,
+                                color = color_fichas_verdes,
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
                     logro.esCompletado -> {
-                        // Imagen de recompensa si existe
-                        if (logro.imagen != 0) {
-                            Image(
-                                painter = painterResource(id = logro.imagen),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(70.dp)
-                                    .aspectRatio(1f),
-                                contentScale = ContentScale.Fit
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                        }
-                        // Texto de recompensa si existe (ej: "2000 SEP")
-                        if (logro.valorRecompensa.isNotEmpty()) {
-                            Text(
-                                text = logro.valorRecompensa,
-                                style = SETextTypes.plano,
-                                color = color_text,
-                                textAlign = TextAlign.End
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                        }
-                        Button(
-                            onClick = { onReclamar(logro.id) },
-                            colors = ButtonDefaults.buttonColors(containerColor = color_fichas_verdes)
-                        ) {
-                            Text("Reclamar", color = color_text)
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            if (logro.imagen != 0) {
+                                Image(
+                                    painter = painterResource(id = logro.imagen),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(70.dp)
+                                        .aspectRatio(1f),
+                                    contentScale = ContentScale.Fit
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                            }
+                            if (logro.valorRecompensa.isNotEmpty()) {
+                                Text(
+                                    text = logro.valorRecompensa,
+                                    style = SETextTypes.plano,
+                                    color = color_text,
+                                    textAlign = TextAlign.Center
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                            }
+                            Button(
+                                onClick = { onReclamar(logro.id) },
+                                colors = ButtonDefaults.buttonColors(containerColor = color_fichas_verdes)
+                            ) {
+                                Text("Reclamar", color = color_text)
+                            }
                         }
                     }
                     else -> {
