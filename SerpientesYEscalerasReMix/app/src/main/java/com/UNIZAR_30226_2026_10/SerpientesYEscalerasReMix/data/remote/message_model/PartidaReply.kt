@@ -17,7 +17,7 @@ data class PartidaReply(
     @SerializedName("tableroInicialNombre")
     val tableroInicialNombre: String,
     @SerializedName("ganador")
-    val ganador: String?,
+    val ganador: Ganador?,
     @SerializedName("partidaJugadores")
     val partidaJugadores: List<PartidaJugadore>,
     @SerializedName("chat")

@@ -242,7 +242,9 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
 
         _chat.value = reply.chat.map { it.toDomain() }
 
-        _ganador.value = reply.ganador ?: ""
+        _ganador.value =
+            if (reply.ganador != null) reply.ganador!!.nombre
+            else ""
     }
 
     // --- Mapeos toDomain ---
