@@ -80,7 +80,7 @@ fun DialogoEscalera(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            "SÍ, SUBIR",
+                            "SÍ",
                             style = SETextTypes.plano.copy(color = androidx.compose.ui.graphics.Color.White)
                         )
                     }
@@ -93,7 +93,7 @@ fun DialogoEscalera(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            "NO, QUEDARME",
+                            "NO",
                             style = SETextTypes.plano.copy(color = androidx.compose.ui.graphics.Color.White)
                         )
                     }

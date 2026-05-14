@@ -17,6 +17,7 @@ interface PartidaRepository {
     val mano: StateFlow<List<Carta?>>
     val chat: StateFlow<List<MsgChat>>
     val ganador: StateFlow<String>
+    val noqueado: StateFlow<Boolean>
 
 
     // Modificar Flujos desde el exterior
@@ -30,7 +31,7 @@ interface PartidaRepository {
     // Devuelve las casillas posibles y la puntuacion del dado
     suspend fun lanzarDado(matchId: String, username: String): Pair<Int, List<Movimiento>>
 
-    suspend fun confirmarMovimiento(matchId: String, username: String, fichaId: Int, destinoId: Int, pasosRestantes: Int?)
+    suspend fun confirmarMovimiento(matchId: String, username: String, fichaId: Int, destinoId: Int, pasosRestantes: Int?, esBifurcacion: Boolean): Boolean
     suspend fun jugarCarta(matchId: String, username: String, cartaId: String, target: String?, inicio: Int?, fin: Int?)
     suspend fun recibirChat(matchId: String, username: String)
     suspend fun enviarMensaje(matchId: String, mensaje: MsgChat)

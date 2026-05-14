@@ -40,6 +40,7 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
     private val _mano = MutableStateFlow<List<Carta?>>(emptyList())
     private val _chat = MutableStateFlow<List<MsgChat>>(emptyList())
     private val _ganador = MutableStateFlow("")
+    private val _noqueado = MutableStateFlow(false)
 
 
     override val matchId = _matchId.asStateFlow()
@@ -49,11 +50,12 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
     override val mano = _mano.asStateFlow()
     override val chat = _chat.asStateFlow()
     override val ganador = _ganador.asStateFlow()
+    override val noqueado = _noqueado.asStateFlow()
 
     private val playerColors = listOf(
-        color_fichas_rojas, 
-        color_fichas_azules, 
-        color_fichas_verdes, 
+        color_fichas_rojas,
+        color_fichas_azules,
+        color_fichas_verdes,
         color_fichas_amarillas
     )
 
@@ -78,7 +80,10 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
         }
     }
 
-    override suspend fun lanzarDado(matchId: String, username: String): Pair<Int, List<Movimiento>> {
+    override suspend fun lanzarDado(
+        matchId: String,
+        username: String
+    ): Pair<Int, List<Movimiento>> {
         val response = api.rollDice(matchId, username)
         if (response.isSuccessful && response.body() != null) {
             val reply = response.body()!!
@@ -95,17 +100,52 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
         username: String,
         fichaId: Int,
         destinoId: Int,
-        pasosRestantes: Int?
-    ) {
-        val response = api.updatePawn(matchId, username, UpdatePawnRequest(destinoId - 1, fichaId, pasosRestantes))
+        pasosRestantes: Int?,
+        esBifurcacion: Boolean
+    ) : Boolean {
+        val casillaDestino = _tablero.value.casillas.getOrNull(destinoId - 1)
+        val destinoFinal = if (casillaDestino?.tipo == TipoCasilla.Serpiente && casillaDestino.saltoA != null) {
+            casillaDestino.saltoA - 1
+        } else {
+            destinoId - 1
+        }
+
+        val response = api.updatePawn(
+            matchId,
+            username,
+            UpdatePawnRequest(destinoFinal, fichaId, pasosRestantes)
+        )
         if (response.isSuccessful && response.body() != null) {
             val reply = response.body()!!
             updateState(reply, username)
+            val fichaActualizada = _fichas.value.find { it.id == fichaId && it.esUsuario }
+            val enEscalera = fichaActualizada?.let {
+                _tablero.value.casillas.getOrNull(it.casilla)?.tipo == TipoCasilla.Escalera
+            } ?: false
+            return esBifurcacion && enEscalera
+        } else {
+            return false
         }
     }
 
-    override suspend fun jugarCarta(matchId: String, username: String, cartaId: String, target: String?, inicio: Int?, fin: Int?) {
-        val response = api.playCard(matchId, username, JugarCartaRequest(cartaId, target, inicio, fin))
+    override suspend fun jugarCarta(
+        matchId: String,
+        username: String,
+        cartaId: String,
+        target: String?,
+        inicio: Int?,
+        fin: Int?
+    ) {
+        val inicioAux =
+            if(inicio == null) null
+            else inicio - 1
+
+        val finAux =
+            if(fin == null) null
+            else fin - 1
+
+        val response =
+            api.playCard(matchId, username, JugarCartaRequest(cartaId, target, inicioAux, finAux))
         if (response.isSuccessful && response.body() != null) {
             updateState(response.body()!!, username)
         }
@@ -127,7 +167,7 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
 
     private fun updateState(reply: PartidaReply, myUsername: String) {
         _tablero.value = reply.snapshotTablero.toDomain()
-        
+
         val snapshotJugadores = reply.snapshotJugadores.jugadores
         val partidaJugadores = reply.partidaJugadores
 
@@ -142,7 +182,7 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
             }
 
             skinMap[jug.username] = Pair(
-                infoExtra?.iconoActualField ?: "default",
+                infoExtra?.fichaActualField ?: "default",
                 playerColors.getOrElse(index) { Color.Gray }
             )
 
@@ -163,40 +203,48 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
             ronda = reply.snapshotJugadores.ronda,
             jugadores = jugadoresMapeados
         )
-        
+
         val allFichas = mutableListOf<FichaSnapshot>()
         snapshotJugadores.forEach { jug ->
             jug.fichas.forEach { f ->
-                allFichas.add(FichaSnapshot(
-                    idJugador = jug.username,
-                    id = f.id,
-                    casilla = f.casilla,
-                    meta = f.meta,
-                    esUsuario = jug.username == myUsername,
-                    idImg = skinMap[jug.username]?.first!!,
-                    color = skinMap[jug.username]?.second!!
-                ))
+                allFichas.add(
+                    FichaSnapshot(
+                        idJugador = jug.username,
+                        id = f.id,
+                        casilla = f.casilla,
+                        meta = f.meta,
+                        esUsuario = jug.username == myUsername,
+                        idImg = skinMap[jug.username]?.first!!,
+                        color = jugadoresMapeados.find { it.username == jug.username }?.color ?: Color.Gray
+                    )
+                )
             }
         }
         _fichas.value = allFichas
 
         // Actualizar mano y posible info extra del jugador local
         val localSnapshot = snapshotJugadores.find { it.username == myUsername }
-        _mano.value = localSnapshot?.mano?.map { 
+        _mano.value = localSnapshot?.mano?.map { nombre ->
             Carta(
-                //FIXME CREO Q NO NECESARIO
-                id = it.toIntOrNull(),
-                nombre = it,
-                descripcion = "Carta de mazo ${localSnapshot.mazo}",
+                id = nombre.toIntOrNull() ?: 0,
+                nombre = nombre,
+                descripcion = descripcionesCartas[nombre] ?: "Descripción no disponible",
                 tipo = Tipo_Carta.Ofensiva,
                 calidad = Calidad.Comun,
                 imagen = 0
             )
         } ?: emptyList()
 
+        _noqueado.value = localSnapshot?.efectosActivos?.any {
+            val efecto = it as? Map<*, *>
+            efecto?.get("resumenEfecto") == "Salto de turno"
+        } ?: false
+
         _chat.value = reply.chat.map { it.toDomain() }
 
-        _ganador.value = reply.ganador ?: ""
+        _ganador.value =
+            if (reply.ganador != null) reply.ganador!!.nombre
+            else ""
     }
 
     // --- Mapeos toDomain ---
@@ -216,7 +264,8 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
             efecto = this.efecto,
             tipo = mapTipoCasilla(this.tipo),
             siguientes = this.siguientes,
-            saltoA = this.saltoA
+            saltoA = if(this.saltoA == null) null
+                     else this.saltoA!! + 1
         )
     }
 
@@ -248,4 +297,28 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
             pasosRestantes = this.pasosRestantes?.toIntOrNull() ?: 0
         )
     }
+
+    val descripcionesCartas = mapOf(
+        "Exceso de medios" to "Tiras 2 dados",
+        "Moises" to "Te saltas un bloqueo",
+        "Wild Frank" to "Pones una serpiente donde quieras",
+        "Carpintero" to "Pones una escalera donde quieras",
+        "Dia de la marmota" to "Cambias la casilla para que quien caiga se mueva 4 casillas atrás",
+        "Salto de longitud" to "Cambias la casilla para que quien caiga se mueva 4 casillas adelante",
+        "Robo de identidad" to "Cambias la posicion de una de tus fichas por otra al azar",
+        "Mal de ojo" to "Le restas a un jugador 3 en su próxima tirada",
+        "Antidoto" to "La próxima serpiente en la que caigas no te hará bajar",
+        "Pickpocket" to "Robas una carta al azar a otro jugador",
+        "Dado envenenado" to "El rival solo puede tirar dados de 1-3 en su próximo turno",
+        "Dado dorado" to "Solo podrás sacar entre 4-6 en tu próxima tirada",
+        "Serpiente en tu bota" to "Creas una casilla que impide al jugador que caiga en ella tirar dados en su próximo turno",
+        "Parca" to "Mandas una ficha al azar al inicio del tablero",
+        "Cambiar de idea" to "Descarta todas las cartas de tu mano y roba nuevas hasta llenar tu mano",
+        "Agujero de serpiente" to "Crea una casilla que te teletransporta a una casilla aleatoria del tablero al caer en ella",
+        "Bolsillo roto" to "Le quitas todas las cartas a un jugador y solo podrá robar 1 carta",
+        "Compañerismo obligado" to "Teletransporta a tu ficha más atrás a la posición de una ficha aliada más avanzada",
+        "Coleccionista" to "Roba dos cartas en tu próximo turno",
+        "Noqueo" to "Cancela el próximo turno de un rival"
+    )
+
 }
