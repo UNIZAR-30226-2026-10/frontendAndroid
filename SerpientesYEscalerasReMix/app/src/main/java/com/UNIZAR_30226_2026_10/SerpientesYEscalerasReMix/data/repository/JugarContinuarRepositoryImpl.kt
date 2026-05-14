@@ -23,7 +23,7 @@ class JugarContinuarRepositoryImpl(private val api: ApiService) : JugarContinuar
     }
 
     private fun PartidaRegistroGetReply.toDomain() = RegistroPartida(
-        fecha = fecha,
+        fecha = fecha.take(10).split("-").reversed().joinToString("/"),
         jugadores = jugadores.joinToString(", "),
         id = iD,
         mapa = mapa

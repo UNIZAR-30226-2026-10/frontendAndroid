@@ -342,6 +342,7 @@ class PartidaViewModel(private val cF: CaseFacade) : ViewModel() {
                     it.copy(
                         casillaEscaleraIni = casillaId,
                         casillaEscaleraFin = _uiState.value.tablero.casillas[casillaId - 1].saltoA!! + 1,
+                        movCancelarEscalera = movAux
                     )
                 }
                 coordinarDialogos("Escalera")

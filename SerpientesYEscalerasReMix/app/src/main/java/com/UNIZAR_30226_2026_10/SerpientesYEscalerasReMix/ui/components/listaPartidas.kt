@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.domain.model.RegistroPartida
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.Destinos
@@ -97,7 +96,7 @@ fun TarjetaPartida(
     }
 }
 
-@Preview(showBackground = true, widthDp = 800, heightDp = 400)
+/*@Preview(showBackground = true, widthDp = 800, heightDp = 400)
 @Composable
 fun PreviewListaPartidas() {
     val partidasEjemplo = listOf(
@@ -105,4 +104,4 @@ fun PreviewListaPartidas() {
         RegistroPartida("2023-09-21", "Mapa2", "Jugador3, Jugador4", "2"),
     )
     ListaPartidas(navHost = null, partidas = partidasEjemplo, onTarjeta = {})
-}
+}*/

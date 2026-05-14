@@ -182,7 +182,7 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
             }
 
             skinMap[jug.username] = Pair(
-                infoExtra?.iconoActualField ?: "default",
+                infoExtra?.fichaActualField ?: "default",
                 playerColors.getOrElse(index) { Color.Gray }
             )
 
@@ -215,7 +215,7 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
                         meta = f.meta,
                         esUsuario = jug.username == myUsername,
                         idImg = skinMap[jug.username]?.first!!,
-                        color = skinMap[jug.username]?.second!!
+                        color = jugadoresMapeados.find { it.username == jug.username }?.color ?: Color.Gray
                     )
                 )
             }
@@ -224,11 +224,11 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
 
         // Actualizar mano y posible info extra del jugador local
         val localSnapshot = snapshotJugadores.find { it.username == myUsername }
-        _mano.value = localSnapshot?.mano?.map {
+        _mano.value = localSnapshot?.mano?.map { nombre ->
             Carta(
-                id = it.toIntOrNull(),
-                nombre = it,
-                descripcion = "Carta de mazo ${localSnapshot.mazo}",
+                id = nombre.toIntOrNull() ?: 0,
+                nombre = nombre,
+                descripcion = descripcionesCartas[nombre] ?: "Descripción no disponible",
                 tipo = Tipo_Carta.Ofensiva,
                 calidad = Calidad.Comun,
                 imagen = 0
@@ -295,4 +295,28 @@ class PartidaRepositoryImpl(private val api: ApiService) : PartidaRepository {
             pasosRestantes = this.pasosRestantes?.toIntOrNull() ?: 0
         )
     }
+
+    val descripcionesCartas = mapOf(
+        "Exceso de medios" to "Tiras 2 dados",
+        "Moises" to "Te saltas un bloqueo",
+        "Wild Frank" to "Pones una serpiente donde quieras",
+        "Carpintero" to "Pones una escalera donde quieras",
+        "Dia de la marmota" to "Cambias la casilla para que quien caiga se mueva 4 casillas atrás",
+        "Salto de longitud" to "Cambias la casilla para que quien caiga se mueva 4 casillas adelante",
+        "Robo de identidad" to "Cambias la posicion de una de tus fichas por otra al azar",
+        "Mal de ojo" to "Le restas a un jugador 3 en su próxima tirada",
+        "Antidoto" to "La próxima serpiente en la que caigas no te hará bajar",
+        "Pickpocket" to "Robas una carta al azar a otro jugador",
+        "Dado envenenado" to "El rival solo puede tirar dados de 1-3 en su próximo turno",
+        "Dado dorado" to "Solo podrás sacar entre 4-6 en tu próxima tirada",
+        "Serpiente en tu bota" to "Creas una casilla que impide al jugador que caiga en ella tirar dados en su próximo turno",
+        "Parca" to "Mandas una ficha al azar al inicio del tablero",
+        "Cambiar de idea" to "Descarta todas las cartas de tu mano y roba nuevas hasta llenar tu mano",
+        "Agujero de serpiente" to "Crea una casilla que te teletransporta a una casilla aleatoria del tablero al caer en ella",
+        "Bolsillo roto" to "Le quitas todas las cartas a un jugador y solo podrá robar 1 carta",
+        "Compañerismo obligado" to "Teletransporta a tu ficha más atrás a la posición de una ficha aliada más avanzada",
+        "Coleccionista" to "Roba dos cartas en tu próximo turno",
+        "Noqueo" to "Cancela el próximo turno de un rival"
+    )
+
 }

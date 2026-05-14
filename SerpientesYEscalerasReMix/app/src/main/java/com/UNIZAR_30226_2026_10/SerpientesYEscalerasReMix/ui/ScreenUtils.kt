@@ -7,6 +7,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.R
 import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.navigation.SENavHostController
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fichas_azules
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fichas_rojas
+import com.UNIZAR_30226_2026_10.SerpientesYEscalerasReMix.ui.theme.color_fichas_verdes
 
 @Composable
 fun fijarOrientacion(orientation: Int) {
@@ -82,6 +85,7 @@ fun buscarIconoEfectoR(efecto: String): Int {
         "+4" -> R.drawable.efecto_mas_cuatro
         "-4" -> R.drawable.efecto_menos_cuatro
         "Agujero de serpiente" -> R.drawable.efecto_agujero_de_serpiente
+        "Serpiente en tu bota" -> R.drawable.efecto_serpiente_en_tu_bota
         else -> R.drawable.debug_error
     }
 }
@@ -89,24 +93,24 @@ fun buscarIconoEfectoR(efecto: String): Int {
 // Busca Icono de ficha en R
 fun buscarIconoFichaR(ficha: String, color: Color): Int {
     return when (ficha) {
-        "ficha_aventurero" -> if (color == Color.Red) R.drawable.jugador_rojo_explorador
-        else if (color == Color.Blue) R.drawable.jugador_azul_explorador
-        else if (color == Color.Green) R.drawable.jugador_verde_explorador
+        "ficha_aventurero" -> if (color == color_fichas_rojas) R.drawable.jugador_rojo_explorador
+        else if (color == color_fichas_azules) R.drawable.jugador_azul_explorador
+        else if (color == color_fichas_verdes) R.drawable.jugador_verde_explorador
         else R.drawable.jugador_amarillo_explorador
 
-        "ficha_esqueleto" -> if (color == Color.Red) R.drawable.jugador_rojo_calavera
-        else if (color == Color.Blue) R.drawable.jugador_azul_calavera
-        else if (color == Color.Green) R.drawable.jugador_verde_calavera
+        "ficha_esqueleto" -> if (color == color_fichas_rojas) R.drawable.jugador_rojo_calavera
+        else if (color == color_fichas_azules) R.drawable.jugador_azul_calavera
+        else if (color == color_fichas_verdes) R.drawable.jugador_verde_calavera
         else R.drawable.jugador_amarillo_calavera
 
-        "ficha_totem" -> if (color == Color.Red) R.drawable.jugador_rojo_totem
-        else if (color == Color.Blue) R.drawable.jugador_azul_totem
-        else if (color == Color.Green) R.drawable.jugador_verde_totem
+        "ficha_totem" -> if (color == color_fichas_rojas) R.drawable.jugador_rojo_totem
+        else if (color == color_fichas_azules) R.drawable.jugador_azul_totem
+        else if (color == color_fichas_verdes) R.drawable.jugador_verde_totem
         else R.drawable.jugador_amarillo_totem
 
-        else -> if (color == Color.Red) R.drawable.jugador_rojo_explorador
-        else if (color == Color.Blue) R.drawable.jugador_azul_explorador
-        else if (color == Color.Green) R.drawable.jugador_verde_explorador
+        else -> if (color == color_fichas_rojas) R.drawable.jugador_rojo_explorador
+        else if (color == color_fichas_azules) R.drawable.jugador_azul_explorador
+        else if (color == color_fichas_verdes) R.drawable.jugador_verde_explorador
         else R.drawable.jugador_amarillo_explorador
     }
 }
